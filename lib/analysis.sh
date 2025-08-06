@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+SCRIPT_ROOT="$(cd "$(dirname "$0")"/.. && pwd)"
+source "$SCRIPT_ROOT/lib/validations/text-finders.sh"
+
 run_analysis() {
   
   dir="${1:-.}"
@@ -11,7 +14,9 @@ run_analysis() {
     }
     END { print count }
   ' {} +)
-  pumpWithoutDuration=$(grep -FoR --include='*.dart' 'tester.pump()' "$dir" | wc -l)
+
+  #pumpWithoutDuration=$(grep -FoR --include='*.dart' 'tester.pump()' "$dir" | wc -l)
+  pumpWithoutDuration=$(find-text-in-dart-test 'tester.pump()' "$dir")
   pumpAndSettleWithoutDuration=$(grep -FoR --include='*.dart' 'tester.pumpAndSettle()' "$dir" | wc -l)
   widgetPredicate=$(grep -FoR --include='*.dart' 'find.byWidgetPredicate(' "$dir" | wc -l)
   verifyArrowCount=$(grep -zoR --include='*.dart' -E 'verify\([^)]*\(\)[[:space:]]*=>' "$dir" | wc -l)
@@ -108,7 +113,7 @@ END { print count+0 }
     buildLongCount +
     testsLongCount
   ))
-
+  
   if [ "$total" -gt 0 ]; then
     printf "Nop!\n\n"
     printf "Tests Found: $testsCount\n"
@@ -117,8 +122,8 @@ END { print count+0 }
     printf "%-40s %4d %-10s\n" "PumpAndSettle without Duration:" "$pumpAndSettleWithoutDuration" "LOW"
     printf "%-40s %4d %-10s\n" "Expect on predicate:" "$widgetPredicate" "LOW"
     printf "%-40s %4d %-10s\n" "Expectation on Keys:"   "$expectKeysCount" "HIGH"
-    printf "%-40s %4d %-10s\n" "Verify method calls:"   "$verifyArrowCount+verifyNeverArrowCount" "HIGH"
-    printf "%-40s %4d %-10s\n" "Big Tests (>15 lines):"   "$testWidgetsLongCount+buildLongCount+testsLongCount" "HIGH"
+    printf "%-40s %4d %-10s\n" "Verify method calls:"   "$(($verifyArrowCount+verifyNeverArrowCount))" "HIGH"
+    printf "%-40s %4d %-10s\n" "Big Tests (>15 lines):"   "$(($testWidgetsLongCount+buildLongCount+testsLongCount))" "HIGH"
     printf "%-40s %4d %-10s\n" "Files with 1 Test:"   "$singleTestWidgetsFilesCount" "CRITICAL"
 
     printf "\n\n%-40s %4d\n" "Total Issues Found:"   "$total"
