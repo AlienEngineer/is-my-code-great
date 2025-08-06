@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+DIR="${1:-.}"
+source "$(dirname "$0")/../lib/analysis.sh"
+run_analysis "$DIR"
