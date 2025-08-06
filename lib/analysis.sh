@@ -2,10 +2,36 @@
 
 SCRIPT_ROOT="$(cd "$(dirname "$0")"/.. && pwd)"
 source "$SCRIPT_ROOT/lib/validations/text-finders.sh"
+source "$SCRIPT_ROOT/lib/validations/builder.sh"
+
 
 run_analysis() {
   
   dir="${1:-.}"
+
+  if [ ! -d "$dir" ]; then
+    echo "Directory $dir does not exist."
+    return 1
+  fi
+
+  source "$SCRIPT_ROOT/lib/validations/pump-without-duration.sh"
+
+  count_all=$(get_validations | wc -l)
+
+  if [ "$count_all" -gt 0 ]; then
+    printf "Nop!\n\n"
+  fi
+
+  printf "%-40s %4s %-10s\n" "Issues on Tests:" "#" "Severity"
+  get_validations | while read -r validation; do
+    printf "%-40s %4d %-10s\n" \
+      "$(get_title "$validation")" \
+      "$(get_result "$validation")" \
+      "$(get_severity "$validation")"
+  done
+
+  printf "\n\n\n\n\n\n"
+
   expectKeysCount=$(find "$dir" -name '*.dart' -exec awk '
     /expect[[:space:]]*\(/ { want=1; if ($0 ~ /find\.byKey/) { count++; want=0 } next }
     want {
@@ -15,7 +41,7 @@ run_analysis() {
     END { print count }
   ' {} +)
 
-  #pumpWithoutDuration=$(grep -FoR --include='*.dart' 'tester.pump()' "$dir" | wc -l)
+  
   pumpWithoutDuration=$(find-text-in-dart-test 'tester.pump()' "$dir")
   pumpAndSettleWithoutDuration=$(grep -FoR --include='*.dart' 'tester.pumpAndSettle()' "$dir" | wc -l)
   widgetPredicate=$(grep -FoR --include='*.dart' 'find.byWidgetPredicate(' "$dir" | wc -l)
