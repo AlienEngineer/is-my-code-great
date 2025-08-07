@@ -1,6 +1,7 @@
 #!]
 
   declare -a SEVERITY COMMAND TITLE VALIDATION EXECUTION_TIME
+  declare -i totalTestsExecutionTime=0
 
   function register_validation() {
     local check_name="$1"
@@ -68,16 +69,16 @@
     for time in "${EXECUTION_TIME[@]}"; do
       total=$((total + time))
     done
-    echo "$total"
+    echo "$((total+totalTestsExecutionTime))"
   }
 
   function print_validations() {
     local totalIssues=$(get_total_issues)
-    printf "%-40s %4d\n\n" "Total Issues Found:" "$totalIssues"
+    printf "%-40s %10d\n\n" "Total Issues Found:" "$totalIssues"
 
-    printf "%-40s %4s %-10s %15s\n" "Issues on Tests:" "#" "Severity" "Execution Time"
+    printf "%-40s %10s %-10s %15s\n" "Issues on Tests:" "#" "Severity" "Execution Time"
     get_validations | while read -r validation; do
-      printf "%-40s %4d %-10s %15s\n" \
+      printf "%-40s %10d %-10s %15s\n" \
         "$(get_title "$validation")" \
         "$(get_result "$validation")" \
         "$(get_severity "$validation")" \

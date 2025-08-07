@@ -13,7 +13,7 @@ function get_count_test_per_file() {
     if [ "$cnt" -eq 1 ]; then
       singleTestWidgetsFilesCount=$((singleTestWidgetsFilesCount+1))
     fi
-  done < <(find "$dir" -name '*.dart' -print0)
+  done < <(find "$dir" -name '*test.dart' -print0)
   echo "$singleTestWidgetsFilesCount"
 }
 

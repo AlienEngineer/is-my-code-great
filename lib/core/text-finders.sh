@@ -3,11 +3,15 @@
 function find-text-in-dart-test() {
   local pattern="$1"
   local dir="${2:-.}"
-  grep -FoR --include='*test.dart' "$pattern" "$dir" | wc -l
+  count=$(grep -FoR --include='*test.dart' "$pattern" "$dir" | wc -l)
+  echo "$((count+0))"
 }
 
 function find-regex-in-dart-test() {
   local pattern="$1"
   local dir="${2:-.}"
-  grep -zoR --include='*test.dart' -E "$pattern" "$dir" | wc -l
+  local count
+  local count
+  count=$(grep -RhoE "$pattern" --include='*test.dart' "$dir" | wc -l)
+  echo "$((count+0))"
 }

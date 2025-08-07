@@ -14,17 +14,22 @@ run_analysis() {
     return 1
   fi
 
+  # source "$SCRIPT_ROOT/lib/validations/widgets-predicate.sh"
+  # source "$SCRIPT_ROOT/lib/validations/big-test-files.sh"
+
+  printf "Evaluating...\n"
+  printf "Is my code great? "
   VALIDATIONS_DIR="$SCRIPT_ROOT/lib/validations"
   for script in "$VALIDATIONS_DIR"/*.sh; do
     [ -r "$script" ] && source "$script"
   done
 
+  local totalTests=$(get_total_tests)
   local totalIssues=$(get_total_issues)
   if [ "$totalIssues" -gt 0 ]; then
     printf "Nop!\n\n"
 
-    local totalTests=$(get_total_tests)
-    printf "%-40s %4d\n" "Total Tests:" "$totalTests"
+    printf "%-40s %10d\n" "Total Tests:" "$totalTests"
     print_validations
   else
     echo "Oh My God! You've done good!"
