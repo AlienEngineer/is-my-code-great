@@ -39,6 +39,7 @@ jobs:
           
       - name: Update formula
         run: |
+         cd homebrew-tap
          cat > Formula/is-my-code-great.rb <<EOF 
          class IsMyCodeGreat < Formula
            desc "CLI to analyse Dart test code quality"
@@ -59,7 +60,6 @@ jobs:
 
       - name: Commit & push
         run: |
-          cd homebrew-tap
           git add Formula/is-my-code-great.rb
           git commit -m "Automated formula update to ${{ env.version }}"
           git push origin HEAD:main
