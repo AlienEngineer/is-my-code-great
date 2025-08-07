@@ -40,22 +40,22 @@ jobs:
       - name: Update formula
         run: |
          cat > Formula/is-my-code-great.rb <<EOF 
-            class IsMyCodeGreat < Formula
-              desc "CLI to analyse Dart test code quality"
-              homepage "https://github.com/alienengineer/is-my-code-great"
-              url      "https://github.com/alienengineer/is-my-code-great/archive/${{ env.version }}.tar.gz"
-              sha256   "${{ env.sha256 }}"}"
+         class IsMyCodeGreat < Formula
+           desc "CLI to analyse Dart test code quality"
+           homepage "https://github.com/alienengineer/is-my-code-great"
+           url      "https://github.com/alienengineer/is-my-code-great/archive/${{ env.version }}.tar.gz"
+           sha256   "${{ env.sha256 }}"}"
 
-              def install
-                lib.install Dir["lib/*"]
-                bin.install "bin/is-my-code-great"
-              end
+           def install
+             lib.install Dir["lib/*"]
+             bin.install "bin/is-my-code-great"
+           end
 
-              test do
-                system "#{bin}/is-my-code-great", "--help"
-              end
-            end
-          EOF
+           test do
+             system "#{bin}/is-my-code-great", "--help"
+           end
+         end
+         EOF
 
       - name: Commit & push
         run: |
