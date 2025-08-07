@@ -5,7 +5,6 @@ source "$SCRIPT_ROOT/lib/core/text-finders.sh"
 source "$SCRIPT_ROOT/lib/core/builder.sh"
 source "$SCRIPT_ROOT/lib/core/tests.sh"
 
-
 run_analysis() {
   
   dir="${1:-.}"
@@ -32,6 +31,7 @@ run_analysis() {
     return 0
   fi
 
+  printf "\n\nCode evaluated in %d ms\n" "$(get_total_execution_time)"
 
   
 
@@ -44,10 +44,6 @@ run_analysis() {
     END { print count }
   ' {} +)
 
-
-  widgetPredicate=$(grep -FoR --include='*.dart' 'find.byWidgetPredicate(' "$dir" | wc -l)
-  verifyArrowCount=$(grep -zoR --include='*.dart' -E 'verify\([^)]*\(\)[[:space:]]*=>' "$dir" | wc -l)
-  verifyNeverArrowCount=$(grep -zoR --include='*.dart' -E 'verifyNever\([^)]*\(\)[[:space:]]*=>' "$dir" | wc -l)
   singleTestWidgetsFilesCount=0
   while IFS= read -r -d '' file; do
     cnt=$(grep -Fo 'testWidgets(' "$file" | wc -l)
@@ -123,37 +119,11 @@ END { print count+0 }
 
 
 
-
-  testWidgetsCount=$(grep -FoR --include='*.dart' 'testWidgets(' "$dir" | wc -l)
-  testCount=$(grep -FoR --include='*.dart' 'test(' "$dir" | wc -l)
-  testBlocCount=$(grep -FoR --include='*.dart' 'blocTest<' "$dir" | wc -l)
-  testsCount=$((testWidgetsCount + testCount + testBlocCount))
-
-  total=$((
-    expectKeysCount + 
-    testWidgetsLongCount + 
-    pumpWithoutDuration + 
-    pumpAndSettleWithoutDuration + 
-    verifyArrowCount+verifyNeverArrowCount + 
-    singleTestWidgetsFilesCount +
-    widgetPredicate +
-    buildLongCount +
-    testsLongCount
-  ))
-  
-  if [ "$total" -gt 0 ]; then
-    printf "Nop!\n\n"
-    printf "Tests Found: $testsCount\n"
+    printf "\n\n"
     printf "%-40s %4s %-10s\n" "Issues on Tests:" "#" "Severity"
-    printf "%-40s %4d %-10s\n" "Expect on predicate:" "$widgetPredicate" "LOW"
     printf "%-40s %4d %-10s\n" "Expectation on Keys:"   "$expectKeysCount" "HIGH"
-    printf "%-40s %4d %-10s\n" "Verify method calls:"   "$(($verifyArrowCount+verifyNeverArrowCount))" "HIGH"
     printf "%-40s %4d %-10s\n" "Big Tests (>15 lines):"   "$(($testWidgetsLongCount+buildLongCount+testsLongCount))" "HIGH"
     printf "%-40s %4d %-10s\n" "Files with 1 Test:"   "$singleTestWidgetsFilesCount" "CRITICAL"
 
-    printf "\n\n%-40s %4d\n" "Total Issues Found:"   "$total"
-  else
-    echo "Oh My God! You've done good!"
-  fi
 
 }
