@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
 SCRIPT_ROOT="$(cd "$(dirname "$0")"/.. && pwd)"
-source "$SCRIPT_ROOT/lib/validations/text-finders.sh"
-source "$SCRIPT_ROOT/lib/validations/builder.sh"
+source "$SCRIPT_ROOT/lib/core/text-finders.sh"
+source "$SCRIPT_ROOT/lib/core/builder.sh"
+source "$SCRIPT_ROOT/lib/core/tests.sh"
 
 
 run_analysis() {
@@ -14,23 +15,25 @@ run_analysis() {
     return 1
   fi
 
-  source "$SCRIPT_ROOT/lib/validations/pump-without-duration.sh"
-
-  count_all=$(get_validations | wc -l)
-
-  if [ "$count_all" -gt 0 ]; then
-    printf "Nop!\n\n"
-  fi
-
-  printf "%-40s %4s %-10s\n" "Issues on Tests:" "#" "Severity"
-  get_validations | while read -r validation; do
-    printf "%-40s %4d %-10s\n" \
-      "$(get_title "$validation")" \
-      "$(get_result "$validation")" \
-      "$(get_severity "$validation")"
+  VALIDATIONS_DIR="$SCRIPT_ROOT/lib/validations"
+  for script in "$VALIDATIONS_DIR"/*.sh; do
+    [ -r "$script" ] && source "$script"
   done
 
-  printf "\n\n\n\n\n\n"
+  local totalIssues=$(get_total_issues)
+  if [ "$totalIssues" -gt 0 ]; then
+    printf "Nop!\n\n"
+
+    local totalTests=$(get_total_tests)
+    printf "%-40s %4d\n" "Total Tests:" "$totalTests"
+    print_validations
+  else
+    echo "Oh My God! You've done good!"
+    return 0
+  fi
+
+
+  
 
   expectKeysCount=$(find "$dir" -name '*.dart' -exec awk '
     /expect[[:space:]]*\(/ { want=1; if ($0 ~ /find\.byKey/) { count++; want=0 } next }
@@ -41,9 +44,7 @@ run_analysis() {
     END { print count }
   ' {} +)
 
-  
-  pumpWithoutDuration=$(find-text-in-dart-test 'tester.pump()' "$dir")
-  pumpAndSettleWithoutDuration=$(grep -FoR --include='*.dart' 'tester.pumpAndSettle()' "$dir" | wc -l)
+
   widgetPredicate=$(grep -FoR --include='*.dart' 'find.byWidgetPredicate(' "$dir" | wc -l)
   verifyArrowCount=$(grep -zoR --include='*.dart' -E 'verify\([^)]*\(\)[[:space:]]*=>' "$dir" | wc -l)
   verifyNeverArrowCount=$(grep -zoR --include='*.dart' -E 'verifyNever\([^)]*\(\)[[:space:]]*=>' "$dir" | wc -l)
@@ -144,8 +145,6 @@ END { print count+0 }
     printf "Nop!\n\n"
     printf "Tests Found: $testsCount\n"
     printf "%-40s %4s %-10s\n" "Issues on Tests:" "#" "Severity"
-    printf "%-40s %4d %-10s\n" "Pump without Duration:" "$pumpWithoutDuration" "LOW"
-    printf "%-40s %4d %-10s\n" "PumpAndSettle without Duration:" "$pumpAndSettleWithoutDuration" "LOW"
     printf "%-40s %4d %-10s\n" "Expect on predicate:" "$widgetPredicate" "LOW"
     printf "%-40s %4d %-10s\n" "Expectation on Keys:"   "$expectKeysCount" "HIGH"
     printf "%-40s %4d %-10s\n" "Verify method calls:"   "$(($verifyArrowCount+verifyNeverArrowCount))" "HIGH"

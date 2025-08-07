@@ -5,7 +5,7 @@ source "$SCRIPT_ROOT/lib/core/text-finders.sh"
 source "$SCRIPT_ROOT/lib/core/builder.sh"
 
 register_validation \
-    "pump-without-duration" \
+    "widgets-predicate" \
     "LOW" \
-    "find-text-in-dart-test 'tester.pump()' \"$dir\"" \
-    "Pump without duration:"
+    "find-text-in-dart-test 'find.byWidgetPredicate(' \"$dir\"" \
+    "Expect on predicate:"
