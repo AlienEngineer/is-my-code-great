@@ -29,14 +29,17 @@ jobs:
           echo "sha256=$SHA" >> $GITHUB_ENV
           echo "version=$TAG" >> $GITHUB_ENV
           
-      - name: Push new version
-        env:
-          TARGET_REPO_TOKEN: ${{ secrets.TARGET_REPO_TOKEN }} //PAT
+      - name: Clone homebrew-tap
         run: |
           git config --global user.name "AlienEngineer"
           git config --global user.email "AlienEngineer@gmail.com"
-          git clone https://AlienEngineer:${TARGET_REPO_TOKEN}@github.com/AlienEngineer/homebrew-tap.git
-          cat > Formula/is-my-code-great.rb <<EOF 
+          git clone https://AlienEngineer:${{TARGET_REPO_TOKEN}}@github.com/AlienEngineer/homebrew-tap.git
+          
+      - name: Update formula
+        env:
+          TARGET_REPO_TOKEN: ${{ secrets.TARGET_REPO_TOKEN }}
+        run: |
+         cat > Formula/is-my-code-great.rb <<EOF 
             class IsMyCodeGreat < Formula
               desc "CLI to analyse Dart test code quality"
               homepage "https://github.com/alienengineer/is-my-code-great"
@@ -54,6 +57,9 @@ jobs:
             end
           EOF
 
-          git add .
-          git commit -m "Automated commit"
-          git push
+      - name: Commit & push
+        run: |
+          cd homebrew-tap
+          git add Formula/is-my-code-great.rb
+          git commit -m "Automated formula update to ${{ env.version }}"
+          git push origin HEAD:main
