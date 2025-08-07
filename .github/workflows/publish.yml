@@ -18,7 +18,13 @@ jobs:
 
       - name: Get tag SHA
         run: |
-          echo "SHA via env: $GITHUB_SHA"
           TAG=${GITHUB_REF#refs/tags/}
-          echo "SHA via git: $(git rev-parse $TAG)"
           echo "$TAG"
+          URL="https://github.com/alienengineer/is-my-code-great/archive/$TAG.tar.gz"
+          echo "$URL"
+          curl -LJO $URL
+          FILE="is-my-code-great-${TAG#v}.tar.gz"
+          SHA=$(shasum -a256 $FILE | awk '{print $1}')
+          echo $SHA
+          echo "sha256=$SHA" >> $GITHUB_ENV
+          
