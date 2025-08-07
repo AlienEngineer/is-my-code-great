@@ -21,3 +21,4 @@ jobs:
           echo "SHA via env: $GITHUB_SHA"
           TAG=${GITHUB_REF#refs/tags/}
           echo "SHA via git: $(git rev-parse $TAG)"
+          echo "$TAG"
