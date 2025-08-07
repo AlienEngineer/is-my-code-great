@@ -1,4 +1,141 @@
 #!/usr/bin/env bash
+
+
+usage() {
+  cat <<EOF
+usage: is-my-code-great <dir>
+  <dir> is optional, if not provided it will run the script in the current folder.
+
+is-my-code-great --help
+  - shows this help
+
+is-my-code-great --help <evaluation>
+  - shows explanation for each evaluation, please provide one of:
+    - Verify method calls
+    - Big Tests
+    - Files with 1 test
+    - PumpAndSettle without duration
+    - Pump without duration
+    - Expect on predicate
+    - Expect on keys
+EOF
+}
+
+explain() {
+  case "$1" in
+    "PumpAndSettle without duration")
+      cat <<EOF
+Expect on keys:
+  SEVERITY:     LOW
+  DESCRIPTION:  PumpAndSettle without duration in tests
+
+  - This validation calculates the number of times a test uses 'tester.pumpAndSettle()' 
+    without a duration parameter.
+
+  - It is recommended to use a duration to increase performance.
+EOF
+    ;;
+    "Pump without duration")
+      cat <<EOF
+Expect on keys:
+  SEVERITY:     LOW
+  DESCRIPTION:  Pump without duration in tests
+
+  - This validation calculates the number of times a test uses 'tester.pump()' without a 
+    duration parameter.
+
+  - It is recommended to use a duration to increase performance.
+EOF
+    ;;
+    "Expect on keys")
+      cat <<EOF
+Expect on keys:
+  SEVERITY:     HIGH
+  DESCRIPTION:  Expect on keys in tests
+
+  - There's a BEEP that describes why this is not recommended, but in short:
+  
+  - Using expect on keys in tests can lead to brittle tests, as it relies on the
+    implementation details of the code under test.
+
+  - In shot, we could replace a widget with another one that has the same keys, but different values,
+    and the test would still pass, even though the behavior of the widget has changed.
+
+EOF
+    ;;
+    "Expect on predicate")
+      cat <<EOF
+Expect on keys:
+  SEVERITY:     LOW
+  DESCRIPTION:  Expect on keys in tests
+
+  - This can make it very hard to understand why a test is failing, as the predicate can be complex 
+    and not easily readable.
+
+  - It much better to retrieve the widget we want to test, then use expect on its properties, 
+    rather than using expect on a predicate.
+EOF
+      ;;
+    "Verify method calls")
+      cat <<EOF
+Verify method calls:
+  SEVERITY:     LOW
+  DESCRIPTION:  Verify method calls in tests
+
+  - This type of expectation in tests makes the tests rely on the implementation details 
+    of the code under test, which can lead to brittle tests.
+
+  - It is better to use expectations on the state of the system after the method call, 
+    rather than checking that a specific method was called.
+
+  - This validation counts the number of times a method call is checked in the tests.
+
+EOF
+      ;;
+    "Big Tests")
+      cat <<EOF
+Big Tests:
+  SEVERITY:     HIGH
+  DESCRIPTION:  Identifies tests that are longer than a threshold.
+
+  - This validation checks the length of tests and identifies those that exceed a certain threshold.
+
+  - Long tests can be a sign of poor test design, as they may be testing too many things at once.
+
+  - It is recommended to keep tests short and focused on a single behavior or functionality.
+
+  - Might be a sign that we are missing some refactoring in the test code.
+
+EOF
+      ;;
+    "Files with 1 test")
+      cat <<EOF
+Files with 1 test:
+  SEVERITY:     CRITICAL
+  DESCRIPTION:  Identifies files that contain exactly one test.
+
+  - Having only one test in a file can indicate that we are missing tests, as tests are complementary to each other.
+
+EOF
+      ;;
+    *)
+      echo "Unknown evaluation: $1"
+      usage
+      exit 1
+      ;;
+  esac
+}
+
+if [[ "$1" == "--help" ]]; then
+  if [[ -z "$2" ]]; then
+    usage
+  else
+    explain "$2"
+  fi
+  exit 0
+fi
+
+
 DIR="${1:-.}"
 source "$(dirname "$0")/../lib/analysis.sh"
 run_analysis "$DIR"
