@@ -31,5 +31,4 @@ run_analysis() {
   fi
 
   printf "\n\nCode evaluated in %d ms\n" "$(get_total_execution_time)"
-  return 1
 }
