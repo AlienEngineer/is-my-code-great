@@ -1,6 +1,8 @@
 # is-my-code-great
 Command-line tool to verify arbitrary aspects about code.
 
+## for windows users
+[brew for windows](https://docs.brew.sh/Installation#linux-or-windows-10-subsystem-for-linux)
 
 ## install
 
