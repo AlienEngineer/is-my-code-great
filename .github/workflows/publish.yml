@@ -60,6 +60,7 @@ jobs:
 
       - name: Commit & push
         run: |
+          cd homebrew-tap
           git add Formula/is-my-code-great.rb
           git commit -m "Automated formula update to ${{ env.version }}"
           git push origin HEAD:main
