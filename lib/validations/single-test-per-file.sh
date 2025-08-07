@@ -7,14 +7,8 @@ source "$SCRIPT_ROOT/lib/core/builder.sh"
 # TODO: take into account other types of tests, not only testWidgets
 #       e.g. test, testBloc, others?
 function get_count_test_per_file() {
-  singleTestWidgetsFilesCount=0
-  while IFS= read -r -d '' file; do
-    cnt=$(grep -Fo 'testWidgets(' "$file" | wc -l)
-    if [ "$cnt" -eq 1 ]; then
-      singleTestWidgetsFilesCount=$((singleTestWidgetsFilesCount+1))
-    fi
-  done < <(find "$dir" -name '*test.dart' -print0)
-  echo "$singleTestWidgetsFilesCount"
+  grep -Frc 'testWidgets(' --include='*test.dart' "$dir" \
+    | awk -F: '$2==1 {c++} END {print c+0}'
 }
 
 register_validation \

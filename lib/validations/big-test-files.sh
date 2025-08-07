@@ -5,28 +5,24 @@ source "$SCRIPT_ROOT/lib/core/text-finders.sh"
 source "$SCRIPT_ROOT/lib/core/builder.sh"
 
 function get_count_test_widgets_long() {
-  testWidgetsLongCount=$(find "$dir" -name '*test.dart' -print0 | xargs -0 awk '
+  find "$dir" -name '*test.dart' -exec awk -v threshold=15 '
     /testWidgets/ {
       inBlock=1
-      nOpen = gsub(/\{/, "")
-      nClose = gsub(/\}/, "")
-      brace = nOpen - nClose
+      brace = gsub(/\{/, "") - gsub(/\}/, "")
       lines=0
       next
     }
     inBlock {
-      nOpen = gsub(/\{/, "")
-      nClose = gsub(/\}/, "")
-      brace += nOpen - nClose
+      brace += gsub(/\{/, "") - gsub(/\}/, "")
       if (brace>0) lines++
       else {
-        if (lines>15) count++
+        count += (lines>threshold)
         inBlock=0
       }
     }
-    END {print count+0}
-  ' | awk '{sum+=$1} END{print sum}')
-  echo "$testWidgetsLongCount"
+    END { print count+0 }
+  ' {} \+ \
+  | awk '{sum += $1} END {print sum}'
 }
 
 function get_count_tests_long() {
