@@ -45,7 +45,7 @@ jobs:
            desc "CLI to analyse Dart test code quality"
            homepage "https://github.com/alienengineer/is-my-code-great"
            url      "https://github.com/alienengineer/is-my-code-great/archive/${{ env.version }}.tar.gz"
-           sha256   "${{ env.sha256 }}"}"
+           sha256   "${{ env.sha256 }}"
 
            def install
              lib.install Dir["lib/*"]
