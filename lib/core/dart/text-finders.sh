@@ -52,36 +52,13 @@ function _get_git_files() {
 }
 
 function find_regex_in_dart_test_for_git() {
-    local base_branch="main"
-    local current_branch="$(git rev-parse --abbrev-ref HEAD)"
-    local dir="."
-
-    while [[ $# -gt 0 ]]; do
-        case "$1" in
-            --base)
-                base_branch="$2"
-                shift 2
-                ;;
-            --current)
-                current_branch="$2"
-                shift 2
-                ;;
-            --dir)
-                dir="$2"
-                shift 2
-                ;;
-            *)
-                echo "❌ Unknown arg: $1"
-                return 1
-                ;;
-        esac
-    done
+    
+    local pattern="$1"
+    local dir="${2:-.}"
+    local base_branch="${3:-main}"
+    local current_branch="${4:-$(git rev-parse --abbrev-ref HEAD)}"
 
     local original_dir=$(pwd)
-    cd "$dir" || {
-        echo "❌ unable to find: $dir"
-        return 1
-    }
 
     _validate_git_repo "$base_branch" "$current_branch" || {
         cd "$original_dir"
@@ -109,36 +86,12 @@ function find_text_in_dart_test_for_local() {
 }
 
 function find_text_in_dart_test_for_git() {
-    local base_branch="main"
-    local current_branch="$(git rev-parse --abbrev-ref HEAD)"
-    local dir="."
-
-    while [[ $# -gt 0 ]]; do
-        case "$1" in
-            --base)
-                base_branch="$2"
-                shift 2
-                ;;
-            --current)
-                current_branch="$2"
-                shift 2
-                ;;
-            --dir)
-                dir="$2"
-                shift 2
-                ;;
-            *)
-                echo "❌ Unknown arg: $1"
-                return 1
-                ;;
-        esac
-    done
+    local pattern="$1"
+    local dir="${2:-.}"
+    local base_branch="${3:-main}"
+    local current_branch="${4:-$(git rev-parse --abbrev-ref HEAD)}"
 
     local original_dir=$(pwd)
-    cd "$dir" || {
-        echo "❌ unable to find: $dir"
-        return 1
-    }
 
     _validate_git_repo "$base_branch" "$current_branch" || {
         cd "$original_dir"
