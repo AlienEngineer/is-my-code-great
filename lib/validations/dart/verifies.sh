@@ -5,9 +5,9 @@ source "$SCRIPT_ROOT/lib/core/dart/text-finders.sh"
 source "$SCRIPT_ROOT/lib/core/builder.sh"
 
 function get_verifies_count() {
- verifyCount=$(find_regex_in_dart_test 'verify\([^)]*\(\)[[:space:]]*=>' "$dir")
- verifyNevercount=$(find_regex_in_dart_test 'verifyNever\([^)]*\(\)[[:space:]]*=>' "$dir")
- echo $((verifyCount + verifyNevercount))
+    verifyCount=$(find_regex_in_dart_test 'verify\([^)]*\(\)[[:space:]]*=>' "$dir")
+    verifyNevercount=$(find_regex_in_dart_test 'verifyNever\([^)]*\(\)[[:space:]]*=>' "$dir")
+    echo $((verifyCount + verifyNevercount))
 }
 
 register_validation \

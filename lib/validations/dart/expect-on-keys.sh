@@ -6,8 +6,8 @@ source "$SCRIPT_ROOT/lib/core/builder.sh"
 
 # TODO: take into account other types of tests, not only testWidgets
 #       e.g. test, testBloc, others?
-function get_count_expect_on_keys() {
-  expectKeysCount=$(  find "$dir" -name '*test.dart' -exec awk '
+function _get_count_expect_on_keys() {
+    expectKeysCount=$(find "$dir" -name '*test.dart' -exec awk '
     /expect[[:space:]]*\(/ { want=1; if ($0 ~ /find\.byKey/) { count++; want=0 } next }
     want {
       if (/find\.byKey/) { count++; want=0 }
@@ -15,11 +15,11 @@ function get_count_expect_on_keys() {
     }
     END { print count }
   ' {} + | awk '{sum+=$1} END{print sum}')
-  echo "$expectKeysCount"
+    echo "$expectKeysCount"
 }
 
 register_validation \
     "expect-on-keys" \
     "HIGH" \
-    "get_count_expect_on_keys" \
+    "_get_count_expect_on_keys" \
     "Expectation on Keys:"

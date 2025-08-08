@@ -2,12 +2,20 @@
 #!/usr/bin/env bash
 
 show_help() {
-	head -n 100 "$(dirname "$0")/../man/is-my-code-great.1"
+	local manfile="$(dirname "$0")/../man/is-my-code-great.1"
+	if command -v less >/dev/null 2>&1; then
+		less "$manfile"
+	else
+		head -n 100 "$manfile"
+	fi
 }
 
 FRAMEWORK=""
 DIR=""
 VERBOSE=0
+BASE_BRANCH="main"
+CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+LOCAL_RUN=true
 
 while [[ $# -gt 0 ]]; do
 	case $1 in
@@ -19,6 +27,16 @@ while [[ $# -gt 0 ]]; do
 			FRAMEWORK="$2"
 			shift 2
 			;;
+        -b|--base)
+            LOCAL_RUN=false
+            BASE_BRANCH="$2"
+            shift 2
+            ;;
+        -c|--current)
+            LOCAL_RUN=false
+            CURRENT_BRANCH="$2"
+            shift 2
+            ;;
 		-v|--verbose)
 			VERBOSE=1
 			shift
@@ -43,7 +61,6 @@ if [ -z "$DIR" ]; then
 	DIR="."
 fi
 
-# Framework detection logic moved to its own file
 source "$(dirname "$0")/../lib/core/framework-detect.sh"
 
 if [ -z "$FRAMEWORK" ]; then
@@ -58,4 +75,4 @@ if [ -z "$FRAMEWORK" ]; then
 fi
 
 source "$(dirname "$0")/../lib/analysis.sh"
-run_analysis "$DIR" "$FRAMEWORK"
+run_analysis "$DIR" "$FRAMEWORK" "$BASE_BRANCH" "$CURRENT_BRANCH" "$LOCAL_RUN"

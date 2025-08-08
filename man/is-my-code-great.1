@@ -10,11 +10,18 @@ DESCRIPTION
     By default, it analyzes Flutter/Dart projects, but is designed to be extensible to other frameworks (such as C#) in the future. The tool can auto-detect the framework based on files in the directory, or you can specify it explicitly.
 
 OPTIONS
+
     -h, --help
         Show this help message and exit.
 
     -f, --framework FRAMEWORK
         Specify the framework to analyze (e.g., dart, csharp). If not provided, the tool will attempt to auto-detect based on project files.
+
+    -b, --base BRANCH
+        Specify the base branch for git comparison. Implies a git-based analysis.
+
+    -c, --current BRANCH
+        Specify the current branch for git comparison. Implies a git-based analysis.
 
     -v, --verbose
         Enable verbose output.
@@ -23,26 +30,38 @@ OPTIONS
         The path to the project directory to analyze. Defaults to the current directory if not specified.
 
 VALIDATIONS
-    big-test-files
+    big-test-files (SEVERITY: HIGH)
         Detects test functions or methods that are longer than 15 lines.
+        Long tests can be a sign of poor test design, as they may be testing too many things at once.
+        It is recommended to keep tests short and focused on a single behavior or functionality.
+        Might be a sign that we are missing some refactoring in the test code.
 
-    single-test-per-file
+    single-test-per-file (SEVERITY: CRITICAL)
         Counts files that contain exactly one test function or method.
+        Having only one test in a file can indicate that we are missing tests, as tests are complementary to each other.
 
-    expect-on-keys
-        Counts the number of expect statements that use a key-based finder (e.g., find.byKey).
+    expect-on-keys (SEVERITY: HIGH)
+        Counts the number of expect statements that use a key-based finder (e.g., find.byKey). 
+        There's a BEEP that describes why this is not recommended, but in short:
+            - Using expect on keys in tests can lead to brittle tests, as it relies on the implementation details of the code under test.
+            - In short, we could replace a widget with another one that has the same keys, but different values and the test would still pass, even though the behavior of the widget has changed.
 
-    pump-and-settle-without-duration
-        Counts occurrences of tester.pumpAndSettle() without a duration argument.
+    pump-and-settle-without-duration (SEVERITY: LOW)
+        Counts occurrences of tester.pumpAndSettle() without a duration argument. 
+        It is recommended to use a duration to increase performance.
 
-    pump-without-duration
-        Counts occurrences of tester.pump() without a duration argument.
+    pump-without-duration (SEVERITY: LOW)
+        Counts occurrences of tester.pump() without a duration argument. 
+        It is recommended to use a duration to increase performance.
 
-    verifies
-        Counts the number of verify and verifyNever calls.
+    verifies (SEVERITY: LOW)
+        Counts the number of times a method call is checked in the tests. 
+        This type of expectation in tests makes the tests rely on the implementation details of the code under test, which can lead to brittle tests.
+        It is better to use expectations on the state of the system after the method call, rather than checking that a specific method was called.
 
-    widgets-predicate
-        Counts the number of times find.byWidgetPredicate is used in tests.
+    widgets-predicate (SEVERITY: LOW)
+        Counts the number of times find.byWidgetPredicate is used in tests. This can make it very hard to understand why a test is failing, as the predicate can be complex and not easily readable.
+        It much better to retrieve the widget we want to test, then use expect on its properties, rather than using expect on a predicate.
 
 EXAMPLES
     Analyze the current directory (auto-detect framework):
