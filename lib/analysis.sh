@@ -23,14 +23,6 @@ run_analysis() {
         return 1
     fi
 
-    if [ "$local_run" = true ]; then
-        [ "$VERBOSE" = "1" ] && printf "Evaluating:\n$dir \n\n"
-        use_local
-    else
-        [ "$VERBOSE" = "1" ] && printf "Evaluating: $base_branch vs $current_branch on dir: \n$dir \n\n"
-        use_git
-    fi
-
     VALIDATIONS_DIR="$SCRIPT_ROOT/lib/validations/$framework"
     if [ ! -d "$VALIDATIONS_DIR" ]; then
         echo "No validations found for framework: $framework" >&2
@@ -40,6 +32,7 @@ run_analysis() {
     for script in "$VALIDATIONS_DIR"/*.sh; do
         [ -r "$script" ] && source "$script"
     done
+
 
     printf "\nIs my code great? "
 

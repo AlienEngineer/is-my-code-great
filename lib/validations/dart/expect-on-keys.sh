@@ -21,7 +21,7 @@ function _get_count_expect_on_keys_git() {
   original_dir=$(pwd)
   cd "$dir" || { echo "❌ Dir not found: $dir" >&2; return 1; }
 
-  _validate_git_repo "$base_branch", "$current_branch" || { cd "$original_dir"; return 1; }
+  _validate_git_repo "$base_branch" "$current_branch" || { cd "$original_dir"; return 1; }
 
   local files
   files="$(get_git_files "$base_branch" "$current_branch")"
@@ -48,7 +48,7 @@ function _get_count_expect_on_keys_git() {
 }
 
 function _find_expect_on_keys() {
-    if [ "$local_run" ]; then
+    if [ "$Local_run" = true ]; then
         _get_count_expect_on_keys
     else
         _get_count_expect_on_keys_git
