@@ -1,28 +1,37 @@
 #!/usr/bin/env bash
 
 SCRIPT_ROOT="$(cd "$(dirname "$0")"/.. && pwd)"
-source "$SCRIPT_ROOT/lib/core/text-finders.sh"
 source "$SCRIPT_ROOT/lib/core/builder.sh"
-source "$SCRIPT_ROOT/lib/core/tests.sh"
 
 run_analysis() {
-  
   dir="${1:-.}"
+  framework="$2"
+
+  # Source framework-specific core files
+  if [ -f "$SCRIPT_ROOT/lib/core/$framework/text-finders.sh" ]; then
+    source "$SCRIPT_ROOT/lib/core/$framework/text-finders.sh"
+  fi
+  if [ -f "$SCRIPT_ROOT/lib/core/$framework/tests.sh" ]; then
+    source "$SCRIPT_ROOT/lib/core/$framework/tests.sh"
+  fi
 
   if [ ! -d "$dir" ]; then
     echo "Directory $dir does not exist."
     return 1
   fi
 
-  # source "$SCRIPT_ROOT/lib/validations/widgets-predicate.sh"
-  # source "$SCRIPT_ROOT/lib/validations/big-test-files.sh"
-
   printf "Evaluating...\n"
-  printf "Is my code great? "
-  VALIDATIONS_DIR="$SCRIPT_ROOT/lib/validations"
+  
+  VALIDATIONS_DIR="$SCRIPT_ROOT/lib/validations/$framework"
+  if [ ! -d "$VALIDATIONS_DIR" ]; then
+    echo "No validations found for framework: $framework" >&2
+    return 1
+  fi
   for script in "$VALIDATIONS_DIR"/*.sh; do
     [ -r "$script" ] && source "$script"
   done
+
+  printf "\nIs my code great? "
 
   local totalTests=$(get_total_tests)
   local totalIssues=$(get_total_issues)

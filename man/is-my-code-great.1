@@ -1,0 +1,61 @@
+NAME
+    is-my-code-great - Test code verification tool
+
+SYNOPSIS
+    is-my-code-great [OPTIONS] [DIRECTORY]
+
+DESCRIPTION
+    is-my-code-great tool to verify arbitrary aspects about test code.
+
+    By default, it analyzes Flutter/Dart projects, but is designed to be extensible to other frameworks (such as C#) in the future. The tool can auto-detect the framework based on files in the directory, or you can specify it explicitly.
+
+OPTIONS
+    -h, --help
+        Show this help message and exit.
+
+    -f, --framework FRAMEWORK
+        Specify the framework to analyze (e.g., dart, csharp). If not provided, the tool will attempt to auto-detect based on project files.
+
+    -v, --verbose
+        Enable verbose output.
+
+    DIRECTORY
+        The path to the project directory to analyze. Defaults to the current directory if not specified.
+
+VALIDATIONS
+    big-test-files
+        Detects test functions or methods that are longer than 15 lines.
+
+    single-test-per-file
+        Counts files that contain exactly one test function or method.
+
+    expect-on-keys
+        Counts the number of expect statements that use a key-based finder (e.g., find.byKey).
+
+    pump-and-settle-without-duration
+        Counts occurrences of tester.pumpAndSettle() without a duration argument.
+
+    pump-without-duration
+        Counts occurrences of tester.pump() without a duration argument.
+
+    verifies
+        Counts the number of verify and verifyNever calls.
+
+    widgets-predicate
+        Counts the number of times find.byWidgetPredicate is used in tests.
+
+EXAMPLES
+    Analyze the current directory (auto-detect framework):
+        is-my-code-great
+
+    Analyze a Dart project in a specific directory:
+        is-my-code-great -f dart /path/to/project
+
+    Analyze a C# project (future support):
+        is-my-code-great -f csharp /path/to/project
+
+AUTHOR
+    AlienEngineer
+
+SEE ALSO
+    For more information, see the README.md in the project repository.
