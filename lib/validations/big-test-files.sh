@@ -21,7 +21,7 @@ function find_big_functions() {
     -print0 |
   while IFS= read -r -d '' f; do
     f=$(realpath "$f")
-    awk -v max="${MAX_LINES:-80}" -v file="$f" '
+    awk -v max="${MAX_LINES}" -v file="$f" '
       function report(name, start, end) {
         if (name != "" && end >= start && (end - start + 1) > max) {
           print file
