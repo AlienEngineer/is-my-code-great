@@ -12,12 +12,12 @@ function find-regex-in-dart-test() {
   "$FIND_REGEX_TEST_IMPL" "$@"
 }
 
-function use-git() {
+function use_git() {
   FIND_TEXT_TEST_IMPL="find-text-in-dart-test-for-git"
   FIND_REGEX_TEST_IMPL="find-regex-in-dart-test-for-git"
 }
 
-function use-local() {
+function use_local() {
   FIND_TEXT_TEST_IMPL="find-text-in-dart-test-for-local"
   FIND_REGEX_TEST_IMPL="find-regex-in-dart-test-for-local"
 }

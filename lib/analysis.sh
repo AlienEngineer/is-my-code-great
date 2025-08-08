@@ -7,17 +7,24 @@ source "$SCRIPT_ROOT/lib/core/tests.sh"
 
 run_analysis() {
   
-  dir="${1:-.}"
-
+  local dir="${1}"
+  local base_branch="${2}"
+  local current_branch="${3}"
+  local local_run="${4}"
+  
   if [ ! -d "$dir" ]; then
     echo "Directory $dir does not exist."
     return 1
   fi
 
-  # source "$SCRIPT_ROOT/lib/validations/widgets-predicate.sh"
-  # source "$SCRIPT_ROOT/lib/validations/big-test-files.sh"
-
-  printf "Evaluating...\n"
+  if [ "$local_run" = true ]; then
+    printf "Evaluating:\n$dir \n\n"
+    use_local
+  else
+    printf "Evaluating: $base_branch vs $current_branch on dir: \n$dir \n\n"
+    use_git
+  fi
+  
   printf "Is my code great? "
   VALIDATIONS_DIR="$SCRIPT_ROOT/lib/validations"
   for script in "$VALIDATIONS_DIR"/*.sh; do
