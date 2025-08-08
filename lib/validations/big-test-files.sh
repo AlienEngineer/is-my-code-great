@@ -5,6 +5,7 @@ source "$SCRIPT_ROOT/lib/core/text-finders.sh"
 source "$SCRIPT_ROOT/lib/core/builder.sh"
 
 MAX_LINES="${2:-15}"
+
 function find_big_functions() {
   find "$dir" \
     -type f \
