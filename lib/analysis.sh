@@ -43,7 +43,7 @@ run_analysis() {
 
     printf "\nIs my code great? "
 
-    local totalTests=$(get_total_tests "$dir" "$base_branch" "$current_branch")
+    local totalTests=$(get_total_tests)
     local totalIssues=$(get_total_issues)
     if [ "$totalIssues" -gt 0 ]; then
         printf "Nop!\n\n"

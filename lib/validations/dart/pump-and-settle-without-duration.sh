@@ -7,5 +7,5 @@ source "$SCRIPT_ROOT/lib/core/builder.sh"
 register_validation \
     "pump-and-settle-without-duration" \
     "LOW" \
-    "find-text-in-dart-test 'tester.pumpAndSettle()' \"$dir\"" \
+    "find_text_in_dart_test 'tester.pumpAndSettle()' \"$dir\"" \
     "PumpAndSettle without duration:"

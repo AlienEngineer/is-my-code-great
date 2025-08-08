@@ -104,7 +104,7 @@ function find_regex_in_dart_test_for_git() {
 function find_text_in_dart_test_for_local() {
     local pattern="$1"
     local dir="${2:-.}"
-    count=$(grep -RhoE "$pattern" --include='*test.dart' "$dir" | wc -l)
+    count=$(grep -FoR "$pattern" --include='*test.dart' "$dir" | wc -l)
     echo "$((count + 0))"
 }
 

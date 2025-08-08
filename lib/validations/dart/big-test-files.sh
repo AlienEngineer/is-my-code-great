@@ -73,19 +73,16 @@ function find_big_functions() {
 }
 
 function get_count_big_test_methods() {
-    local files
-    mapfile -t files < (find_big_functions | cut -d: -f1 | sort -u)
+  local list total=0
+  list="$(mktemp)"; trap 'rm -f "$list"' EXIT
+  find_big_functions | cut -d: -f1 | sort -u > "$list"
 
-    local total=0
-    for file in "${files[@]}"; do
-        if [[ -f "$file" ]]; then
-            local count
-            count=$(grep -hoE 'test\(|testWidgets\(|testBloc<' "$file" | wc -l)
-            total=$((total + count))
-        fi
-    done
+  while IFS= read -r file; do
+    [[ -f "$file" ]] || continue
+    total=$(( total + $(grep -hoE 'test\(|testWidgets\(|testBloc<' "$file" | wc -l) ))
+  done < "$list"
 
-    echo "$total"
+  echo "$total"
 }
 
 register_validation \
@@ -94,4 +91,3 @@ register_validation \
     "get_count_big_test_methods" \
     "Big Tests (>15 lines):"
 
-get_count_big_test_methods

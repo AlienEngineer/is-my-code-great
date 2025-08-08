@@ -11,7 +11,10 @@ function register_validation() {
 
     local start=$(date +%s%N)
     local command="$3"
-    local result=$(eval "$command")
+    local result
+    result=$(eval "$command") || {
+      echo "Error executing command: $command" >&2
+    }
 
     COMMAND+=("$result")
 
