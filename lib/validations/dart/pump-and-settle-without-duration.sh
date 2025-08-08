@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-SCRIPT_ROOT="$(cd "$(dirname "$0")"/.. && pwd)"
-source "$SCRIPT_ROOT/lib/core/text-finders.sh"
+SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+source "$SCRIPT_ROOT/lib/core/dart/text-finders.sh"
 source "$SCRIPT_ROOT/lib/core/builder.sh"
 
 register_validation \

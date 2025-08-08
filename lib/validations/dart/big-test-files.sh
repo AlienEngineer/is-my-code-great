@@ -1,25 +1,25 @@
 #!/usr/bin/env bash
 
-SCRIPT_ROOT="$(cd "$(dirname "$0")"/.. && pwd)"
-source "$SCRIPT_ROOT/lib/core/text-finders.sh"
+SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+source "$SCRIPT_ROOT/lib/core/dart/text-finders.sh"
 source "$SCRIPT_ROOT/lib/core/builder.sh"
 
 MAX_LINES="${2:-15}"
 function find_big_functions() {
-  find "$dir" \
-  -type f \
-  -name '*test.dart' \
-  -not -path '*/.git/*' \
-  -not -path '*/node_modules/*' \
-  -not -path '*/vendor/*' \
-  -not -path '*/dist/*' \
-  -not -path '*/build/*' \
-  -not -path '*/.next/*' \
-  -not -path '*/.venv/*' \
-  -not -path '*/target/*' \
-  -print0 |
-  while IFS= read -r -d '' file; do
-    awk -v max="$max_lines" -v file="$file" '
+    find "$dir" \
+        -type f \
+        -name '*test.dart' \
+        -not -path '*/.git/*' \
+        -not -path '*/node_modules/*' \
+        -not -path '*/vendor/*' \
+        -not -path '*/dist/*' \
+        -not -path '*/build/*' \
+        -not -path '*/.next/*' \
+        -not -path '*/.venv/*' \
+        -not -path '*/target/*' \
+        -print0 |
+        while IFS= read -r -d '' file; do
+            awk -v max="$max_lines" -v file="$file" '
       function report(name, start, end) {
         if (name != "" && end >= start && (end - start + 1) > max) {
           printf("%s:%d-%d (%d lines): %s\n", file, start, end, end-start+1, name)
@@ -69,33 +69,29 @@ function find_big_functions() {
         if (infunc) report(funcname, startline, NR)
       }
     ' "$file"
-  done | sort -u
+        done | sort -u
 }
-
 
 function get_count_big_test_methods() {
-  local files
-  mapfile -t files < <(find_big_functions | cut -d: -f1 | sort -u)
+    local files
+    mapfile -t files < (find_big_functions | cut -d: -f1 | sort -u)
 
-  local total=0
-  for file in "${files[@]}"; do
-    if [[ -f "$file" ]]; then
-      local count
-      count=$(grep -hoE 'test\(|testWidgets\(|testBloc<' "$file" | wc -l)
-      total=$((total + count))
-    fi
-  done
+    local total=0
+    for file in "${files[@]}"; do
+        if [[ -f "$file" ]]; then
+            local count
+            count=$(grep -hoE 'test\(|testWidgets\(|testBloc<' "$file" | wc -l)
+            total=$((total + count))
+        fi
+    done
 
-  echo "$total"
+    echo "$total"
 }
-
-
 
 register_validation \
     "big-test-files" \
     "HIGH" \
     "get_count_big_test_methods" \
     "Big Tests (>15 lines):"
-
 
 get_count_big_test_methods
