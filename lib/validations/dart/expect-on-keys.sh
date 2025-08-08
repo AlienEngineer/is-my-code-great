@@ -48,7 +48,7 @@ function _get_count_expect_on_keys_git() {
 }
 
 function _find_expect_on_keys() {
-    if [ "$local_run" = true ]; then
+    if [ "$local_run" ]; then
         _get_count_expect_on_keys
     else
         _get_count_expect_on_keys_git
