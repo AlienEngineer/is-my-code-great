@@ -45,14 +45,13 @@ function _validate_git_repo() {
     return 0
 }
 
-function _get_git_files() {
+function get_git_files() {
     local base_branch="$1"
     local current_branch="$2"
     git diff --name-only "$base_branch"..."$current_branch" -- '*_test.dart'
 }
 
 function find_regex_in_dart_test_for_git() {
-    
     local pattern="$1"
     local dir="${2:-.}"
     local base_branch="${3:-main}"
@@ -65,7 +64,7 @@ function find_regex_in_dart_test_for_git() {
         return 1
     }
 
-    local files=$(_get_git_files "$base_branch" "$current_branch")
+    local files=$(get_git_files "$base_branch" "$current_branch")
     local count=0
 
     for file in $files; do
@@ -98,7 +97,7 @@ function find_text_in_dart_test_for_git() {
         return 1
     }
 
-    local files=$(_get_git_files "$base_branch" "$current_branch")
+    local files=$(get_git_files "$base_branch" "$current_branch")
     local count=0
 
     for file in $files; do

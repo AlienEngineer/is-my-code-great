@@ -24,8 +24,46 @@ function _get_count_test_per_file() {
     echo "$total"
 }
 
+function _get_count_test_per_file_git() {
+  local original_dir
+  original_dir=$(pwd)
+  cd "$dir" || { echo "❌ Dir not found: $dir" >&2; return 1; }
+
+  _validate_git_repo "$base_branch" "$current_branch" || { cd "$original_dir"; return 1; }
+
+  [ "$VERBOSE" = "1" ] && echo -e "\n[dart][single-test-per-file] (git) base=$base_branch current=$current_branch" >&2
+
+  local files
+  files="$(get_git_files "$base_branch" "$current_branch")"
+
+  local total=0
+  local IFS=$'\n'
+  for file in $files; do
+    [[ -f "$file" ]] || continue
+
+    local c
+    c=$(grep -Fo 'testWidgets(' "$file" | wc -l); [[ "$c" -eq 1 ]] && total=$((total+1))
+    c=$(grep -Fo 'test('        "$file" | wc -l); [[ "$c" -eq 1 ]] && total=$((total+1))
+    c=$(grep -Fo 'testBloc<'    "$file" | wc -l); [[ "$c" -eq 1 ]] && total=$((total+1))
+  done
+  unset IFS
+
+  [ "$VERBOSE" = "1" ] && echo -e "\n[dart][single-test-per-file] (git) Found $total files (per-pattern exactly one occurrence)." >&2
+
+  cd "$original_dir"
+  echo "$total"
+}
+
+function _find_single_test_per_file() {
+    if [ "$local_run" = true ]; then
+        _get_count_test_per_file
+    else
+        _get_count_test_per_file_git
+    fi
+}
+
 register_validation \
     "tests-per-file" \
     "CRITICAL" \
-    "_get_count_test_per_file" \
+    "_find_single_test_per_file" \
     "Files with 1 Test:"

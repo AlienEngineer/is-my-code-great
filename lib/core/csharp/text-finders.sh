@@ -65,7 +65,7 @@ function _validate_git_repo() {
     return 0
 }
 
-function _get_git_files() {
+function get_git_files() {
     local base_branch="$1"
     local current_branch="$2"
     git diff --name-only "$base_branch"..."$current_branch" -- '*Test*.cs'

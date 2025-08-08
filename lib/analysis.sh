@@ -24,10 +24,10 @@ run_analysis() {
     fi
 
     if [ "$local_run" = true ]; then
-        printf "Evaluating:\n$dir \n\n"
+        [ "$VERBOSE" = "1" ] && printf "Evaluating:\n$dir \n\n"
         use_local
     else
-        printf "Evaluating: $base_branch vs $current_branch on dir: \n$dir \n\n"
+        [ "$VERBOSE" = "1" ] && printf "Evaluating: $base_branch vs $current_branch on dir: \n$dir \n\n"
         use_git
     fi
 
