@@ -4,87 +4,87 @@ SCRIPT_ROOT="$(cd "$(dirname "$0")"/.. && pwd)"
 source "$SCRIPT_ROOT/lib/core/text-finders.sh"
 source "$SCRIPT_ROOT/lib/core/builder.sh"
 
-function get_count_test_widgets_long() {
-  find "$dir" -name '*test.dart' -exec awk -v threshold=15 '
-    /testWidgets/ {
-      inBlock=1
-      brace = gsub(/\{/, "") - gsub(/\}/, "")
-      lines=0
-      next
-    }
-    inBlock {
-      brace += gsub(/\{/, "") - gsub(/\}/, "")
-      if (brace>0) lines++
-      else {
-        count += (lines>threshold)
-        inBlock=0
-      }
-    }
-    END { print count+0 }
-  ' {} \+ \
-  | awk '{sum += $1} END {print sum}'
-}
-
-function get_count_tests_long() {
-  testsLongCount=$(find "$dir" -name '*test.dart' -print0 | xargs -0 awk '
-    /test\(/ {
-      inBlock=1
-      nOpen = gsub(/\{/, "")
-      nClose = gsub(/\}/, "")
-      brace = nOpen - nClose
-      lines=0
-      next
-    }
-    inBlock {
-      nOpen = gsub(/\{/, "")
-      nClose = gsub(/\}/, "")
-      brace += nOpen - nClose
-      if (brace>0) lines++
-      else {
-        if (lines>15) count++
-        inBlock=0
-      }
-    }
-    END {print count+0}
-  ' | awk '{sum+=$1} END{print sum}')
-  echo "$testsLongCount"
-}
-
-function get_count_build_long() {
-  buildLongCount=$(find "$dir" -name '*test.dart' -print0 | xargs -0 awk '
-    /blocTest[[:space:]]*(<[^>]+>)?[[:space:]]*\(/ { inBloc=1; next }
-    /build:[[:space:]]*\(\)[[:space:]]*\{/ && inBloc {
-        inBuild=1
-        nOpen   = gsub(/\{/, "")
-        nClose  = gsub(/\}/, "")
-        brace   = nOpen - nClose
-        lines   = 0
-        next
-    }
-    inBuild {
-        nOpen   = gsub(/\{/, "")
-        nClose  = gsub(/\}/, "")
-        brace  += nOpen - nClose
-        if (brace > 0) lines++
-        else {
-            if (lines > 5) count++
-            inBuild=0
-            inBloc=0
+MAX_LINES="${2:-15}"
+function find_big_functions() {
+  find "$dir" \
+    -type f \
+    -name '*_test.dart' \
+    -not -path '*/.git/*' \
+    -not -path '*/node_modules/*' \
+    -not -path '*/vendor/*' \
+    -not -path '*/dist/*' \
+    -not -path '*/build/*' \
+    -not -path '*/.next/*' \
+    -not -path '*/.venv/*' \
+    -not -path '*/target/*' \
+    -print0 |
+  while IFS= read -r -d '' f; do
+    f=$(realpath "$f")
+    awk -v max="${MAX_LINES:-80}" -v file="$f" '
+      function report(name, start, end) {
+        if (name != "" && end >= start && (end - start + 1) > max) {
+          print file
         }
-    }
-    END { print count+0 }
-    ' | awk '{sum+=$1} END{print sum}')
-  echo "$buildLongCount"
+      }
+
+      function line_has_opening_brace(line) {
+        return line ~ /[{][ \t]*$|[{][ \t]*\/\//
+      }
+
+      /^[ \t]*(Future<.*>|Stream<.*>|void|int|double|bool|String|List<.*>|Map<.*>|dynamic|var)?[ \t]+[A-Za-z0-9_<>]+\s*\([^)]*\)[ \t]*(async)?[ \t]*[{]?[ \t]*$/ {
+        if (infunc) { report(funcname, startline, NR - 1); }
+        infunc = 1
+        startline = NR
+        funcname = $0
+        depth = 0
+
+        if (line_has_opening_brace($0)) {
+          depth = 1
+        } else {
+          wait_for_open_brace = 1
+        }
+        next
+      }
+
+      {
+        if (infunc) {
+          if (wait_for_open_brace && $0 ~ /^[ \t]*{/) {
+            depth = 1
+            wait_for_open_brace = 0
+          }
+
+          for (i = 1; i <= length($0); i++) {
+            c = substr($0, i, 1)
+            if (c == "{") depth++
+            if (c == "}") depth--
+          }
+
+          if (depth == 0) {
+            report(funcname, startline, NR)
+            infunc = 0
+            funcname = ""
+            startline = 0
+            wait_for_open_brace = 0
+          }
+        }
+      }
+
+      END {
+        if (infunc) report(funcname, startline, NR)
+      }
+    ' "$f"
+  done | sort -u
 }
-
-
 
 function get_count_big_test_methods() {
-  testWidgetsLongCount=$(get_count_test_widgets_long) || 0
-  testsLongCount=$(get_count_tests_long) || 0
-  buildLongCount=$(get_count_build_long) || 0
-
-  echo "$(($testWidgetsLongCount + buildLongCount + testsLongCount))"
+  local total=0
+  while IFS= read -r file; do
+    if [[ -f "$file" ]]; then
+      matches=$(grep -hoE 'test\(|testWidgets\(|testBloc<' "$file" | wc -l)
+      total=$((total + matches))
+    fi
+  done < <(find_big_functions)
+  echo "$total"
 }
 
 register_validation \
