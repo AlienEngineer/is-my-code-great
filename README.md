@@ -45,3 +45,8 @@ Navigate to the root folder you would like to evaluate and execute the following
 ```sh
 is-my-code-great
 ```
+
+Alternatively you can also specify a path
+```sh
+is-my-code-great ~/dev/my_repo/
+```
