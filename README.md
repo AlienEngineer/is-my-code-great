@@ -43,7 +43,8 @@ register_validation \
 ## Usage
 Navigate to the root folder you would like to evaluate and execute the following command
 ```sh
-is-my-code-great
+is-my-code-great <path>
+is-my-code-great --help
 ```
 
 Alternatively you can also specify a path
