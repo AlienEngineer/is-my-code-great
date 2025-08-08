@@ -39,3 +39,9 @@ register_validation \
     "my_custom_validaton" \
     "<description>:"
 ```
+
+## Usage
+Navigate to the root folder you would like to evaluate and execute the following command
+```sh
+is-my-code-great
+```
