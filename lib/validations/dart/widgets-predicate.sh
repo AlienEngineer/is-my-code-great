@@ -5,7 +5,7 @@ source "$SCRIPT_ROOT/lib/core/dart/text-finders.sh"
 source "$SCRIPT_ROOT/lib/core/builder.sh"
 
 function _find_widgets_predicate() {
-    count=$(find_text_in_dart_test "find.byWidgetPredicate(" "$dir" "$base_branch" "$current_branch")
+    count=$(find_text_in_dart_test "find.byWidgetPredicate(" "$DIR" "$BASE_BRANCH" "$CURRENT_BRANCH")
     echo "$count"
 }
 

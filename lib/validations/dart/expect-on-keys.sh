@@ -5,7 +5,7 @@ source "$SCRIPT_ROOT/lib/core/dart/text-finders.sh"
 source "$SCRIPT_ROOT/lib/core/builder.sh"
 
 function _get_count_expect_on_keys() {
-    expectKeysCount=$(find "$dir" -name '*test.dart' -exec awk '
+    expectKeysCount=$(find "$DIR" -name '*test.dart' -exec awk '
     /expect[[:space:]]*\(/ { want=1; if ($0 ~ /find\.byKey/) { count++; want=0 } next }
     want {
       if (/find\.byKey/) { count++; want=0 }
@@ -19,12 +19,12 @@ function _get_count_expect_on_keys() {
 function _get_count_expect_on_keys_git() {
   local original_dir
   original_dir=$(pwd)
-  cd "$dir" || { echo "❌ Dir not found: $dir" >&2; return 1; }
+  cd "$DIR" || { echo "❌ Dir not found: $DIR" >&2; return 1; }
 
-  _validate_git_repo "$base_branch" "$current_branch" || { cd "$original_dir"; return 1; }
+  _validate_git_repo "$BASE_BRANCH" "$CURRENT_BRANCH" || { cd "$original_dir"; return 1; }
 
   local files
-  files="$(get_git_files "$base_branch" "$current_branch")"
+  files="$(get_git_files "$BASE_BRANCH" "$CURRENT_BRANCH")"
 
   local total=0
   local IFS=$'\n'
@@ -48,7 +48,7 @@ function _get_count_expect_on_keys_git() {
 }
 
 function _find_expect_on_keys() {
-    if [ "$Local_run" = true ]; then
+    if [ "$LOCAL_RUN" = true ]; then
         _get_count_expect_on_keys
     else
         _get_count_expect_on_keys_git

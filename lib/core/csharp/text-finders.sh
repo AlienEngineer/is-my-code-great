@@ -18,7 +18,7 @@ function find_text_in_csharp_test_for_local() {
     local pattern="$1"
     local dir="${2:-.}"
 
-    count=$(grep -FoR --include='*Test*.cs' "$pattern" "$dir" | wc -l)
+    count=$(grep -FoR --include='*Test*.cs' "$pattern" "$DIR" | wc -l)
     echo "$((count + 0))"
 }
 
@@ -30,12 +30,12 @@ function find_text_in_csharp_test_for_git() {
 
     local original_dir=$(pwd)
 
-    _validate_git_repo "$base_branch" "$current_branch" || {
+    _validate_git_repo "$BASE_BRANCH" "$CURRENT_BRANCH" || {
         cd "$original_dir"
         return 1
     }
 
-    local files=$(_get_git_files "$base_branch" "$current_branch")
+    local files=$(_get_git_files "$BASE_BRANCH" "$CURRENT_BRANCH")
     local count=0
 
     for file in $files; do
@@ -68,5 +68,5 @@ function _validate_git_repo() {
 function get_git_files() {
     local base_branch="$1"
     local current_branch="$2"
-    git diff --name-only "$base_branch"..."$current_branch" -- '*Test*.cs'
+    git diff --name-only "$BASE_BRANCH"..."$CURRENT_BRANCH" -- '*Test*.cs'
 }

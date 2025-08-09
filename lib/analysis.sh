@@ -4,28 +4,23 @@ SCRIPT_ROOT="$(cd "$(dirname "$0")"/.. && pwd)"
 source "$SCRIPT_ROOT/lib/core/builder.sh"
 
 run_analysis() {
-    dir="${1:-.}"
-    framework="$2"
-    base_branch="$3"
-    current_branch="$4"
-    local_run="$5"
 
     # Source framework-specific core files
-    if [ -f "$SCRIPT_ROOT/lib/core/$framework/text-finders.sh" ]; then
-        source "$SCRIPT_ROOT/lib/core/$framework/text-finders.sh"
+    if [ -f "$SCRIPT_ROOT/lib/core/$FRAMEWORK/text-finders.sh" ]; then
+        source "$SCRIPT_ROOT/lib/core/$FRAMEWORK/text-finders.sh"
     fi
-    if [ -f "$SCRIPT_ROOT/lib/core/$framework/tests.sh" ]; then
-        source "$SCRIPT_ROOT/lib/core/$framework/tests.sh"
+    if [ -f "$SCRIPT_ROOT/lib/core/$FRAMEWORK/tests.sh" ]; then
+        source "$SCRIPT_ROOT/lib/core/$FRAMEWORK/tests.sh"
     fi
 
-    if [ ! -d "$dir" ]; then
-        echo "Directory $dir does not exist."
+    if [ ! -d "$DIR" ]; then
+        echo "Directory $DIR does not exist."
         return 1
     fi
 
-    VALIDATIONS_DIR="$SCRIPT_ROOT/lib/validations/$framework"
+    VALIDATIONS_DIR="$SCRIPT_ROOT/lib/validations/$FRAMEWORK"
     if [ ! -d "$VALIDATIONS_DIR" ]; then
-        echo "No validations found for framework: $framework" >&2
+        echo "No validations found for framework: $FRAMEWORK" >&2
         return 1
     fi
 

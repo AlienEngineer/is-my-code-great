@@ -26,7 +26,7 @@ source "$SCRIPT_ROOT/lib/core/text-finders.sh"
 source "$SCRIPT_ROOT/lib/core/builder.sh"
 
 # implementation for the new validation
-# $dir - this variable can be used to fetch which directory we are working on.
+# $DIR - this variable can be used to fetch which directory we are working on.
 # checkout the text-finders.sh for functions that makes it easier to find text on files.
 function my_custom_validaton() {
  echo -1

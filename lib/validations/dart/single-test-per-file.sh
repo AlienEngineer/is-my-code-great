@@ -12,7 +12,7 @@ function _get_count_test_per_file() {
     fi
 
     for pattern in 'testWidgets(' 'test(' 'testBloc<'; do
-        count=$(grep -Frc "$pattern" --include='*test.dart' "$dir" |
+        count=$(grep -Frc "$pattern" --include='*test.dart' "$DIR" |
             awk -F: '$2==1 {c++} END {print c+0}')
         total=$((total + count))
     done
@@ -27,14 +27,14 @@ function _get_count_test_per_file() {
 function _get_count_test_per_file_git() {
   local original_dir
   original_dir=$(pwd)
-  cd "$dir" || { echo "❌ Dir not found: $dir" >&2; return 1; }
+  cd "$DIR" || { echo "❌ Dir not found: $DIR" >&2; return 1; }
 
-  _validate_git_repo "$base_branch" "$current_branch" || { cd "$original_dir"; return 1; }
+  _validate_git_repo "$BASE_BRANCH" "$CURRENT_BRANCH" || { cd "$original_dir"; return 1; }
 
-  [ "$VERBOSE" = "1" ] && echo -e "\n[dart][single-test-per-file] (git) base=$base_branch current=$current_branch" >&2
+  [ "$VERBOSE" = "1" ] && echo -e "\n[dart][single-test-per-file] (git) base=$BASE_BRANCH current=$CURRENT_BRANCH" >&2
 
   local files
-  files="$(get_git_files "$base_branch" "$current_branch")"
+  files="$(get_git_files "$BASE_BRANCH" "$CURRENT_BRANCH")"
 
   local total=0
   local IFS=$'\n'
@@ -55,7 +55,7 @@ function _get_count_test_per_file_git() {
 }
 
 function _find_single_test_per_file() {
-    if [ "$local_run" = true ]; then
+    if [ "$LOCAL_RUN" = true ]; then
         _get_count_test_per_file
     else
         _get_count_test_per_file_git

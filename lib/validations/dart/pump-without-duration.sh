@@ -5,7 +5,7 @@ source "$SCRIPT_ROOT/lib/core/dart/text-finders.sh"
 source "$SCRIPT_ROOT/lib/core/builder.sh"
 
 function _find_pump_without_duration() {
-    count=$(find_text_in_dart_test 'tester.pump()' "$dir" "$base_branch" "$current_branch")
+    count=$(find_text_in_dart_test 'tester.pump()' "$DIR" "$BASE_BRANCH" "$CURRENT_BRANCH")
     echo "$count"
 }
 

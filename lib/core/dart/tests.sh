@@ -7,9 +7,9 @@ source "$SCRIPT_ROOT/lib/core/builder.sh"
 function get_total_tests() {
     local start=$(date +%s%N)
 
-    testWidgetsCount=$(find_text_in_dart_test 'testWidgets(' "$dir")
-    testCount=$(find_text_in_dart_test 'test(' "$dir")
-    testBlocCount=$(find_text_in_dart_test 'blocTest<' "$dir")
+    testWidgetsCount=$(find_text_in_dart_test 'testWidgets(' "$DIR")
+    testCount=$(find_text_in_dart_test 'test(' "$DIR")
+    testBlocCount=$(find_text_in_dart_test 'blocTest<' "$DIR")
     testsCount=$((testWidgetsCount + testCount + testBlocCount))
 
     totalTestsExecutionTime=$((($(date +%s%N) - start) / 1000000))

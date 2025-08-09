@@ -8,7 +8,7 @@ function get_count_tests_long() {
         echo "\n[csharp][big-test-files] Looking for C# test methods > 15 lines in files matching: *Test*.cs" >&2
     fi
 
-    testsLongCount=$(find "$dir" -name '*Test*.cs' -print0 | xargs -0 awk '
+    testsLongCount=$(find "$DIR" -name '*Test*.cs' -print0 | xargs -0 awk '
     /\[TestMethod\]/ { inTest=1; lines=0; next }
     inTest {
       if (/^\s*\}/) { inTest=0; if (lines>15) count++ } else { lines++ }

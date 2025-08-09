@@ -6,7 +6,7 @@ source "$SCRIPT_ROOT/lib/core/builder.sh"
 
 MAX_LINES="${2:-15}"
 function find_big_functions() {
-    find "$dir" \
+    find "$DIR" \
         -type f \
         -name '*test.dart' \
         -not -path '*/.git/*' \
@@ -88,7 +88,7 @@ function find_big_functions_git() {
   local max_lines="${MAX_LINES:-15}"
 
   local files
-  files="$(get_git_files "$base_branch" "$current_branch")"
+  files="$(get_git_files "$BASE_BRANCH" "$CURRENT_BRANCH")"
 
   local IFS=$'\n'
   for file in $files; do
@@ -151,7 +151,7 @@ function get_count_big_test_methods_git() {
   local list total=0
   list="$(mktemp)"; trap 'rm -f "$list"' RETURN
 
-  find_big_functions_git --base "$base_branch" --current "$current_branch" --dir "$dir" --max "$max_lines" \
+  find_big_functions_git --base "$BASE_BRANCH" --current "$CURRENT_BRANCH" --dir "$DIR" --max "$max_lines" \
     | cut -d: -f1 | sort -u > "$list"
 
   while IFS= read -r file; do
@@ -163,7 +163,7 @@ function get_count_big_test_methods_git() {
 }
 
 function find_count_big_test_methods() {
-    if [ "$local_run" = true ]; then
+    if [ "$LOCAL_RUN" = true ]; then
         get_count_big_test_methods
     else
         get_count_big_test_methods_git

@@ -9,7 +9,7 @@ function get_count_test_per_file() {
     fi
 
     count=$(
-        find "$dir" -name '*Test*.cs' -print0 | xargs -0 awk '
+        find "$DIR" -name '*Test*.cs' -print0 | xargs -0 awk '
     /\[TestMethod\]/ {n++}
     ENDFILE {if (n==1) c++; n=0}
     END {print c+0}'

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 function find_text_in_dart_test() {
-    if [ "$Local_run" = true ]; then
+    if [ "$LOCAL_RUN" = true ]; then
         find_text_in_dart_test_for_local "$@"
     else
         find_text_in_dart_test_for_git "$@"
@@ -9,7 +9,7 @@ function find_text_in_dart_test() {
 }
 
 function find_regex_in_dart_test() {
-    if [ "$Local_run" = true ]; then
+    if [ "$LOCAL_RUN" = true ]; then
         find_regex_in_dart_test_for_local "$@"
     else
         find_regex_in_dart_test_for_git "$@"
@@ -19,7 +19,7 @@ function find_regex_in_dart_test() {
 function find_regex_in_dart_test_for_local() {
     local pattern="$1"
     local dir="${2:-.}"
-    count=$(grep -RhoE "$pattern" --include='*test.dart' "$dir" | wc -l)
+    count=$(grep -RhoE "$pattern" --include='*test.dart' "$DIR" | wc -l)
     echo "$((count + 0))"
 }
 
@@ -43,12 +43,12 @@ function _validate_git_repo() {
 function get_git_files() {
 
     local original_dir=$(pwd)
-    cd "$dir" || { echo "❌ Dir not found: $dir" >&2; return 1; }
+    cd "$DIR" || { echo "❌ Dir not found: $DIR" >&2; return 1; }
 
     repo_root=$(git rev-parse --show-toplevel)
 
     files=$(
-        git diff --name-only "$base_branch"..."$current_branch" -- '*test.dart' \
+        git diff --name-only "$BASE_BRANCH"..."$CURRENT_BRANCH" -- '*test.dart' \
         | awk -v root="$repo_root" 'NF{print root "/" $0}'
     )
 
@@ -59,14 +59,11 @@ function get_git_files() {
 
 function find_regex_in_dart_test_for_git() {
     local pattern="$1"
-    local dir="${2:-.}"
-    local base_branch="${3:-main}"
-    local current_branch="${4:-$(git rev-parse --abbrev-ref HEAD)}"
 
     local original_dir=$(pwd)
 
-    cd "$dir" || { echo "❌ Dir not found: $dir" >&2; return 1; }
-    _validate_git_repo "$base_branch" "$current_branch" || {
+    cd "$DIR" || { echo "❌ Dir not found: $DIR" >&2; return 1; }
+    _validate_git_repo "$BASE_BRANCH" "$CURRENT_BRANCH" || {
         cd "$original_dir"
         return 1
     }
@@ -90,8 +87,7 @@ function find_regex_in_dart_test_for_git() {
 
 function find_text_in_dart_test_for_local() {
     local pattern="$1"
-    local dir="${2:-.}"
-    count=$(grep -FoR "$pattern" --include='*test.dart' "$dir" | wc -l)
+    count=$(grep -FoR "$pattern" --include='*test.dart' "$DIR" | wc -l)
     echo "$((count + 0))"
 }
 
@@ -100,13 +96,13 @@ function find_text_in_dart_test_for_git() {
 
     local original_dir=$(pwd)
 
-    cd "$dir" || { echo "❌ Dir not found: $dir" >&2; return 1; }
-    _validate_git_repo "$base_branch" "$current_branch" || {
+    cd "$DIR" || { echo "❌ Dir not found: $DIR" >&2; return 1; }
+    _validate_git_repo "$BASE_BRANCH" "$CURRENT_BRANCH" || {
         cd "$original_dir"
         return 1
     }
 
-    local files=$(get_git_files "$base_branch" "$current_branch")
+    local files=$(get_git_files "$BASE_BRANCH" "$CURRENT_BRANCH")
     local count=0
 
     for file in $files; do

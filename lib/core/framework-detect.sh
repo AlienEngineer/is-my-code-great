@@ -8,13 +8,13 @@ detect_framework() {
     local dir="$1"
     local verbose="$2"
     if [ "$verbose" = "1" ]; then
-        echo "[framework-detect] Scanning directory: $dir" >&2
+        echo "[framework-detect] Scanning directory: $DIR" >&2
     fi
-    if find "$dir" -name "pubspec.yaml" -o -name "*.dart" | grep -q .; then
+    if find "$DIR" -name "pubspec.yaml" -o -name "*.dart" | grep -q .; then
         [ "$verbose" = "1" ] && echo "[framework-detect] Detected Dart project" >&2
         echo "dart"
         return 0
-    elif find "$dir" -name "*.csproj" -o -name "*.cs" | grep -q .; then
+    elif find "$DIR" -name "*.csproj" -o -name "*.cs" | grep -q .; then
         [ "$verbose" = "1" ] && echo "[framework-detect] Detected C# project" >&2
         echo "csharp"
         return 0
