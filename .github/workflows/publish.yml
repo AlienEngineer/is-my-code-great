@@ -50,6 +50,7 @@ jobs:
            def install
              lib.install Dir["lib/*"]
              bin.install "bin/is-my-code-great"
+             man1.install Dir["man/*.1"]
            end
 
            test do
