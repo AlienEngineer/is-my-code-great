@@ -86,7 +86,7 @@ function get_count_big_test_methods() {
 }
 function find_big_functions_git() {
   local max_lines="${MAX_LINES:-15}"
-
+  
   local files
   files="$(get_git_files "$BASE_BRANCH" "$CURRENT_BRANCH")"
 
@@ -141,8 +141,6 @@ function find_big_functions_git() {
     ' "$file"
   done | sort -u
   unset IFS
-
-  cd "$original_dir"
 }
 
 # Git-based variant of the counter, mirroring get_count_big_test_methods

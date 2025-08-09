@@ -40,9 +40,9 @@ while [[ $# -gt 0 ]]; do
 		
         -g|--use-git-diff)
             LOCAL_RUN=false
-            shift 2
+            shift 1
             ;;
-			
+
 		-v|--verbose)
 			VERBOSE=1
 			shift
@@ -89,6 +89,14 @@ if [ "$LOCAL_RUN" = false ]; then
 		CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 		cd "$current_dir" || { echo "❌ Could not return to original directory: $current_dir" >&2; exit 1; }
 	fi
+fi
+
+if [ "$VERBOSE" = "1" ]; then
+	echo "[main] FRAMEWORK: $FRAMEWORK" >&2
+	echo "[main] DIR: $DIR" >&2
+	echo "[main] BASE_BRANCH: $BASE_BRANCH" >&2
+	echo "[main] CURRENT_BRANCH: $CURRENT_BRANCH" >&2
+	echo "[main] LOCAL_RUN: $LOCAL_RUN" >&2
 fi
 
 source "$(dirname "$0")/../lib/analysis.sh"
