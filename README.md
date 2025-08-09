@@ -10,6 +10,20 @@ Command-line tool to verify arbitrary aspects about code.
 
 `brew install is-my-code-great`
 
+
+## Usage
+Navigate to the root folder you would like to evaluate and execute the following command, alternativelly the path can be specified.
+```sh
+is-my-code-great <path>
+is-my-code-great --help
+
+# for quick check againt main branch:
+is-my-code-great -g
+
+# for quick check againt specific branch:
+is-my-code-great -b master
+```
+
 ## update
 `brew update`
 
@@ -40,12 +54,3 @@ register_validation \
     "<description>:"
 ```
 
-## Usage
-Navigate to the root folder you would like to evaluate and execute the following command
-```sh
-is-my-code-great <path>
-```
-
-```sh
-is-my-code-great --help
-```
