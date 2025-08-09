@@ -18,7 +18,6 @@ function find_regex_in_dart_test() {
 
 function find_regex_in_dart_test_for_local() {
     local pattern="$1"
-    local dir="${2:-.}"
     count=$(grep -RhoE "$pattern" --include='*test.dart' "$DIR" | wc -l)
     echo "$((count + 0))"
 }

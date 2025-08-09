@@ -3,30 +3,21 @@
 FIND_TEXT_TEST_IMPL="find_text_in_csharp_test_for_local"
 
 function find_text_in_csharp_test() {
-    "$FIND_TEXT_TEST_IMPL" "$@"
-}
-
-function use_git() {
-    FIND_TEXT_TEST_IMPL="find_text_in_csharp_test_for_git"
-}
-
-function use_local() {
-    FIND_TEXT_TEST_IMPL="find_text_in_csharp_test_for_local"
+    if [ "$LOCAL_RUN" == "true" ]; then 
+        find_text_in_csharp_test_for_local "$@"
+    else
+        find_text_in_csharp_test_for_git "$@"
+    fi
 }
 
 function find_text_in_csharp_test_for_local() {
     local pattern="$1"
-    local dir="${2:-.}"
-
     count=$(grep -FoR --include='*Test*.cs' "$pattern" "$DIR" | wc -l)
     echo "$((count + 0))"
 }
 
 function find_text_in_csharp_test_for_git() {
     local pattern="$1"
-    local dir="$2"
-    local base_branch="$3"
-    local current_branch="$4"
 
     local original_dir=$(pwd)
 
@@ -66,7 +57,16 @@ function _validate_git_repo() {
 }
 
 function get_git_files() {
-    local base_branch="$1"
-    local current_branch="$2"
-    git diff --name-only "$BASE_BRANCH"..."$CURRENT_BRANCH" -- '*Test*.cs'
+    local original_dir=$(pwd)
+    cd "$DIR" || { echo "❌ Dir not found: $DIR" >&2; return 1; }
+
+    repo_root=$(git rev-parse --show-toplevel)
+
+    files=$(
+        git diff --name-only "$BASE_BRANCH"..."$CURRENT_BRANCH" -- '*test*.cs' \
+        | awk -v root="$repo_root" 'NF{print root "/" $0}'
+    )
+
+    cd "$original_dir" 
+    echo "$files"
 }
