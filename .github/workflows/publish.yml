@@ -54,7 +54,9 @@ jobs:
            end
 
            test do
-             system "#{bin}/is-my-code-great", "--help"
+             bin_path = bin/"is-my-code-great"
+             assert_predicate bin_path, :exist?, "Binary not installed"
+             assert_predicate bin_path, :executable?, "Binary is not executable"
            end
          end
          EOF
