@@ -19,9 +19,15 @@ OPTIONS
 
     -b, --base BRANCH
         Specify the base branch for git comparison. Implies a git-based analysis.
-
+        Using this makes -g not applicable.
+        
     -c, --current BRANCH
         Specify the current branch for git comparison. Implies a git-based analysis.
+        Using this makes -g not applicable.
+
+    -g, --use-git-diff
+        Tells the script to executing using the difference between branches using the default branches.
+        To specify branches use -c for current branch and/or -b for base branch.
 
     -v, --verbose
         Enable verbose output.

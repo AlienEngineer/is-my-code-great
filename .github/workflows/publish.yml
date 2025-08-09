@@ -48,7 +48,6 @@ jobs:
            sha256   "${{ env.sha256 }}"
 
            def install
-             chmod 0755, "bin/is-my-code-great"
              lib.install Dir["lib/*"]
              bin.install "bin/is-my-code-great"
              man1.install Dir["man/*.1"]
