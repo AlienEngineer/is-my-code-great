@@ -14,8 +14,9 @@ FRAMEWORK=""
 DIR=""
 VERBOSE=0
 BASE_BRANCH="main"
-CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+CURRENT_BRANCH="" #"$(git rev-parse --abbrev-ref HEAD)"
 LOCAL_RUN=true
+
 
 while [[ $# -gt 0 ]]; do
 	case $1 in
@@ -71,6 +72,17 @@ if [ -z "$FRAMEWORK" ]; then
 	if [ $? -ne 0 ]; then
 		echo "Could not auto-detect framework. Please specify with -f." >&2
 		exit 1
+	fi
+fi
+
+# We can only set the current branch after receiving in which directory we are running.
+
+if [ "$LOCAL_RUN" = false ]; then
+	if [ -z "$CURRENT_BRANCH" ]; then
+		current_dir=$(pwd);
+		cd "$DIR" || { echo "❌ Dir not found: $DIR" >&2; exit 1; }
+		CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+		cd "$current_dir" || { echo "❌ Could not return to original directory: $current_dir" >&2; exit 1; }
 	fi
 fi
 
