@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
-source "$SCRIPT_ROOT/lib/core/dart/text-finders.sh"
-source "$SCRIPT_ROOT/lib/core/builder.sh"
-
 function _get_count_expect_on_keys() {
     expectKeysCount=$(find "$DIR" -name '*test.dart' -exec awk '
     /expect[[:space:]]*\(/ { want=1; if ($0 ~ /find\.byKey/) { count++; want=0 } next }

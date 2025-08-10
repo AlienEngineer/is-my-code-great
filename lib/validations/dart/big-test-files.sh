@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
-source "$SCRIPT_ROOT/lib/core/dart/text-finders.sh"
-source "$SCRIPT_ROOT/lib/core/builder.sh"
-
 MAX_LINES="${2:-15}"
 function find_big_functions() {
     find "$DIR" \

@@ -2,6 +2,7 @@
 
 SCRIPT_ROOT="$(cd "$(dirname "$0")"/.. && pwd)"
 source "$SCRIPT_ROOT/lib/core/builder.sh"
+source "$SCRIPT_ROOT/lib/core/git/git_diff.sh"
 
 run_analysis() {
 
