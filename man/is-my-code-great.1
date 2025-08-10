@@ -69,6 +69,11 @@ VALIDATIONS
         Counts the number of times find.byWidgetPredicate is used in tests. This can make it very hard to understand why a test is failing, as the predicate can be complex and not easily readable.
         It much better to retrieve the widget we want to test, then use expect on its properties, rather than using expect on a predicate.
 
+    expects-in-middle (SEVERITY: LOW)
+        Counts the number of times there's expect calls before another actions. 
+        This is a clear indicator that the test is testing multiple things. Another reason for this might be the lack of trust on what the test is testing.
+        e.g. an expect to find a key before tapping a key is a double check. tester.tap already tests this.
+
 EXAMPLES
     Analyze the current directory (auto-detect framework):
         is-my-code-great
@@ -80,7 +85,10 @@ EXAMPLES
         is-my-code-great -f csharp /path/to/project
 
 AUTHOR
-    AlienEngineer
+    Sérgio Ferreira
+
+CONTRIBUTORS
+    Miguel Teixeira
 
 SEE ALSO
     For more information, see the README.md in the project repository.
