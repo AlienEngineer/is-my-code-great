@@ -4,7 +4,7 @@ count_expects_in_the_middle_in_file() {
   local file="$1"
 
   # Generate the test patterns dynamically from TEST_FUNCTION_PATTERNS
-  # TEST_FUNCTION_PATTERNS ends up looking like: testWidgets|testGoldens|...
+  # regex_pattern ends up looking like: testWidgets|testGoldens|...
   local regex_pattern
   regex_pattern=$(get_test_function_pattern_names | tr ' ' '|')
 
