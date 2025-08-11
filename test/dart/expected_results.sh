@@ -4,7 +4,7 @@
 # Format: validation_key:expected_count
 
 EXPECTED_RESULTS="
-big-test-files:1
+big-test-files:2
 expect-on-keys:3
 expects-in-middle:7
 pump-and-settle-without-duration:1
