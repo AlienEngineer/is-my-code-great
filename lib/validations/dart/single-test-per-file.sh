@@ -1,23 +1,20 @@
 #!/usr/bin/env bash
 
-SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
-source "$SCRIPT_ROOT/lib/core/dart/text-finders.sh"
-
 function _get_count_test_per_file() {
     local total=0
 
     if [ "$VERBOSE" = "1" ]; then
-      echo "\n[dart][single-test-per-file] Looking for dart files with exactly one test method (patterns: $(get_test_patterns_names)) in files matching: *test.dart" >&2
+      echo "\n[dart][single-test-per-file] Looking for dart files with exactly one test method (patterns: $(get_test_function_pattern_names)) in files matching: *test.dart" >&2
     fi
 
-    for pattern in "${TEST_PATTERNS[@]}"; do
+    for pattern in "${TEST_FUNCTION_PATTERNS[@]}"; do
         count=$(grep -Frc "$pattern" --include='*test.dart' "$DIR" |
             awk -F: '$2==1 {c++} END {print c+0}')
         total=$((total + count))
     done
 
     if [ "$VERBOSE" = "1" ]; then
-        echo "\n[dart][single-test-per-file] Found $total files with exactly one test method (patterns: $(get_test_patterns_names))." >&2
+        echo "\n[dart][single-test-per-file] Found $total files with exactly one test method (patterns: $(get_test_function_pattern_names))." >&2
     fi
 
     echo "$total"
@@ -39,7 +36,7 @@ function _get_count_test_per_file_git() {
   local IFS=$'\n'
   for file in $files; do
     [[ -f "$file" ]] || continue
-    for pattern in "${TEST_PATTERNS[@]}"; do
+    for pattern in "${TEST_FUNCTION_PATTERNS[@]}"; do
       c=$(grep -Fo "$pattern" "$file" | wc -l); [[ "$c" -eq 1 ]] && total=$((total+1))
     done
   done

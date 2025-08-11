@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
-source "$SCRIPT_ROOT/lib/core/dart/text-finders.sh"
-
 MAX_LINES="${2:-15}"
 function find_big_functions() {
     find "$DIR" \
@@ -78,7 +75,7 @@ function get_count_big_test_methods() {
 
   while IFS= read -r file; do
     [[ -f "$file" ]] || continue
-    for pattern in "${TEST_PATTERNS[@]}"; do
+    for pattern in "${TEST_FUNCTION_PATTERNS[@]}"; do
       total=$(( total + $(grep -hoF "$pattern" "$file" | wc -l) ))
     done
   done < "$list"
@@ -155,7 +152,7 @@ function get_count_big_test_methods_git() {
 
   while IFS= read -r file; do
     [[ -f "$file" ]] || continue
-    for pattern in "${TEST_PATTERNS[@]}"; do
+    for pattern in "${TEST_FUNCTION_PATTERNS[@]}"; do
       total=$(( total + $(grep -hoF "$pattern" "$file" | wc -l) ))
     done
   done < "$list"
