@@ -1,1 +1,2 @@
 TEST_FILE_PATTERN='*Test*.cs'
+TEST_FUNCTION_PATTERNS=('[TestMethod]')

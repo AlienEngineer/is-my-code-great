@@ -9,9 +9,6 @@ run_analysis() {
     if [ -f "$SCRIPT_ROOT/lib/core/$FRAMEWORK/config.sh" ]; then
         source "$SCRIPT_ROOT/lib/core/$FRAMEWORK/config.sh"
     fi
-    if [ -f "$SCRIPT_ROOT/lib/core/$FRAMEWORK/tests.sh" ]; then
-        source "$SCRIPT_ROOT/lib/core/$FRAMEWORK/tests.sh"
-    fi
 
     # Souce tech agnostic core files
     # These files can only be sourced after config.sh is sourced
@@ -23,6 +20,9 @@ run_analysis() {
     fi
     if [ -f "$SCRIPT_ROOT/lib/core/text-finders.sh" ]; then
         source "$SCRIPT_ROOT/lib/core/text-finders.sh"
+    fi
+    if [ -f "$SCRIPT_ROOT/lib/core/tests.sh" ]; then
+        source "$SCRIPT_ROOT/lib/core/tests.sh"
     fi
 
     if [ ! -d "$DIR" ]; then
