@@ -2,6 +2,9 @@ name: Validate Test Examples
 
 on:
   pull_request:
+    types:
+      - opened
+      - synchronize
     branches:
       - main
 
@@ -19,7 +22,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Run validation on all languages
+    - name: Run validation on specified languages
       id: validate
       run: |
         echo "Running validation on languages: $LANGUAGES"
@@ -75,33 +78,29 @@ jobs:
           ⚠️ Some validation tests failed. Please review the results above and fix any issues.
           `;
 
-          // Find existing comment to update or create new one
           const { data: comments } = await github.rest.issues.listComments({
             owner: context.repo.owner,
             repo: context.repo.repo,
             issue_number: context.issue.number,
           });
 
-          const existingComment = comments.find(comment => 
-            comment.body.includes('## ❌ Validation Results') || 
-            comment.body.includes('## ✅ Validation Results')
-          );
+          const existingComment = comments.find(comment => comment.body.includes('## ❌ Validation Results'));
 
           if (existingComment) {
-            await github.rest.issues.updateComment({
+            return await github.rest.issues.updateComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               comment_id: existingComment.id,
               body: comment
             });
-          } else {
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: comment
-            });
           }
+          
+          await github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+            body: comment
+          });
 
     - name: Fail job if validation failed
       if: steps.validate.outputs.validation_success == 'false'

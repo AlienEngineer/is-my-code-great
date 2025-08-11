@@ -43,7 +43,7 @@ while [[ $# -gt 0 ]]; do
 			VERBOSE=1
 			shift
 			;;
-		--parseable)
+		-p|--parseable)
 			PARSEABLE=1
 			shift
 			;;
