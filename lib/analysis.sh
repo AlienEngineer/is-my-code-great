@@ -40,6 +40,10 @@ run_analysis() {
         [ -r "$script" ] && source "$script"
     done
 
+    if [ "$PARSEABLE" = "1" ]; then
+        print_validations_parseable
+        return 0
+    fi
 
     printf "\nIs my code great? "
 

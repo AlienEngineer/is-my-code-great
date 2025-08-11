@@ -1,5 +1,3 @@
-#!]
-
 declare -a SEVERITY COMMAND TITLE VALIDATION EXECUTION_TIME
 
 function register_validation() {
@@ -72,6 +70,12 @@ function get_total_execution_time() {
         total=$((total + time))
     done
     echo "$total"
+}
+
+function print_validations_parseable() {
+    get_validations | while read -r validation; do
+        printf "%s=%d\n" "$validation" "$(get_result "$validation")"
+    done
 }
 
 function print_validations() {

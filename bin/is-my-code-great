@@ -7,6 +7,7 @@ show_help() {
 FRAMEWORK=""
 DIR=""
 VERBOSE=0
+PARSEABLE=0
 BASE_BRANCH="main"
 CURRENT_BRANCH="" #"$(git rev-parse --abbrev-ref HEAD)"
 LOCAL_RUN=true
@@ -40,6 +41,10 @@ while [[ $# -gt 0 ]]; do
 
 		-v|--verbose)
 			VERBOSE=1
+			shift
+			;;
+		--parseable)
+			PARSEABLE=1
 			shift
 			;;
 		--)
@@ -95,4 +100,4 @@ if [ "$VERBOSE" = "1" ]; then
 fi
 
 source "$(dirname "$0")/../lib/analysis.sh"
-run_analysis "$DIR" "$FRAMEWORK" "$BASE_BRANCH" "$CURRENT_BRANCH" "$LOCAL_RUN"
+run_analysis "$DIR" "$FRAMEWORK" "$BASE_BRANCH" "$CURRENT_BRANCH" "$LOCAL_RUN" "$PARSEABLE"
