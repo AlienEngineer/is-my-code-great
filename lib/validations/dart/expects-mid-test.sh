@@ -1,18 +1,8 @@
 
 
-# Counts "expects in the middle" (NOT the final expect) on changed *_test.dart files
-get_count_expects_in_middle_git() {
-  local files
-  files="$(get_git_files)"
-
-  local total=0
-  local IFS=$'\n'
-  for file in $files; do
-    [[ -f "$file" ]] || continue
-    local abs_file="${repo_root}/${file}"
-    local c
-    c=$(
-      awk -v file="$abs_file" '
+count_expects_in_the_middle_in_file() {
+  local file="$1"
+  awk -v file="$file" '
         function reset_block(){ in_test=0; depth=0; pending=0 }
         BEGIN { reset_block() }
 
@@ -47,12 +37,24 @@ get_count_expects_in_middle_git() {
           }
         }
         END { print count+0 }
-      ' "$abs_file"
-    )
+      ' "$file"
+}
 
-    total=$((total + c))
+
+get_files_to_analyse() {
+  if [ "$LOCAL_RUN" = true ]; then
+    find "$DIR" -type f -name '*test.dart'
+  else
+    get_git_files
+  fi
+}
+
+get_count_expects_in_middle() {
+  local total=0
+  for file in $(get_files_to_analyse); do
+    [[ -f "$file" ]] || continue
+    total=$((total + $(count_expects_in_the_middle_in_file "$file")))
   done
-  unset IFS
 
   echo "$total"
 }
@@ -60,5 +62,5 @@ get_count_expects_in_middle_git() {
 register_validation \
     "expects-in-middle" \
     "LOW" \
-    "get_count_expects_in_middle_git" \
+    "get_count_expects_in_middle" \
     "Expects in the middle:"
