@@ -35,13 +35,9 @@ To add a new validations it's as simple as adding a new <filename>.sh file to th
 ```
 #!/usr/bin/env bash
 
-SCRIPT_ROOT="$(cd "$(dirname "$0")"/.. && pwd)"
-source "$SCRIPT_ROOT/lib/core/text-finders.sh"
-source "$SCRIPT_ROOT/lib/core/builder.sh"
-
 # implementation for the new validation
 # $DIR - this variable can be used to fetch which directory we are working on.
-# checkout the text-finders.sh for functions that makes it easier to find text on files.
+# checkout the core folder for functions that makes it easier to find text on files.
 function my_custom_validaton() {
  echo -1
 }
