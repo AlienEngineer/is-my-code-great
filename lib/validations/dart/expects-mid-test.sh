@@ -9,7 +9,7 @@ count_expects_in_the_middle_in_file() {
   # Generate the test patterns dynamically from TEST_PATTERNS
   # test_patterns ends up looking like: testWidgets|testGoldens|...
   local regex_pattern
-  regex_pattern=$(get_test_patterns | tr ' ' '|')
+  regex_pattern=$(get_test_patterns_names | tr ' ' '|')
 
   awk -v file="$file" -v test_patterns="$regex_pattern" '
         function reset_block(){ in_test=0; depth=0; pending=0 }
