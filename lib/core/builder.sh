@@ -1,7 +1,6 @@
 #!]
 
 declare -a SEVERITY COMMAND TITLE VALIDATION EXECUTION_TIME
-declare -i totalTestsExecutionTime=0
 
 function register_validation() {
     local check_name="$1"
@@ -72,7 +71,7 @@ function get_total_execution_time() {
     for time in "${EXECUTION_TIME[@]}"; do
         total=$((total + time))
     done
-    echo "$((total + totalTestsExecutionTime))"
+    echo "$total"
 }
 
 function print_validations() {
