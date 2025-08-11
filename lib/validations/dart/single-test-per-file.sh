@@ -4,11 +4,11 @@ function _get_count_test_per_file() {
     local total=0
 
     if [ "$VERBOSE" = "1" ]; then
-      echo "\n[dart][single-test-per-file] Looking for dart files with exactly one test method (patterns: $(get_test_function_pattern_names)) in files matching: *test.dart" >&2
+      echo "\n[dart][single-test-per-file] Looking for dart files with exactly one test method (patterns: $(get_test_function_pattern_names)) in files matching: $TEST_FILE_PATTERN)" >&2
     fi
 
     for pattern in "${TEST_FUNCTION_PATTERNS[@]}"; do
-        count=$(grep -Frc "$pattern" --include='*test.dart' "$DIR" |
+        count=$(grep -Frc "$pattern" --include="$TEST_FILE_PATTERN" "$DIR" |
             awk -F: '$2==1 {c++} END {print c+0}')
         total=$((total + count))
     done

@@ -4,7 +4,7 @@ MAX_LINES="${2:-15}"
 function find_big_functions() {
     find "$DIR" \
         -type f \
-        -name '*test.dart' \
+        -name "$TEST_FILE_PATTERN" \
         -not -path '*/.git/*' \
         -not -path '*/node_modules/*' \
         -not -path '*/vendor/*' \
