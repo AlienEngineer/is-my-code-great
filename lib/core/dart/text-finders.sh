@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+declare -a TEST_PATTERNS=('testWidgets(' 'test(' 'testBloc<' 'testGoldens(')
+
 function find_text_in_dart_test() {
     if [ "$LOCAL_RUN" = true ]; then
         find_text_in_dart_test_for_local "$@"
