@@ -7,7 +7,5 @@ function get_total_tests() {
         count=$(find_text_in_test "$pattern" "$DIR")
         testsCount=$((testsCount + count))
     done
-
-    totalTestsExecutionTime=$((($(date +%s%N) - start) / 1000000))
     echo "$testsCount"
 }
