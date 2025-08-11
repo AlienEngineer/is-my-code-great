@@ -1,13 +1,25 @@
+#!/usr/bin/env bash
 
+SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+source "$SCRIPT_ROOT/lib/core/dart/text-finders.sh"
 
 count_expects_in_the_middle_in_file() {
   local file="$1"
-  awk -v file="$file" '
+
+  # Generate the test patterns dynamically from TEST_PATTERNS
+  # test_patterns ends up looking like: testWidgets|testGoldens|...
+  local regex_pattern
+  regex_pattern=$(get_test_patterns | tr ' ' '|')
+
+  awk -v file="$file" -v test_patterns="$regex_pattern" '
         function reset_block(){ in_test=0; depth=0; pending=0 }
         BEGIN { reset_block() }
 
-        /^[[:space:]]*(testWidgets|test|blocTest)([[:space:]]*<[^>]+>)?[[:space:]]*\(/ {
-          in_test=1; depth=0; pending=0;
+        {
+          pattern_regex = "^[[:space:]]*(" test_patterns ")([[:space:]]*<[^>]+>)?[[:space:]]*\\("
+          if ($0 ~ pattern_regex) {
+            in_test=1; depth=0; pending=0;
+          }
         }
 
         {

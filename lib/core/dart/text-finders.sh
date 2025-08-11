@@ -2,6 +2,17 @@
 
 declare -a TEST_PATTERNS=('testWidgets(' 'test(' 'testBloc<' 'testGoldens(')
 
+# Format the patterns to remove any trailing characters like '<' or '(' and output them as a space separated string.
+function get_test_patterns_names() {
+    local -a names=()
+    for pattern in "${TEST_PATTERNS[@]}"; do
+        clean_name="${pattern%(*}"
+        clean_name="${clean_name%<*}"
+        names+=("$clean_name")
+    done
+    echo "${names[@]}"
+}
+
 function find_text_in_dart_test() {
     if [ "$LOCAL_RUN" = true ]; then
         find_text_in_dart_test_for_local "$@"

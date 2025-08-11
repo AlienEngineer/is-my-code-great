@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 
+SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+source "$SCRIPT_ROOT/lib/core/dart/text-finders.sh"
+
 function _get_count_test_per_file() {
     local total=0
 
     if [ "$VERBOSE" = "1" ]; then
-        echo "\n[dart][single-test-per-file] Looking for dart files with exactly one testWidgets or test or testBloc method in files matching: *test.dart" >&2
+      echo "\n[dart][single-test-per-file] Looking for dart files with exactly one test method (patterns: $(get_test_patterns_names)) in files matching: *test.dart" >&2
     fi
 
     for pattern in "${TEST_PATTERNS[@]}"; do
@@ -14,7 +17,7 @@ function _get_count_test_per_file() {
     done
 
     if [ "$VERBOSE" = "1" ]; then
-        echo "\n[dart][single-test-per-file] Found $total files with exactly one testWidgets or test or testBloc method." >&2
+        echo "\n[dart][single-test-per-file] Found $total files with exactly one test method (patterns: $(get_test_patterns_names))." >&2
     fi
 
     echo "$total"
