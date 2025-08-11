@@ -6,17 +6,23 @@ source "$SCRIPT_ROOT/lib/core/builder.sh"
 run_analysis() {
 
     # Source framework-specific core files
+    if [ -f "$SCRIPT_ROOT/lib/core/$FRAMEWORK/config.sh" ]; then
+        source "$SCRIPT_ROOT/lib/core/$FRAMEWORK/config.sh"
+    fi
     if [ -f "$SCRIPT_ROOT/lib/core/$FRAMEWORK/text-finders.sh" ]; then
         source "$SCRIPT_ROOT/lib/core/$FRAMEWORK/text-finders.sh"
     fi
     if [ -f "$SCRIPT_ROOT/lib/core/$FRAMEWORK/tests.sh" ]; then
         source "$SCRIPT_ROOT/lib/core/$FRAMEWORK/tests.sh"
     fi
-    if [ -f "$SCRIPT_ROOT/lib/core/$FRAMEWORK/files.sh" ]; then
-        source "$SCRIPT_ROOT/lib/core/$FRAMEWORK/files.sh"
-    fi
     if [ -f "$SCRIPT_ROOT/lib/core/$FRAMEWORK/git_diff.sh" ]; then
         source "$SCRIPT_ROOT/lib/core/$FRAMEWORK/git_diff.sh"
+    fi
+
+    # Souce tech agnostic core files
+    # These files can only be sourced after config.sh is sourced
+    if [ -f "$SCRIPT_ROOT/lib/core/files.sh" ]; then
+        source "$SCRIPT_ROOT/lib/core/files.sh"
     fi
 
     if [ ! -d "$DIR" ]; then
