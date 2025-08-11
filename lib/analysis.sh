@@ -2,7 +2,6 @@
 
 SCRIPT_ROOT="$(cd "$(dirname "$0")"/.. && pwd)"
 source "$SCRIPT_ROOT/lib/core/builder.sh"
-source "$SCRIPT_ROOT/lib/core/git/git_diff.sh"
 
 run_analysis() {
 
@@ -12,6 +11,12 @@ run_analysis() {
     fi
     if [ -f "$SCRIPT_ROOT/lib/core/$FRAMEWORK/tests.sh" ]; then
         source "$SCRIPT_ROOT/lib/core/$FRAMEWORK/tests.sh"
+    fi
+    if [ -f "$SCRIPT_ROOT/lib/core/$FRAMEWORK/files.sh" ]; then
+        source "$SCRIPT_ROOT/lib/core/$FRAMEWORK/files.sh"
+    fi
+    if [ -f "$SCRIPT_ROOT/lib/core/$FRAMEWORK/git_diff.sh" ]; then
+        source "$SCRIPT_ROOT/lib/core/$FRAMEWORK/git_diff.sh"
     fi
 
     if [ ! -d "$DIR" ]; then
