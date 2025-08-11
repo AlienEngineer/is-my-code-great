@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 function _get_count_expect_on_keys() {
-    expectKeysCount=$(find "$DIR" -name '*test.dart' -exec awk '
+    expectKeysCount=$(find "$DIR" -name "$TEST_FILE_PATTERN" -exec awk '
     /expect[[:space:]]*\(/ { want=1; if ($0 ~ /find\.byKey/) { count++; want=0 } next }
     want {
       if (/find\.byKey/) { count++; want=0 }

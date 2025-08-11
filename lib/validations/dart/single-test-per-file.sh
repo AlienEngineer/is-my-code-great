@@ -4,17 +4,17 @@ function _get_count_test_per_file() {
     local total=0
 
     if [ "$VERBOSE" = "1" ]; then
-        echo "\n[dart][single-test-per-file] Looking for dart files with exactly one testWidgets or test or testBloc method in files matching: *test.dart" >&2
+      echo "\n[dart][single-test-per-file] Looking for dart files with exactly one test method (patterns: $(get_test_function_pattern_names)) in files matching: $TEST_FILE_PATTERN)" >&2
     fi
 
-    for pattern in 'testWidgets(' 'test(' 'testBloc<'; do
-        count=$(grep -Frc "$pattern" --include='*test.dart' "$DIR" |
+    for pattern in "${TEST_FUNCTION_PATTERNS[@]}"; do
+        count=$(grep -Frc "$pattern" --include="$TEST_FILE_PATTERN" "$DIR" |
             awk -F: '$2==1 {c++} END {print c+0}')
         total=$((total + count))
     done
 
     if [ "$VERBOSE" = "1" ]; then
-        echo "\n[dart][single-test-per-file] Found $total files with exactly one testWidgets or test or testBloc method." >&2
+        echo "\n[dart][single-test-per-file] Found $total files with exactly one test method (patterns: $(get_test_function_pattern_names))." >&2
     fi
 
     echo "$total"
@@ -36,11 +36,9 @@ function _get_count_test_per_file_git() {
   local IFS=$'\n'
   for file in $files; do
     [[ -f "$file" ]] || continue
-
-    local c
-    c=$(grep -Fo 'testWidgets(' "$file" | wc -l); [[ "$c" -eq 1 ]] && total=$((total+1))
-    c=$(grep -Fo 'test('        "$file" | wc -l); [[ "$c" -eq 1 ]] && total=$((total+1))
-    c=$(grep -Fo 'testBloc<'    "$file" | wc -l); [[ "$c" -eq 1 ]] && total=$((total+1))
+    for pattern in "${TEST_FUNCTION_PATTERNS[@]}"; do
+      c=$(grep -Fo "$pattern" "$file" | wc -l); [[ "$c" -eq 1 ]] && total=$((total+1))
+    done
   done
   unset IFS
 
