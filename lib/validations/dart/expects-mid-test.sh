@@ -53,13 +53,6 @@ count_expects_in_the_middle_in_file() {
 }
 
 
-get_files_to_analyse() {
-  if [ "$LOCAL_RUN" = true ]; then
-    find "$DIR" -type f -name '*test.dart'
-  else
-    get_git_files
-  fi
-}
 
 get_count_expects_in_middle() {
   local total=0
