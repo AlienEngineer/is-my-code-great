@@ -1,12 +1,7 @@
 #!/usr/bin/env bash
 
 show_help() {
-	local manfile="$(dirname "$0")/../share/man/is-my-code-great.1"
-	if command -v less >/dev/null 2>&1; then
-		less "$manfile"
-	else
-		head -n 100 "$manfile"
-	fi
+	man is-my-code-great
 }
 
 FRAMEWORK=""
