@@ -8,6 +8,8 @@ function register_validation() {
     TITLE+=("$4")
     VALIDATION+=("$check_name")
 
+    add_details_start_evaluation "$4" "$2"
+
     local start=$(date +%s%N)
     local command="$3"
     local result
@@ -19,6 +21,8 @@ function register_validation() {
 
     elapsed=$((($(date +%s%N) - start) / 1000000))
     EXECUTION_TIME+=("$elapsed")
+
+    add_details_end_evaluation "$result" "$elapsed"
 
 }
 

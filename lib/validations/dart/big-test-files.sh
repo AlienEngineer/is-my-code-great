@@ -6,7 +6,7 @@ function _find_big_functions() {
   awk -v max="$MAX_LINES" -v file="$file" '
       function report(name, start, end) {
         if (name != "" && end >= start && (end - start + 1) > max) {
-          printf("(%d) - %d-%d (%d lines): %s\n", max, start, end, end-start+1, name)
+          printf("%s:%d - (%d lines) %s\n", file, start, end-start+1, name)
         }
       }
       function line_has_opening_brace(line) {
@@ -51,9 +51,7 @@ function _find_big_functions() {
     ' "$file"
 }
 
-function find_big_functions_git() {
-  local max_lines="${MAX_LINES:-15}"
-  
+function find_big_functions() {  
   local files
   files="$(get_files_to_analyse)"
 
@@ -69,9 +67,12 @@ function _count_big_test_methods() {
       for pattern in "${TEST_FUNCTION_PATTERNS[@]}"; do
         local count=0
         count=$(printf "%s\n" "$line" | grep -F "$pattern" | wc -l)
+        if [[ $count -gt 0 ]]; then
+          add_details "$line"
+        fi
         total=$(( total + count ))
       done
-  done < <(find_big_functions_git)
+  done < <(find_big_functions)
 
   echo "$total"
 }

@@ -24,11 +24,16 @@ run_analysis() {
     if [ -f "$SCRIPT_ROOT/lib/core/tests.sh" ]; then
         source "$SCRIPT_ROOT/lib/core/tests.sh"
     fi
+    if [ -f "$SCRIPT_ROOT/lib/core/details.sh" ]; then
+        source "$SCRIPT_ROOT/lib/core/details.sh"
+    fi
 
     if [ ! -d "$DIR" ]; then
         echo "Directory $DIR does not exist."
         return 1
     fi
+
+    init_details_file
 
     VALIDATIONS_DIR="$SCRIPT_ROOT/lib/validations/$FRAMEWORK"
     if [ ! -d "$VALIDATIONS_DIR" ]; then
@@ -55,4 +60,7 @@ run_analysis() {
     fi
 
     printf "\n\nCode evaluated in %d ms\n" "$(get_total_execution_time)"
+
+    finish_details_file
+    open_details_file
 }

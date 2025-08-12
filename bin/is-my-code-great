@@ -8,8 +8,10 @@ FRAMEWORK=""
 DIR=""
 VERBOSE=0
 BASE_BRANCH="main"
-CURRENT_BRANCH="" #"$(git rev-parse --abbrev-ref HEAD)"
+CURRENT_BRANCH=""
 LOCAL_RUN=true
+DETAILED=false
+DETAILED_FILE="result.html"
 
 
 while [[ $# -gt 0 ]]; do
@@ -22,6 +24,10 @@ while [[ $# -gt 0 ]]; do
 			FRAMEWORK="$2"
 			shift 2
 			;;
+		-d|--detailed)
+			DETAILED=true
+			shift
+			;;
         -b|--base)
             LOCAL_RUN=false
             BASE_BRANCH="$2"
@@ -31,13 +37,11 @@ while [[ $# -gt 0 ]]; do
             LOCAL_RUN=false
             CURRENT_BRANCH="$2"
             shift 2
-            ;;
-		
+            ;;		
         -g|--use-git-diff)
             LOCAL_RUN=false
             shift 1
             ;;
-
 		-v|--verbose)
 			VERBOSE=1
 			shift
@@ -92,6 +96,7 @@ if [ "$VERBOSE" = "1" ]; then
 	echo "[main] BASE_BRANCH: $BASE_BRANCH" >&2
 	echo "[main] CURRENT_BRANCH: $CURRENT_BRANCH" >&2
 	echo "[main] LOCAL_RUN: $LOCAL_RUN" >&2
+	echo "[main] DETAILED: $DETAILED" >&2
 fi
 
 source "$(dirname "$0")/../lib/analysis.sh"
