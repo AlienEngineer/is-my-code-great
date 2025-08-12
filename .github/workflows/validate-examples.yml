@@ -57,26 +57,31 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
         fi
 
-    - name: Comment PR with validation failures
+    - name: Comment PR with validation results
       uses: actions/github-script@v7
-      if: steps.validate.outputs.validation_success == 'false'
       with:
         script: |
-          const output = process.env.VALIDATION_OUTPUT;
-          
-          const comment = `## ❌ Validation Results - FAILED
+          const isFailure = '${{ steps.validate.outputs.validation_success }}' === 'false';
+          let comment = `## ✅ Validation Results - PASSED
 
-          <details>
-          <summary>Click to see detailed failure results</summary>
-
-          \`\`\`
-          ${output}
-          \`\`\`
-          
-          </details>
-
-          ⚠️ Some validation tests failed. Please review the results above and fix any issues.
+          All validation tests passed successfully! 🎉
           `;
+          
+          if (isFailure) {
+            comment = `## ❌ Validation Results - FAILED
+
+            <details>
+            <summary>Click to see detailed failure results</summary>
+
+            \`\`\`
+            ${process.env.VALIDATION_OUTPUT}
+            \`\`\`
+            
+            </details>
+
+            ⚠️ Some validation tests failed. Please review the results above and fix any issues.
+            `;
+          }
 
           const { data: comments } = await github.rest.issues.listComments({
             owner: context.repo.owner,
@@ -84,17 +89,20 @@ jobs:
             issue_number: context.issue.number,
           });
 
-          const existingComment = comments.find(comment => comment.body.includes('## ❌ Validation Results'));
-
-          if (existingComment) {
-            return await github.rest.issues.updateComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              comment_id: existingComment.id,
-              body: comment
-            });
+          if (!isFailure) {
+            // For success: delete any previous success comment and create new one
+            const existingSuccessComment = comments.find(c => c.body.includes('## ✅ Validation Results'));
+            
+            if (existingSuccessComment) {
+              await github.rest.issues.deleteComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingSuccessComment.id,
+              });
+            }
           }
           
+          // For failure: don't delete previous comments (keep history)
           await github.rest.issues.createComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
