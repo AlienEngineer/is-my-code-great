@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-count_expects_in_the_middle_in_file() {
+find_expects_in_the_middle_in_file() {
   local file="$1"
 
   # Generate the test patterns dynamically from TEST_FUNCTION_PATTERNS
@@ -28,8 +28,7 @@ count_expects_in_the_middle_in_file() {
             if (pending &&
                 ($0 ~ /await[ \t]+tester\./ ||
                  $0 ~ /(^|[[:space:]])tester\.(tap|enterText|pumpAndSettle|pump|drag|longPress|fling|scroll|press|sendKeyEvent)\(/)) {
-              count++;
-              # print file ":" NR ": action after expect → " $0
+              printf("%s:%d: %s\n", file, NR ,$0)
               pending=0
             }
 
@@ -45,18 +44,27 @@ count_expects_in_the_middle_in_file() {
             }
           }
         }
-        END { print count+0 }
+        END { }
       ' "$file"
 }
 
 
 
-get_count_expects_in_middle() {
+_find_count_expects_in_middle() {
   local total=0
   for file in $(get_files_to_analyse); do
     [[ -f "$file" ]] || continue
-    total=$((total + $(count_expects_in_the_middle_in_file "$file")))
+    find_expects_in_the_middle_in_file "$file"
   done
+}
+
+function _count_expect_in_middle() {
+  local total=0
+
+  while read -r line; do
+    total=$((total + 1))
+    add_details "$line"
+  done < <(_find_count_expects_in_middle)
 
   echo "$total"
 }
@@ -64,5 +72,5 @@ get_count_expects_in_middle() {
 register_validation \
     "expects-in-middle" \
     "LOW" \
-    "get_count_expects_in_middle" \
+    "_count_expect_in_middle" \
     "Expects in the middle:"

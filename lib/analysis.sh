@@ -25,8 +25,14 @@ run_analysis() {
     if [ -f "$SCRIPT_ROOT/lib/core/tests.sh" ]; then
         source "$SCRIPT_ROOT/lib/core/tests.sh"
     fi
-    if [ -f "$SCRIPT_ROOT/lib/core/details.sh" ]; then
-        source "$SCRIPT_ROOT/lib/core/details.sh"
+    if [[ "${DETAILED:-}" == "true" ]]; then
+        if [ -f "$SCRIPT_ROOT/lib/core/details.sh" ]; then
+            source "$SCRIPT_ROOT/lib/core/details.sh"
+        fi
+    else
+        if [ -f "$SCRIPT_ROOT/lib/core/details_stub.sh" ]; then
+            source "$SCRIPT_ROOT/lib/core/details_stub.sh"
+        fi
     fi
     if [ -f "$SCRIPT_ROOT/lib/core/report/html.sh" ]; then
         source "$SCRIPT_ROOT/lib/core/report/html.sh"

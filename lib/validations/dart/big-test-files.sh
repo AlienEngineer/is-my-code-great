@@ -6,7 +6,7 @@ function _find_big_functions() {
   awk -v max="$MAX_LINES" -v file="$file" '
       function report(name, start, end) {
         if (name != "" && end >= start && (end - start + 1) > max) {
-          printf("%s:%d - (%d lines) %s\n", file, start, end-start+1, name)
+          printf("%s:%d: (%d lines) %s\n", file, start, end-start+1, name)
         }
       }
       function line_has_opening_brace(line) {

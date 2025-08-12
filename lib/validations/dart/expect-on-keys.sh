@@ -4,7 +4,7 @@ get_find_by_key_lines() {
   local file="$1"
   awk -v file="$file" '
     /expect[[:space:]]*\(/ { want=1; if ($0 ~ /find\.byKey/) { 
-      printf("%s:%d - %s\n", file, NR ,$0)
+      printf("%s:%d: %s\n", file, NR ,$0)
       want=0 
     } next }
     want {

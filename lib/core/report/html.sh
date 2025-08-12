@@ -108,9 +108,10 @@ function export_report() {
             <div class='card-content'>
 "
         get_execution_details "$validation" | while read -r detail; do
-            file=$(echo "$detail" | cut -d: -f1)
-            linenum=$(echo "$detail" | cut -d: -f2 | awk '{print $1}')
-            label=$(echo "$detail" | sed -E 's/^[^ ]+:[0-9]+ - //')
+            file="${detail%%:*}"
+            rest="${detail#*:}"
+            linenum="${rest%%:*}"
+            label="${rest#*:}"
 
             print_to_file "$(printf '<a href="vscode://file/%s:%s">%s</a>\n' "$file" "$linenum" "$label")"
         done
