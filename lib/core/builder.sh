@@ -1,6 +1,6 @@
 #!]
 
-declare -a SEVERITY COMMAND TITLE VALIDATION EXECUTION_TIME
+declare -a SEVERITY COMMAND TITLE VALIDATION EXECUTION_TIME DETAILS
 
 function register_validation() {
     local check_name="$1"
@@ -8,7 +8,7 @@ function register_validation() {
     TITLE+=("$4")
     VALIDATION+=("$check_name")
 
-    add_details_start_evaluation "$4" "$2"
+    start_new_evaluation_details
 
     local start=$(date +%s%N)
     local command="$3"
@@ -17,13 +17,17 @@ function register_validation() {
       echo "Error executing command: $command" >&2
     }
 
+    local details
+    details=$(get_details)
+
+    DETAILS+=("$details")
+
     COMMAND+=("$result")
 
     elapsed=$((($(date +%s%N) - start) / 1000000))
     EXECUTION_TIME+=("$elapsed")
 
-    add_details_end_evaluation "$result" "$elapsed"
-
+    
 }
 
 function get_validations() {
@@ -70,24 +74,16 @@ function get_total_issues() {
     echo "$total"
 }
 
+function get_execution_details() {
+    local index
+    index=$(get_index "$1")
+    echo "${DETAILS[$index]}"
+}
+
 function get_total_execution_time() {
     local total=0
     for time in "${EXECUTION_TIME[@]}"; do
         total=$((total + time))
     done
     echo "$total"
-}
-
-function print_validations() {
-    local totalIssues=$(get_total_issues)
-    printf "%-40s %10d\n\n" "Total Issues Found:" "$totalIssues"
-
-    printf "%-40s %10s %-10s %15s\n" "Issues on Tests:" "#" "Severity" "Execution Time"
-    get_validations | while read -r validation; do
-        printf "%-40s %10d %-10s %15s\n" \
-            "$(get_title "$validation")" \
-            "$(get_result "$validation")" \
-            "$(get_severity "$validation")" \
-            "$(get_execution_time "$validation")ms"
-    done
 }
