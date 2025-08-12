@@ -1,5 +1,3 @@
-#!]
-
 declare -a SEVERITY COMMAND TITLE VALIDATION EXECUTION_TIME DETAILS
 
 function register_validation() {
@@ -86,4 +84,24 @@ function get_total_execution_time() {
         total=$((total + time))
     done
     echo "$total"
+}
+
+function print_validations() {
+    local totalIssues=$(get_total_issues)
+    printf "%-40s %10d\n\n" "Total Issues Found:" "$totalIssues"
+
+    printf "%-40s %10s %-10s %15s\n" "Issues on Tests:" "#" "Severity" "Execution Time"
+    get_validations | while read -r validation; do
+        printf "%-40s %10d %-10s %15s\n" \
+            "$(get_title "$validation")" \
+            "$(get_result "$validation")" \
+            "$(get_severity "$validation")" \
+            "$(get_execution_time "$validation")ms"
+    done
+}
+
+function print_validations_parseable() {
+    get_validations | while read -r validation; do
+        printf "%s=%d\n" "$validation" "$(get_result "$validation")"
+    done
 }

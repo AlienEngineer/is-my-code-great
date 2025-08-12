@@ -39,6 +39,10 @@ OPTIONS
     -v, --verbose
         Enable verbose output.
 
+    -p, --parseable
+        Output results in a machine-readable format (key=value pairs) instead of the default human-readable format.
+        This is primarily used for automated testing and validation.
+
     DIRECTORY
         The path to the project directory to analyze. Defaults to the current directory if not specified.
 
@@ -90,6 +94,38 @@ EXAMPLES
 
     Analyze a C# project (future support):
         is-my-code-great -f csharp /path/to/project
+
+TESTING
+    Test Structure:
+        test/
+        ├── validate_results.sh          # Main validation script
+        └── <language>/
+            └── expected_results.sh      # Expected validation counts for each language
+
+    Running Tests:
+        ./test/validate_results.sh <language>
+
+        Example:
+            ./test/validate_results.sh dart
+
+    The validation script:
+        • Runs analysis with --parseable flag on examples/<language>/ directory
+        • Compares actual results against expected counts in test/<language>/expected_results.sh
+        • Reports PASS/FAIL for each validation rule
+        • Exits with code 0 on success, 1 on failure
+
+    Expected Results Format:
+        Expected results are stored as key:value pairs in a simple text format:
+            validation-key:expected-count
+
+        Example:
+            big-test-files:1
+            expect-on-keys:3
+            expects-in-middle:7
+
+    CI/CD Integration:
+        Includes GitHub Actions workflows that automatically run validation tests on pull requests and
+        comment failures directly on the PR for immediate feedback.
 
 AUTHOR
     Sérgio Ferreira
