@@ -2,6 +2,7 @@
 
 SCRIPT_ROOT="$(cd "$(dirname "$0")"/.. && pwd)"
 source "$SCRIPT_ROOT/lib/core/builder.sh"
+source "$SCRIPT_ROOT/lib/core/report/terminal.sh"
 
 run_analysis() {
 
@@ -27,13 +28,14 @@ run_analysis() {
     if [ -f "$SCRIPT_ROOT/lib/core/details.sh" ]; then
         source "$SCRIPT_ROOT/lib/core/details.sh"
     fi
+    if [ -f "$SCRIPT_ROOT/lib/core/report/html.sh" ]; then
+        source "$SCRIPT_ROOT/lib/core/report/html.sh"
+    fi
 
     if [ ! -d "$DIR" ]; then
         echo "Directory $DIR does not exist."
         return 1
     fi
-
-    init_details_file
 
     VALIDATIONS_DIR="$SCRIPT_ROOT/lib/validations/$FRAMEWORK"
     if [ ! -d "$VALIDATIONS_DIR" ]; then
@@ -52,19 +54,6 @@ run_analysis() {
 
     printf "\nIs my code great? "
 
-    local totalTests=$(get_total_tests)
-    local totalIssues=$(get_total_issues)
-    if [ "$totalIssues" -gt 0 ]; then
-        printf "Nop!\n\n"
-
-        printf "%-40s %10d\n" "Total Tests:" "$totalTests"
-        print_validations
-    else
-        echo "Oh My God! You've done good!"
-    fi
-
-    printf "\n\nCode evaluated in %d ms\n" "$(get_total_execution_time)"
-
-    finish_details_file
-    open_details_file
+    dump_summary
+    export_report
 }
