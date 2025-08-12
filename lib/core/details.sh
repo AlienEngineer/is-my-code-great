@@ -3,7 +3,6 @@ RESULT_DETAILS="$(mktemp)"
 trap 'rm -f "$RESULT_DETAILS"' EXIT
 
 function add_details() {
-    [[ "${DETAILED:-}" == "true" ]] || return
     echo "$1" >> "$RESULT_DETAILS"
 }
 
