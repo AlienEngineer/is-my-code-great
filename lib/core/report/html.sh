@@ -100,7 +100,7 @@ function export_report() {
         local elapsed=$(get_execution_time "$validation")
         local title=$(get_title "$validation")
         print_to_file "
-        <div class='card'>
+        <div class='card collapsed'>
             <div class='card-header'>
                 <h2 class='title'>$title</h2>
                 <span class='severity'>$severity</span>
