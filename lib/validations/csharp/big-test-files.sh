@@ -13,7 +13,7 @@ function get_count_tests_long() {
     inTest {
       if (/^\s*\}/) { inTest=0; if (lines>15) count++ } else { lines++ }
     }
-    END { print count+0 }
+    END { print count+0 } 
   ' | awk '{sum+=$1} END{print sum}')
 
     if [ "$VERBOSE" = "1" ]; then
