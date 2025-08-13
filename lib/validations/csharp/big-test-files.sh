@@ -1,30 +1,81 @@
 #!/usr/bin/env bash
 
-SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
-source "$SCRIPT_ROOT/lib/core/builder.sh"
-
-function get_count_tests_long() {
-    if [ "$VERBOSE" = "1" ]; then
-        echo "\n[csharp][big-test-files] Looking for C# test methods > 15 lines in files matching: *Test*.cs" >&2
-    fi
-
-    testsLongCount=$(find "$DIR" -name '*Test*.cs' -print0 | xargs -0 awk '
-    /\[TestMethod\]/ { inTest=1; lines=0; next }
-    inTest {
-      if (/^\s*\}/) { inTest=0; if (lines>15) count++ } else { lines++ }
+find_big_tests_in_file() {
+  MAX_LINES="${2:-15}"
+  local file="$1"
+  awk -v max="$MAX_LINES" -v file="$file" '
+    function report(name, start, end) {
+      if (name != "" && end >= start && (end - start) > max) {
+        printf("%s:%d: (%d lines) %s\n", file, start, end-start, name)
+      }
     }
-    END { print count+0 } 
-  ' | awk '{sum+=$1} END{print sum}')
+    function line_has_opening_brace(line) {
+      return line ~ /[{][ \t]*$|[{][ \t]*\/\//
+    }    
+    /\[TestMethod\]/ { 
+      #if (infunc) report(funcname, startline, NR - 1)
+      inTest = 1
+      infunc = 0
+      startline = 0
+      depth = 0
+      funcname=""
+      wait_for_open_brace = 1
+      
+      next 
+    }
+    {
+      # If we are in a test method, we need to check for the function name
+      if (inTest && !infunc && $0 ~ /^[ \t]*public (void|async[ \t]+Task)[ \t]+[A-Za-z0-9_]+[ \t]*\(\)[ \t]*$/) {
+        infunc = 1
+        startline = NR+2
+        funcname = $0
+      }
+      {
+        if (wait_for_open_brace && $0 ~ /{[ \t]*$/ || $0 ~ /^[ \t]*{[ \t]*$/) {
+          depth = 1
+          wait_for_open_brace = 0
+        }
+        for (i = 1; i <= length($0); i++) {
+          c = substr($0, i, 1)
+          if (c == "{") depth++
+          if (c == "}") depth--
+        }
+        
+        if (depth == 0 && NR > startline) {
+          report(funcname, startline, NR-1)
+          infunc = 0
+          funcname = ""
+          startline = 0
+          wait_for_open_brace = 0
+        }
+      }
+    }
+    END { } 
+  ' "$file"
+}
 
-    if [ "$VERBOSE" = "1" ]; then
-        echo "\n[csharp][big-test-files] Found $testsLongCount test methods > 15 lines." >&2
-    fi
+find_big_functions() {  
+  local files
+  files="$(get_files_to_analyse)"
 
-    echo "$testsLongCount"
+  for file in $files; do
+    [[ -f "$file" ]] || continue
+    find_big_tests_in_file "$file"
+  done | sort -u
+}
+
+function count_big_test_methods() {
+  local total=0
+  while read -r line; do
+      add_details "$line"
+      total=$(( total + 1 ))
+  done < <(find_big_functions)
+
+  echo "$total"
 }
 
 register_validation \
     "big-test-files" \
     "HIGH" \
-    "get_count_tests_long" \
+    "count_big_test_methods" \
     "C# Test methods > 15 lines:"
