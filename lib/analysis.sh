@@ -55,6 +55,13 @@ run_analysis() {
         [ -r "$script" ] && source "$script"
     done
 
+    
+    VALIDATIONS_DIR="$SCRIPT_ROOT/lib/validations/agnostic"
+
+    for script in "$VALIDATIONS_DIR"/*.sh; do
+        [ -r "$script" ] && source "$script"
+    done
+
     if [ "$PARSEABLE" = "1" ]; then
         print_validations_parseable
         return 0
