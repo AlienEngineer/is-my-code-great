@@ -1,5 +1,5 @@
 # is-my-code-great
-Command-line tool to verify arbitrary aspects about code.
+Command-line tool to verify arbitrary aspects about code. Has initial support for dart and C#.
 
 ## for windows users
 [brew for windows](https://docs.brew.sh/Installation#linux-or-windows-10-subsystem-for-linux)
