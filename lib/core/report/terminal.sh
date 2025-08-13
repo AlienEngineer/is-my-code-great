@@ -16,6 +16,11 @@ function dump_summary() {
                 "$(get_execution_time "$validation")ms"
         done
     else
+        printf "YES!\n\n"
+
+        printf "%-40s %10d\n" "Total Tests:" "$totalTests"
+        printf "%-40s %10d\n\n" "Total Issues Found:" "$totalIssues"
+
         echo "Oh My God! You've done good!"
     fi
 

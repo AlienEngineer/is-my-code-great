@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
 SCRIPT_ROOT="$(cd "$(dirname "$0")"/.. && pwd)"
+source "$SCRIPT_ROOT/lib/core/verbosity.sh"
 source "$SCRIPT_ROOT/lib/core/builder.sh"
 source "$SCRIPT_ROOT/lib/core/report/terminal.sh"
+
 
 run_analysis() {
 
