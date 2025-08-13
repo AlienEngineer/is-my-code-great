@@ -11,12 +11,10 @@ function get_count_test_per_file() {
       if [[ "$c" -eq 1 ]] then 
         total=$((total+1))
         file_name="$(basename "$file")"
-        add_details "$file:0 - $file_name"
+        add_details "$file:0: $file_name"
       fi
     done
   done
-
-  [ "$VERBOSE" = "1" ] && echo -e "\n[dart][single-test-per-file] (git) Found $total files (per-pattern exactly one occurrence)." >&2
 
   echo "$total"
 }
