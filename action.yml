@@ -14,6 +14,11 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: "Checkout repository"
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.base-branch }}
+
     - name: "execute script"
       shell: bash
       run: |
@@ -40,7 +45,7 @@ runs:
             repo: context.repo.repo,
             issue_number: context.issue.number,
           });
-          const existingComment = comments.find(c => c.body.includes('### Is My Code Great Results:'));
+          const existingComment = comments.find(c => c.body.includes('Is My Code Great Results:'));
 
           if (existingComment) {
             await github.rest.issues.updateComment({
