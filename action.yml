@@ -30,7 +30,7 @@ runs:
           VERBOSE_FLAG="-v"
         fi
         
-        bin/is-my-code-great -b ${{ inputs.base-branch }} $VERBOSE_FLAG > results.txt
+        ${{ github.action_path }}/bin/is-my-code-great -b ${{ inputs.base-branch }} $VERBOSE_FLAG > results.txt
         echo "VALIDATION_OUTPUT<<EOF" >> $GITHUB_ENV
         cat results.txt >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
