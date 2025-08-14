@@ -14,6 +14,10 @@ detect_framework() {
         [ "$verbose" = "1" ] && echo "[framework-detect] Detected Dart project" >&2
         echo "dart"
         return 0
+    elif find "$dir" -name "package.json" -o -name "*.ts" | grep -q .; then
+        [ "$verbose" = "1" ] && echo "[framework-detect] Detected NodeJs project" >&2
+        echo "node"
+        return 0
     elif find "$dir" -name "*.csproj" -o -name "*.cs" | grep -q .; then
         [ "$verbose" = "1" ] && echo "[framework-detect] Detected C# project" >&2
         echo "csharp"
