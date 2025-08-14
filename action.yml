@@ -17,7 +17,8 @@ runs:
     - name: "Checkout repository"
       uses: actions/checkout@v4
       with:
-        ref: ${{ inputs.base-branch }}
+        # ref: ${{ inputs.base-branch }}
+        fetch-depth: 0
 
     - name: "execute script"
       shell: bash
