@@ -19,5 +19,5 @@ jobs:
             echo "Version bump detected."
           else
             echo "No version bump detected."
-            exit 0
+            exit 1
           fi
