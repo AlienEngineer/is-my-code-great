@@ -13,6 +13,7 @@ runs:
   using: "composite"
   steps:
     - name: "execute script"
+      shell: bash
       run: |
         bin/is-my-code-great -b ${{ inputs.base-branch }} > results.txt
         echo "VALIDATION_OUTPUT<<EOF" >> $GITHUB_ENV
