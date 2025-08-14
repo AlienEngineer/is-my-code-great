@@ -14,9 +14,11 @@ inputs:
 runs:
   using: "composite"
   steps:
+    
     - name: "fetch main"
       shell: bash
       run: |
+        git branch
         git fetch origin ${{ inputs.base-branch }}
         git branch ${{ inputs.base-branch }} origin/${{ inputs.base-branch }}
 
