@@ -6,6 +6,10 @@ inputs:
     description: "Base branch to compare against"
     required: false
     default: "main"
+  verbose:
+    description: "Enable verbose output"
+    required: false
+    default: "false"
 
 runs:
   using: "composite"
@@ -13,7 +17,12 @@ runs:
     - name: "execute script"
       shell: bash
       run: |
-        bin/is-my-code-great -b ${{ inputs.base-branch }} > results.txt
+        VERBOSE_FLAG=""
+        if [[ "${{ inputs.verbose }}" == "true" ]]; then
+          VERBOSE_FLAG="-v"
+        fi
+        
+        bin/is-my-code-great -b ${{ inputs.base-branch }} $VERBOSE_FLAG > results.txt
         echo "VALIDATION_OUTPUT<<EOF" >> $GITHUB_ENV
         cat results.txt >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
