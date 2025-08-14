@@ -17,7 +17,7 @@ runs:
     - name: "fetch main"
       shell: bash
       run: |
-        git fetch origin ${{ inputs.base-branch }} --depth=0
+        git fetch origin ${{ inputs.base-branch }}
         git branch ${{ inputs.base-branch }} origin/${{ inputs.base-branch }}
 
     - name: "execute script"
