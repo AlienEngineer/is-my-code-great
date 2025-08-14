@@ -67,3 +67,4 @@ jobs:
           git add Formula/is-my-code-great.rb
           git commit -m "Automated formula update to ${{ env.version }}"
           git push origin HEAD:main
+      

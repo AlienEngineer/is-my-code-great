@@ -124,3 +124,9 @@ jobs:
         path: |
           validation_*_output.txt
         retention-days: 7
+
+    - name: is my code great?
+      uses: alienengineer/is-my-code-great@v0.9.22
+      with:
+        verbose: true # Optional, set to true for detailed output
+        
