@@ -5,7 +5,7 @@ inputs:
   base-branch:
     description: "Base branch to compare against"
     required: false
-    default: "main"
+    default: "${{ github.event.repository.default_branch }}"
   verbose:
     description: "Enable verbose output"
     required: false
@@ -18,10 +18,8 @@ runs:
     - name: "fetch main"
       shell: bash
       run: |
-        git fetch origin feature/creating_base_action
-        git checkout feature/creating_base_action
-        git fetch origin ${{ inputs.base-branch }}
-        git branch ${{ inputs.base-branch }} origin/${{ inputs.base-branch }}
+        git switch -c ${{ github.head_ref }}
+        git fetch origin ${{ inputs.base-branch }}:${{ inputs.base-branch }}
 
     - name: "execute script"
       shell: bash
