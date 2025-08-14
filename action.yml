@@ -14,11 +14,11 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: "Checkout repository"
-      uses: actions/checkout@v4
-      with:
-        # ref: ${{ inputs.base-branch }}
-        fetch-depth: 0
+    - name: "fetch main"
+      shell: bash
+      run: |
+        git fetch origin ${{ inputs.base-branch }} --depth=0
+        git branch ${{ inputs.base-branch }} origin/${{ inputs.base-branch }}
 
     - name: "execute script"
       shell: bash
