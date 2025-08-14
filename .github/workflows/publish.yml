@@ -61,9 +61,17 @@ jobs:
          end
          EOF
 
+      - name: Testing Formula
+        run: |
+          cd homebrew-tap
+          brew install --build-from-source --force ./Formula/is-my-code-great.rb
+          brew test is-my-code-great || true
+          brew uninstall is-my-code-great || true
+
       - name: Commit & push
         run: |
           cd homebrew-tap
           git add Formula/is-my-code-great.rb
           git commit -m "Automated formula update to ${{ env.version }}"
           git push origin HEAD:main
+      

@@ -1,0 +1,21 @@
+name: "Say Hello"
+description: "Greets and prints the SHA"
+author: "you"
+inputs:
+  who:
+    description: "Who to greet"
+    required: false
+    default: "world"
+outputs:
+  greeting:
+    description: "The full greeting"
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        echo "Hello, ${{ inputs.who }}! SHA=${GITHUB_SHA}"
+        echo "greeting=Hello, ${{ inputs.who }}!" >> "$GITHUB_OUTPUT"
+branding:
+  color: "blue"
+  icon: "mic"
