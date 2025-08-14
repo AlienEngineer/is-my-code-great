@@ -18,7 +18,7 @@ runs:
     - name: "fetch main"
       shell: bash
       run: |
-        git branch
+        git checkout feature/creating_base_action
         git fetch origin ${{ inputs.base-branch }}
         git branch ${{ inputs.base-branch }} origin/${{ inputs.base-branch }}
 
