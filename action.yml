@@ -1,21 +1,39 @@
-name: "Say Hello"
-description: "Greets and prints the SHA"
-author: "you"
+name: "Is my code great?"
+description: "Executes the is-my-code-great CLI tool to validate code quality."
+author: "AlienEngineer"
 inputs:
-  who:
-    description: "Who to greet"
+  base-branch:
+    description: "Base branch to compare against"
     required: false
-    default: "world"
+    default: "main"
 outputs:
   greeting:
     description: "The full greeting"
 runs:
   using: "composite"
   steps:
-    - shell: bash
+    - name: "execute script"
       run: |
-        echo "Hello, ${{ inputs.who }}! SHA=${GITHUB_SHA}"
-        echo "greeting=Hello, ${{ inputs.who }}!" >> "$GITHUB_OUTPUT"
+        bin/is-my-code-great -b ${{ inputs.base-branch }} > results.txt
+        echo "VALIDATION_OUTPUT<<EOF" >> $GITHUB_ENV
+        cat results.txt >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+
+    - name: "Comment PR with results"
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const results = process.env.VALIDATION_OUTPUT || 'No results found.';
+          const commentBody = `### Is My Code Great Results:\n\n\`\`\`\n${results}\n\`\`\``;
+
+          await github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+            body: commentBody
+          });
+
+
 branding:
   color: "blue"
   icon: "mic"
