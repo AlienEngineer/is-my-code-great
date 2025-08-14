@@ -5,7 +5,7 @@ Command-line tool to verify arbitrary aspects about code. Has initial support fo
 
 ```
     - name: is my code great?
-      uses: alienengineer/is-my-code-great@v0.9.13
+      uses: alienengineer/is-my-code-great@v0.9.22
       with:
         base-branch: main   # Optional, set to the branch you want to compare against
         verbose: true       # Optional, set to true for detailed output
