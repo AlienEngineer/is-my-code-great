@@ -10,6 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          token: ${{ secrets.INTERNAL_GITHUB_TOKEN }}
           fetch-depth: 0
           fetch-tags: true
 
@@ -21,6 +22,4 @@ jobs:
           git config --global user.email "AlienEngineer@gmail.com"
           git tag "$TAG"
           git push origin "$TAG"
-        env:
-          GITHUB_TOKEN: ${{ secrets.INTERNAL_GITHUB_TOKEN }}
           
