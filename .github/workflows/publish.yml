@@ -75,7 +75,3 @@ jobs:
           git commit -m "Automated formula update to ${{ env.version }}"
           git push origin HEAD:main
       
-      - name: is my code great?
-        uses: alienengineer/is-my-code-great@v0.9.8
-        with:
-          who: "world"
