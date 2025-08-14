@@ -1,0 +1,24 @@
+name: Merge Main
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Create and push new tag
+        run: |
+          VERSION=$(cat VERSION)
+          TAG="v${VERSION}"
+          git config --global user.name "AlienEngineer"
+          git config --global user.email "AlienEngineer@gmail.com"
+          git tag "$TAG"
+          git push origin "$TAG"
+          
