@@ -2,7 +2,7 @@
 
 function find_text_in_test() {
     local pattern="$1"
-    local files=$(get_files_to_analyse)
+    local files=$(get_test_files_to_analyse)
     local count=0
     for file in $files; do
         while IFS= read -r match; do
@@ -15,7 +15,7 @@ function find_text_in_test() {
 
 function find_regex_in_test() {
     local pattern="$1"
-    local files=$(get_files_to_analyse)
+    local files=$(get_test_files_to_analyse)
     local count=0
     for file in $files; do
         while IFS= read -r match; do

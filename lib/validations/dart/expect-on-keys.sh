@@ -20,7 +20,7 @@ get_find_by_key_lines() {
 
 function _find_expect_on_keys() {
   local files
-  files="$(get_files_to_analyse)"
+  files="$(get_test_files_to_analyse)"
 
   for file in $files; do
     [[ -f "$file" ]] || continue
@@ -39,7 +39,7 @@ function _count_expect_on_keys() {
   echo "$total"
 }
 
-register_validation \
+register_test_validation \
     "expect-on-keys" \
     "HIGH" \
     "_count_expect_on_keys" \

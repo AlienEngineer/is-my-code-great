@@ -2,10 +2,11 @@
 Command-line tool to verify arbitrary aspects about code. Has initial support for dart and C#.
 
 ## use it as a github action
+### is-my-code-great@v0
 
 ```
     - name: is my code great?
-      uses: alienengineer/is-my-code-great@v0.9.22
+      uses: alienengineer/is-my-code-great@v0
       with:
         base-branch: main   # Optional, set to the branch you want to compare against
         verbose: true       # Optional, set to true for detailed output
@@ -52,8 +53,15 @@ function my_custom_validaton() {
  echo -1
 }
 
-# registers the new validation
-register_validation \
+# registers a new test validation (choose this one for testing validations)
+register_test_validation \
+    "<unique_key>" \
+    "<severity>" \ # LOW, HIGH, CRITICAL
+    "my_custom_validaton" \
+    "<description>:"
+
+# registers a new production code validation (choose this one for production code validations)
+register_code_validation \
     "<unique_key>" \
     "<severity>" \ # LOW, HIGH, CRITICAL
     "my_custom_validaton" \

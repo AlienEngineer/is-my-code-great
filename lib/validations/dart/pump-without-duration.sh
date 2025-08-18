@@ -5,7 +5,7 @@ function _find_pump_without_duration() {
     echo "$count"
 }
 
-register_validation \
+register_test_validation \
     "pump-without-duration" \
     "LOW" \
     "_find_pump_without_duration" \

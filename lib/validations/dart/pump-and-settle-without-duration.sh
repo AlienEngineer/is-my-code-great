@@ -5,7 +5,7 @@ function _find_pump_and_settle_without_duration() {
     echo "$count"
 }
 
-register_validation \
+register_test_validation \
     "pump-and-settle-without-duration" \
     "LOW" \
     "_find_pump_and_settle_without_duration" \

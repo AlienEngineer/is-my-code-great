@@ -5,7 +5,7 @@ function _find_widgets_predicate() {
     echo "$count"
 }
 
-register_validation \
+register_test_validation \
     "widgets-predicate" \
     "LOW" \
     "_find_widgets_predicate" \

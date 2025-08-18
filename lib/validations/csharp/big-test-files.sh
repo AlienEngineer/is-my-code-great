@@ -56,7 +56,7 @@ find_big_tests_in_file() {
 
 find_big_functions() {  
   local files
-  files="$(get_files_to_analyse)"
+  files="$(get_test_files_to_analyse)"
 
   for file in $files; do
     [[ -f "$file" ]] || continue
@@ -74,7 +74,7 @@ function count_big_test_methods() {
   echo "$total"
 }
 
-register_validation \
+register_test_validation \
     "big-test-files" \
     "HIGH" \
     "count_big_test_methods" \

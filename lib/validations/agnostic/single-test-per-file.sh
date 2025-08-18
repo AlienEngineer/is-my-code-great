@@ -1,7 +1,7 @@
 
 function get_count_test_per_file() {
   local files
-  files="$(get_files_to_analyse)"
+  files="$(get_test_files_to_analyse)"
 
   local total=0
   for file in $files; do
@@ -21,7 +21,7 @@ function get_count_test_per_file() {
   echo "$total"
 }
 
-register_validation \
+register_test_validation \
     "tests-per-file" \
     "CRITICAL" \
     "get_count_test_per_file" \
