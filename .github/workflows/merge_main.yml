@@ -16,10 +16,18 @@ jobs:
 
       - name: Create and push new tag
         run: |
-          VERSION=$(cat VERSION)
-          TAG="v${VERSION}"
+          
           git config --global user.name "AlienEngineer"
           git config --global user.email "AlienEngineer@gmail.com"
+
+          VERSION=$(cat VERSION)
+          MAJOR="v${VERSION%%.*}"
+          
+          git push origin :refs/tags/$MAJOR
+          git tag -fa "$MAJOR" -m "Release $MAJOR"
+          git push origin "$MAJOR"
+
+          TAG="v${VERSION}"
           git tag "$TAG"
           git push origin "$TAG"
           
