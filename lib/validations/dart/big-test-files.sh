@@ -77,7 +77,7 @@ function _count_big_test_methods() {
   echo "$total"
 }
 
-register_validation \
+register_test_validation \
     "big-test-files" \
     "HIGH" \
     "_count_big_test_methods" \

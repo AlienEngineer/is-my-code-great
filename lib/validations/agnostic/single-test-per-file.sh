@@ -21,7 +21,7 @@ function get_count_test_per_file() {
   echo "$total"
 }
 
-register_validation \
+register_test_validation \
     "tests-per-file" \
     "CRITICAL" \
     "get_count_test_per_file" \

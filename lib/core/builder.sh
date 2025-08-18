@@ -1,9 +1,40 @@
-declare -a SEVERITY COMMAND TITLE VALIDATION EXECUTION_TIME DETAILS
+declare -a SEVERITY COMMAND TITLE VALIDATION EXECUTION_TIME DETAILS CATEGORY
+
+function register_test_validation() {
+    local check_name="$1"
+    local severity="$2"
+    local command="$3"
+    local title="$4"
+    local category="TESTS"
+
+    if [[ -z "$check_name" || -z "$severity" || -z "$command" || -z "$title" ]]; then
+        echo "Error: Missing parameters for register_test_validation." >&2
+        return 1
+    fi
+
+    register_validation "$check_name" "$severity" "$command" "$title" "$category"
+}
+
+function register_code_validation() {
+    local check_name="$1"
+    local severity="$2"
+    local command="$3"
+    local title="$4"
+    local category="PRODUCTION"
+
+    if [[ -z "$check_name" || -z "$severity" || -z "$command" || -z "$title" ]]; then
+        echo "Error: Missing parameters for register_test_validation." >&2
+        return 1
+    fi
+
+    register_validation "$check_name" "$severity" "$command" "$title" "$category"
+}
 
 function register_validation() {
     local check_name="$1"
     SEVERITY+=("$2")
     TITLE+=("$4")
+    CATEGORY+=("$5")
     VALIDATION+=("$check_name")
 
     start_new_evaluation_details
@@ -25,7 +56,6 @@ function register_validation() {
     EXECUTION_TIME+=("$elapsed")
 
     print_verbose "[builder] Validation '$check_name' executed in $elapsed ms with result: $result"
-
 }
 
 function get_validations() {

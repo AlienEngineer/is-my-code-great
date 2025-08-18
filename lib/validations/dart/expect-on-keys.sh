@@ -39,7 +39,7 @@ function _count_expect_on_keys() {
   echo "$total"
 }
 
-register_validation \
+register_test_validation \
     "expect-on-keys" \
     "HIGH" \
     "_count_expect_on_keys" \

@@ -6,7 +6,7 @@ function get_verifies_count() {
     echo $((verifyCount + 0))
 }
 
-register_validation \
+register_test_validation \
     "verifies" \
     "HIGH" \
     "get_verifies_count" \
