@@ -21,11 +21,14 @@ jobs:
           TAG=${GITHUB_REF#refs/tags/}
           echo "$TAG"
           
+          echo "version=$TAG" >> $GITHUB_ENV
+
           # Require format vX.X.X (two dots)
           if ! [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "❌ Invalid version for homebrew: $TAG"
             exit 0
           fi
+
           URL="https://github.com/alienengineer/is-my-code-great/archive/$TAG.tar.gz"
           echo "$URL"
           curl -LJO $URL
@@ -33,42 +36,63 @@ jobs:
           SHA=$(shasum -a256 $FILE | awk '{print $1}')
           echo $SHA
           echo "sha256=$SHA" >> $GITHUB_ENV
-          echo "version=$TAG" >> $GITHUB_ENV
           
       - name: Clone homebrew-tap
         env:
           TARGET_REPO_TOKEN: ${{ secrets.TARGET_REPO_TOKEN }}
         run: |
+
+          # Require format vX.X.X (two dots)
+          if ! [[ "${{ env.version }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "❌ Invalid version for homebrew: ${{ env.version }}"
+            exit 0
+          fi
+
+
           git config --global user.name "AlienEngineer"
           git config --global user.email "AlienEngineer@gmail.com"
           git clone https://AlienEngineer:${TARGET_REPO_TOKEN}@github.com/AlienEngineer/homebrew-tap.git
           
       - name: Update formula
         run: |
-         cd homebrew-tap
-         cat > Formula/is-my-code-great.rb <<EOF 
-         class IsMyCodeGreat < Formula
-           desc "CLI to analyse Dart test code quality"
-           homepage "https://github.com/alienengineer/is-my-code-great"
-           url      "https://github.com/alienengineer/is-my-code-great/archive/${{ env.version }}.tar.gz"
-           sha256   "${{ env.sha256 }}"
 
-           def install
-             lib.install Dir["lib/*"]
-             bin.install "bin/is-my-code-great"
-            man1.install Dir["share/man/man1/*"]
-           end
+          # Require format vX.X.X (two dots)
+          if ! [[ "${{ env.version }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "❌ Invalid version for homebrew: ${{ env.version }}"
+            exit 0
+          fi
 
-           test do
-             bin_path = bin/"is-my-code-great"
-             assert_predicate bin_path, :exist?, "Binary not installed"
-             assert_predicate bin_path, :executable?, "Binary is not executable"
-           end
-         end
-         EOF
+          cd homebrew-tap
+          cat > Formula/is-my-code-great.rb <<EOF 
+          class IsMyCodeGreat < Formula
+            desc "CLI to analyse Dart test code quality"
+            homepage "https://github.com/alienengineer/is-my-code-great"
+            url      "https://github.com/alienengineer/is-my-code-great/archive/${{ env.version }}.tar.gz"
+            sha256   "${{ env.sha256 }}"
+
+            def install
+              lib.install Dir["lib/*"]
+              bin.install "bin/is-my-code-great"
+              man1.install Dir["share/man/man1/*"]
+            end
+
+            test do
+              bin_path = bin/"is-my-code-great"
+              assert_predicate bin_path, :exist?, "Binary not installed"
+              assert_predicate bin_path, :executable?, "Binary is not executable"
+            end
+          end
+          EOF
 
       - name: Commit & push
         run: |
+
+          # Require format vX.X.X (two dots)
+          if ! [[ "${{ env.version }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "❌ Invalid version for homebrew: ${{ env.version }}"
+            exit 0
+          fi
+          
           cd homebrew-tap
           git add Formula/is-my-code-great.rb
           git commit -m "Automated formula update to ${{ env.version }}"
