@@ -7,8 +7,20 @@ function dump_summary() {
         printf "%-40s %10d\n" "Total Tests:" "$totalTests"
         printf "%-40s %10d\n\n" "Total Issues Found:" "$totalIssues"
 
+        printf "%-40s %10s %-10s %15s\n" "Issues on Production Code:" "#" "Severity" "Execution Time"
+        get_production_validations | while read -r validation; do
+            printf "%-40s %10d %-10s %15s\n" \
+                "$(get_title "$validation")" \
+                "$(get_result "$validation")" \
+                "$(get_severity "$validation")" \
+                "$(get_execution_time "$validation")ms"
+        done
+
+
+        printf "\n\n"
+
         printf "%-40s %10s %-10s %15s\n" "Issues on Tests:" "#" "Severity" "Execution Time"
-        get_validations | while read -r validation; do
+        get_test_validations | while read -r validation; do
             printf "%-40s %10d %-10s %15s\n" \
                 "$(get_title "$validation")" \
                 "$(get_result "$validation")" \

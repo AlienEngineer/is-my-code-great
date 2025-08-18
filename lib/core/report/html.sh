@@ -17,10 +17,20 @@ function export_report() {
             color:#111;
             font:14px/1.5 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Ubuntu,Arial
         }
+        h1{
+            text-align:center;
+            margin:24px 0;
+            color:#1f8fff;
+        }
+        .note{
+            text-align:center;
+            margin:0 0 24px;
+            color:#666;
+        }
         .card{
             max-width:1000px;
             margin:24px auto;
-            padding:18px 22px 42px;
+            padding:18px 22px 22px;
             background:#fff;
             border:2px solid #1f8fff;
             border-radius:14px;
@@ -68,16 +78,14 @@ function export_report() {
         }
         .card .found{
             position:absolute;
-            left:26px;
-            bottom:14px;
+            right: 227px;
             margin:0;
             font-weight:700;
             color:#111;
         }
         .card .elapsed{
             position:absolute;
-            right:26px;
-            bottom:14px;
+            right: 100px;
             margin:0;
             color:#111;
         }
@@ -94,7 +102,21 @@ function export_report() {
         }
     </style>
 "
-    get_validations | while read -r validation; do
+
+    print_to_file "
+    <body>
+        <h1>Detailed Validation Results</h1>
+        <p class='note'>Click on the titles to expand details.</p>
+    "
+
+    print_to_file "
+        <div class='card collapsed'>
+            <div class='card-header'>
+                <h2>Production Code Validations</h2>
+            </div>
+            <div class='card-content'>
+    "
+    get_production_validations | while read -r validation; do
         local found=$(get_result "$validation")
         local severity=$(get_severity "$validation")
         local elapsed=$(get_execution_time "$validation")
@@ -103,6 +125,8 @@ function export_report() {
         <div class='card collapsed'>
             <div class='card-header'>
                 <h2 class='title'>$title</h2>
+                <span class='found'>Found: $found</span>
+                <span class='elapsed'>Elapsed: ${elapsed}ms</span>
                 <span class='severity'>$severity</span>
             </div>
             <div class='card-content'>
@@ -117,14 +141,57 @@ function export_report() {
         done
         print_to_file "
             </div>
-            <p class='found'>Found: $found</p>
-            <p class='elapsed'>Execution Time: ${elapsed}ms</p>
         </div>
 "
     done
 
+    print_to_file "
+        </div>
+        </div>
+"
 
     print_to_file "
+        <div class='card collapsed'>
+            <div class='card-header'>
+                <h2>Test Validations</h2>
+            </div>
+            <div class='card-content'>
+    "
+    get_test_validations | while read -r validation; do
+        local found=$(get_result "$validation")
+        local severity=$(get_severity "$validation")
+        local elapsed=$(get_execution_time "$validation")
+        local title=$(get_title "$validation")
+        print_to_file "
+        <div class='card collapsed'>
+            <div class='card-header'>
+                <h2 class='title'>$title</h2>
+                <span class='found'>Found: $found</span>
+                <span class='elapsed'>Elapsed: ${elapsed}ms</span>
+                <span class='severity'>$severity</span>
+            </div>
+            <div class='card-content'>
+"
+        get_execution_details "$validation" | while read -r detail; do
+            file="${detail%%:*}"
+            rest="${detail#*:}"
+            linenum="${rest%%:*}"
+            label="${rest#*:}"
+
+            print_to_file "$(printf '<a href="vscode://file/%s:%s">%s</a>\n' "$file" "$linenum" "$label")"
+        done
+        print_to_file "
+            </div>
+        </div>
+"
+    done
+
+    print_to_file "
+        </div>
+"
+
+    print_to_file "
+    </body>
     <script>
         // Toggle collapse on click
         document.querySelectorAll('.card-header').forEach(header => {

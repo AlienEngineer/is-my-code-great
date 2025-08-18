@@ -17,7 +17,7 @@ function _validate_git_repo() {
     return 0
 }
 
-function get_git_files() {
+function get_git_test_files() {
 
     local original_dir=$(pwd)
     cd "$DIR" || { echo "❌ Dir not found: $DIR" >&2; return 1; }
@@ -30,6 +30,26 @@ function get_git_files() {
 
     files=$(
         git diff --name-only "$BASE_BRANCH"..."$CURRENT_BRANCH" -- "$TEST_FILE_PATTERN" \
+        | awk -v root="$repo_root" 'NF{print root "/" $0}'
+    )
+
+    cd "$original_dir" 
+    echo "$files"
+}
+
+function get_git_files() {
+
+    local original_dir=$(pwd)
+    cd "$DIR" || { echo "❌ Dir not found: $DIR" >&2; return 1; }
+    _validate_git_repo "$BASE_BRANCH" "$CURRENT_BRANCH" || {
+        cd "$original_dir"
+        return 1
+    }
+    
+    repo_root=$(get_repo_root)
+
+    files=$(
+        git diff --name-only "$BASE_BRANCH"..."$CURRENT_BRANCH" \
         | awk -v root="$repo_root" 'NF{print root "/" $0}'
     )
 

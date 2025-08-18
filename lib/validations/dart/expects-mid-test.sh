@@ -52,7 +52,7 @@ find_expects_in_the_middle_in_file() {
 
 _find_count_expects_in_middle() {
   local total=0
-  for file in $(get_files_to_analyse); do
+  for file in $(get_test_files_to_analyse); do
     [[ -f "$file" ]] || continue
     find_expects_in_the_middle_in_file "$file"
   done

@@ -49,7 +49,7 @@ find_big_tests_in_file() {
 
 find_big_functions() {  
   local files
-  files="$(get_files_to_analyse)"
+  files="$(get_test_files_to_analyse)"
 
   for file in $files; do
     [[ -f "$file" ]] || continue

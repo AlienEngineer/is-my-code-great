@@ -23,7 +23,10 @@ function register_code_validation() {
     local category="PRODUCTION"
 
     if [[ -z "$check_name" || -z "$severity" || -z "$command" || -z "$title" ]]; then
-        echo "Error: Missing parameters for register_test_validation." >&2
+        echo "Error: Missing parameters for register_code_validation." >&2
+        echo "Check name: $check_name, Severity: $severity, Command: $command, Title: $title" >&2
+        echo "Category: $category" >&2
+        echo "Please ensure all parameters are provided." >&2
         return 1
     fi
 
@@ -58,8 +61,30 @@ function register_validation() {
     print_verbose "[builder] Validation '$check_name' executed in $elapsed ms with result: $result"
 }
 
-function get_validations() {
-    printf "%s\n" "${VALIDATION[@]}"
+function get_test_validations() {
+    local validations=()
+    for i in "${!VALIDATION[@]}"; do
+        if [[ "${CATEGORY[$i]}" == "TESTS" ]]; then
+            validations+=("${VALIDATION[$i]}")
+        fi
+    done
+    printf "%s\n" "${validations[@]}"
+}
+
+function get_production_validations() {
+    local validations=()
+    for i in "${!VALIDATION[@]}"; do
+        if [[ "${CATEGORY[$i]}" == "PRODUCTION" ]]; then
+            validations+=("${VALIDATION[$i]}")
+        fi
+    done
+    printf "%s\n" "${validations[@]}"
+}
+
+function get_category() {
+    local index
+    index=$(get_index "$1")
+    echo "${CATEGORY[$index]}"
 }
 
 function get_index() {
