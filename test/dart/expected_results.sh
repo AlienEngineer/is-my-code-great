@@ -4,6 +4,7 @@
 # Format: validation_key:expected_count
 
 EXPECTED_RESULTS="
+law-of-demeter:1
 big-test-files:1
 expect-on-keys:3
 expects-in-middle:7

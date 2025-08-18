@@ -28,4 +28,4 @@ register_code_validation \
     "law-of-demeter" \
     "HIGH" \
     "my_custom_validaton" \
-    "law-of-demeter:"
+    "law-of-demeter (>2):"
