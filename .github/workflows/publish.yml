@@ -20,6 +20,12 @@ jobs:
         run: |
           TAG=${GITHUB_REF#refs/tags/}
           echo "$TAG"
+          
+          # Require format vX.X.X (two dots)
+          if ! [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "❌ Invalid version for homebrew: $TAG"
+            exit 0
+          fi
           URL="https://github.com/alienengineer/is-my-code-great/archive/$TAG.tar.gz"
           echo "$URL"
           curl -LJO $URL
