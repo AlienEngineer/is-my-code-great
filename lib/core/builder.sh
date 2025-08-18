@@ -142,6 +142,9 @@ function get_total_execution_time() {
 }
 
 function print_validations_parseable() {
+    get_production_validations | while read -r validation; do
+        printf "%s=%d\n" "$validation" "$(get_result "$validation")"
+    done
     get_test_validations | while read -r validation; do
         printf "%s=%d\n" "$validation" "$(get_result "$validation")"
     done
