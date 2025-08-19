@@ -28,8 +28,11 @@ function get_git_test_files() {
     
     repo_root=$(get_repo_root)
 
+    print_verbose "[git] Repo root: $repo_root"
+    print_verbose "[git] Test file patterns: $TEST_FILE_PATTERN"
+
     files=$(
-        git diff --name-only "$BASE_BRANCH"..."$CURRENT_BRANCH" -- "$TEST_FILE_PATTERN" \
+        git diff --name-only --diff-filter=ACMRT "$BASE_BRANCH"..."$CURRENT_BRANCH" -- "$TEST_FILE_PATTERN" \
         | awk -v root="$repo_root" 'NF{print root "/" $0}'
     )
 
@@ -47,9 +50,10 @@ function get_git_files() {
     }
     
     repo_root=$(get_repo_root)
+    print_verbose "[git] Repo root: $repo_root"
 
     files=$(
-        git diff --name-only "$BASE_BRANCH"..."$CURRENT_BRANCH" \
+        git diff --name-only --diff-filter=ACMRT "$BASE_BRANCH"..."$CURRENT_BRANCH" \
         | awk -v root="$repo_root" 'NF{print root "/" $0}'
     )
 
