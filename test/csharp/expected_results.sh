@@ -4,8 +4,8 @@
 # Format: validation_key:expected_count
 
 EXPECTED_RESULTS="
-law-of-demeter:0
+law-of-demeter:1
 big-test-files:1
-verifies:0
+verifies:1
 tests-per-file:1
 "
