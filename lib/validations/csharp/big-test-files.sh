@@ -9,48 +9,20 @@ find_big_tests_in_file() {
         printf("%s:%d: (%d lines) %s\n", file, start, end-start, name)
       }
     }
-    function line_has_opening_brace(line) {
-      return line ~ /[{][ \t]*$|[{][ \t]*\/\//
-    }    
-    /\[TestMethod\]/ { 
-      #if (infunc) report(funcname, startline, NR - 1)
-      inTest = 1
-      infunc = 0
-      startline = 0
-      depth = 0
-      funcname=""
-      wait_for_open_brace = 1
-      
-      next 
+    /\[TestMethod\]/ { inTest=1; count=0; next }
+    /^[ \t]*public (void|async[ \t]+Task)[ \t]+[A-Za-z0-9_]+[ \t]*\(\)[ \t]*$/ {
+      funcname=$0
+      startline=NR
     }
-    {
-      # If we are in a test method, we need to check for the function name
-      if (inTest && !infunc && $0 ~ /^[ \t]*public (void|async[ \t]+Task)[ \t]+[A-Za-z0-9_]+[ \t]*\(\)[ \t]*$/) {
-        infunc = 1
-        startline = NR+2
-        funcname = $0
-      }
-      {
-        if (wait_for_open_brace && $0 ~ /{[ \t]*$/ || $0 ~ /^[ \t]*{[ \t]*$/) {
-          depth = 1
-          wait_for_open_brace = 0
+    /^[[:space:]]*}/ { 
+        if (inTest) {
+            report(funcname, startline, NR - 1)
         }
-        for (i = 1; i <= length($0); i++) {
-          c = substr($0, i, 1)
-          if (c == "{") depth++
-          if (c == "}") depth--
-        }
-        
-        if (depth == 0 && NR > startline) {
-          report(funcname, startline, NR-1)
-          infunc = 0
-          funcname = ""
-          startline = 0
-          wait_for_open_brace = 0
-        }
-      }
+        inTest=0 
     }
-    END { } 
+    inTest {
+        count++ 
+    }
   ' "$file"
 }
 
@@ -79,3 +51,5 @@ register_test_validation \
     "HIGH" \
     "count_big_test_methods" \
     "C# Test methods > 15 lines:"
+
+# find_big_functions

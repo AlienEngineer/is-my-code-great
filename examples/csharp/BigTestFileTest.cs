@@ -21,4 +21,16 @@ public class TestClass
         // This is my test
         // This is my test
     }
+
+    [TestMethod]
+    public void My_test1()
+    {
+        // This is my test
+        // This is my test
+        // This is my test
+        // This is my test
+        // This is my test
+        // This is my test
+        // This is my test
+    }
 }
