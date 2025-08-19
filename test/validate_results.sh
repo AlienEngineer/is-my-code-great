@@ -28,16 +28,16 @@ fi
 source "$EXPECTED_RESULTS_FILE"
 
 cd "$EXAMPLES_DIR"
-ACTUAL_RESULTS=$("$PROJECT_ROOT/bin/is-my-code-great" --parseable 2>/dev/null || true)
+ACTUAL_RESULTS=$("$PROJECT_ROOT/bin/is-my-code-great" -p 2>/dev/null || true)
 
 get_expected_count() {
     local key="$1"
-    echo "$EXPECTED_RESULTS" | grep "^$key:" | cut -d: -f2 | tr -d ' '
+    echo "$EXPECTED_RESULTS" | grep "^$key:" | cut -d: -f2 | tr -d ' ' || echo ""
 }
 
 get_actual_count() {
     local key="$1"
-    echo "$ACTUAL_RESULTS" | grep "^$key=" | cut -d= -f2 | tr -d ' '
+    echo "$ACTUAL_RESULTS" | grep "^$key=" | cut -d= -f2 | tr -d ' ' || echo ""
 }
 
 echo "Validating $LANGUAGE results..."
@@ -46,8 +46,6 @@ echo "================================"
 EXIT_CODE=0
 
 while IFS=: read -r expected_key expected_count; do
-    [ -z "$expected_key" ] && continue
-
     expected_key=$(echo "$expected_key" | tr -d ' ')
     expected_count=$(echo "$expected_count" | tr -d ' ')
 
@@ -62,16 +60,17 @@ while IFS=: read -r expected_key expected_count; do
     fi
 done < <(echo "$EXPECTED_RESULTS" | grep ":")
 
+
 while IFS= read -r line; do
     actual_key=$(echo "$line" | cut -d= -f1 | tr -d ' ')
     actual_value=$(echo "$line" | cut -d= -f2 | tr -d ' ')
 
-    [ -z "$actual_key" ] && continue
-
     expected_count=$(get_expected_count "$actual_key")
+
     if [ -z "$expected_count" ]; then
         echo "⚠ WARNING: Unexpected result found: $actual_key=$actual_value"
     fi
+    
 done < <(echo "$ACTUAL_RESULTS" | grep "=")
 
 echo "================================"
