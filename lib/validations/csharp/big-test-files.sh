@@ -31,7 +31,6 @@ find_big_functions() {
   files="$(get_test_files_to_analyse)"
 
   for file in $files; do
-    [[ -f "$file" ]] || continue
     find_big_tests_in_file "$file"
   done | sort -u
 }
