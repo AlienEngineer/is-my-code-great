@@ -8,9 +8,6 @@ on:
     branches:
       - main
 
-env:
-  LANGUAGES: "dart"  # Space-separated list of languages to validate
-
 jobs:
   validate-examples:
     runs-on: ubuntu-latest
@@ -24,7 +21,8 @@ jobs:
 
     - name: Run validation on specified languages
       id: validate
-      run: |
+      run: |        
+        LANGUAGES=$(ls -d examples/*/ | sed 's|examples/||; s|/||')
         echo "Running validation on languages: $LANGUAGES"
         
         OVERALL_SUCCESS=true
