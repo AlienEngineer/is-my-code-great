@@ -13,4 +13,5 @@ pump-without-duration:2
 tests-per-file:6
 verifies:4
 widgets-predicate:3
+exclude-from-code-coverage:2
 "
