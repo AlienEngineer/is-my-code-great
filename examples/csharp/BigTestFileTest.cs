@@ -20,6 +20,9 @@ public class TestClass
         // This is my test
         // This is my test
         // This is my test
+        {
+
+        }
     }
 
     [TestMethod]
@@ -33,4 +36,5 @@ public class TestClass
         // This is my test
         // This is my test
     }
+
 }

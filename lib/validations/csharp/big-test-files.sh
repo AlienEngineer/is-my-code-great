@@ -1,38 +1,54 @@
 #!/usr/bin/env bash
 
-find_big_tests_in_file() {
-  MAX_LINES="${2:-15}"
-  local file="$1"
-  awk -v max="$MAX_LINES" -v file="$file" '
-    function report(name, start, end) {
-      if (name != "" && end >= start && (end - start) > max) {
+find_big_functions() {  
+  grep -nE '\[TestMethod\]|public[[:space:]]+(void|async[[:space:]]+Task(<[^>]+>)?)[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*\(\)|\{|\}' -- $(get_test_files_to_analyse) \
+    | awk '
+    function report(file, name, start, end) {
+      if (name != "" && end >= start && (end - start) > 15) {
         printf("%s:%d: (%d lines) %s\n", file, start, end-start, name)
       }
     }
-    /\[TestMethod\]/ { inTest=1; count=0; next }
-    /^[ \t]*public (void|async[ \t]+Task)[ \t]+[A-Za-z0-9_]+[ \t]*\(\)[ \t]*$/ {
-      funcname=$0
-      startline=NR
+    function get_line_number(line) {
+      split(line, parts, ":")
+      lineno = parts[2]
+      return lineno
     }
-    /^[[:space:]]*}/ { 
-        if (inTest) {
-            report(funcname, startline, NR - 1)
-        }
-        inTest=0 
+    function get_file(line) {
+      split(line, parts, ":")
+      lineno = parts[1]
+      return lineno
     }
-    inTest {
-        count++ 
+    function get_funcname(line) {
+      split(line, parts, ":")
+      lineno = parts[3]
+      return lineno
     }
-  ' "$file"
-}
-
-find_big_functions() {  
-  local files
-  files="$(get_test_files_to_analyse)"
-
-  for file in $files; do
-    find_big_tests_in_file "$file"
-  done
+    /\[TestMethod\]/ { 
+      inTest=1 
+      count=0
+      depth=0
+      funcname=""
+      next 
+    }
+    inTest && funcname == "" {
+      funcname=get_funcname($0); next
+    }
+    inTest && /\{/ {
+      if (depth == 0) {
+        startline=get_line_number($0)+1
+      }    
+      depth++
+      next
+    }
+    inTest && /\}/ {
+      depth--
+      if (depth == 0) {
+        report(get_file($0), funcname, startline, get_line_number($0))
+        inTest=0
+        funcname=""
+      }
+    }
+    '
 }
 
 function count_big_test_methods() {
@@ -51,4 +67,3 @@ register_test_validation \
     "count_big_test_methods" \
     "C# Test methods > 15 lines:"
 
-# find_big_functions

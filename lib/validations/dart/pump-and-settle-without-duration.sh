@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 function _find_pump_and_settle_without_duration() {
-    count=$(find_text_in_test 'tester.pumpAndSettle()' "$DIR" "$BASE_BRANCH" "$CURRENT_BRANCH")
-    echo "$count"
+    find_text_in_test 'tester.pumpAndSettle()' "$DIR" "$BASE_BRANCH" "$CURRENT_BRANCH"
 }
 
 register_test_validation \
