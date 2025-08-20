@@ -13,7 +13,7 @@ find_lines_that_violate_law_of_demeter_in_file() {
 }
 
 my_custom_validaton() {
-    local files=$(get_test_files_to_analyse)
+    local files=$(get_files_to_analyse)
     local count=0
     for file in $files; do
         while IFS= read -r match; do

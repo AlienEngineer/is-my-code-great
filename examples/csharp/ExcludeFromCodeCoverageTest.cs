@@ -1,0 +1,5 @@
+[ExcludeFromCodeCoverage]
+public class SomeFile
+{
+
+}
