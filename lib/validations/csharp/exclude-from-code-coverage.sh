@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
 function count_exclusions() {
-    coverage=$(find_text_in_files '[ExcludeFromCodeCoverage]' "$DIR" "$BASE_BRANCH" "$CURRENT_BRANCH")
-
-    echo $((coverage + 0))
+    find_text_in_files '[ExcludeFromCodeCoverage]' "$DIR" "$BASE_BRANCH" "$CURRENT_BRANCH"
 }
 
 register_test_validation \

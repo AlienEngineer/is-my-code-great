@@ -53,7 +53,7 @@ function get_git_files() {
     print_verbose "[git] Repo root: $repo_root"
 
     files=$(
-        git diff --name-only --diff-filter=ACMRT "$BASE_BRANCH"..."$CURRENT_BRANCH" \
+        git diff --name-only --diff-filter=ACMRT "$BASE_BRANCH"..."$CURRENT_BRANCH" -- "$CODE_FILE_PATTERN" \
         | awk -v root="$repo_root" 'NF{print root "/" $0}'
     )
 

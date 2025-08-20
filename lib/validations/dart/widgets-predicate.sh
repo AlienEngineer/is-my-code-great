@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 function _find_widgets_predicate() {
-    count=$(find_text_in_test "find.byWidgetPredicate(" "$DIR" "$BASE_BRANCH" "$CURRENT_BRANCH")
-    echo "$count"
+    find_text_in_test "find.byWidgetPredicate(" "$DIR" "$BASE_BRANCH" "$CURRENT_BRANCH"
 }
 
 register_test_validation \
