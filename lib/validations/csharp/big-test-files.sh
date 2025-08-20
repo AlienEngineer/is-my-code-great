@@ -32,7 +32,7 @@ find_big_functions() {
 
   for file in $files; do
     find_big_tests_in_file "$file"
-  done | sort -u
+  done
 }
 
 function count_big_test_methods() {
