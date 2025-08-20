@@ -10,10 +10,7 @@ find_lines_that_violate_lod() {
 
 find_lines_that_violate_law_of_demeter_in_file() {
     local file="$1"
-    grep -nE '\b[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*){3,}\b' "$file" \
-     | grep -vE 'using ' \
-     | grep -vE 'namespace ' \
-     | grep -vE 'assembly\: ' \
+    find_lines_that_violate_lod "$file" \
      | while read -r line; do
         echo "$file:$line"
     done
