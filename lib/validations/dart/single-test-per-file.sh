@@ -1,5 +1,5 @@
 find_single_test_in_files() {
-  local -n batch="$1"; shift
+  local -n batch="$1";
   grep -nE "test\(|testWidgets\(|testGoldens\(" -- "${batch[@]}" \
   | awk '
       function get_file(line) {

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 function find_big_functions() {  
-  grep -nE 'test\('.*?',\s*\(\)(?: async)? \{|testWidgets\('.*?',\s*\(.*?\)(?: async)? \{|testGoldens\('.*?',\s*\(.*?\)(?: async)? \{|\}\);|.*?\(\(.*?\).*?\{' -- $(get_test_files_to_analyse) \
+  local -n batch="$1";
+  grep -nE 'test\('.*?',\s*\(\)(?: async)? \{|testWidgets\('.*?',\s*\(.*?\)(?: async)? \{|testGoldens\('.*?',\s*\(.*?\)(?: async)? \{|\}\);|.*?\(\(.*?\).*?\{' -- "${batch[@]}" \
   | awk '
     function report(file, name, start, end) {
       if (name != "" && end >= start && (end - start) > 15) {
@@ -50,7 +51,7 @@ function _count_big_test_methods() {
     while read -r line; do
         add_details "$line"
         total=$(( total + 1 ))
-    done < <(find_big_functions)
+    done < <(iterate_test_files find_big_functions)
 
     echo "$total"
 }

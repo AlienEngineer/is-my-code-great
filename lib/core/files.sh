@@ -73,7 +73,7 @@ function iterate_test_files() {
   while :; do
     mapfile -d '' -t files < <(get_test_files_paginated "$page" "$page_size" 2>/dev/null || printf '')
     ((${#files[@]})) || break
-    "$callback" files "$@"    
+    "$callback" "$@" files
     ((page++))
   done
 }
@@ -87,7 +87,7 @@ function iterate_code_files() {
   while :; do
     mapfile -d '' -t files < <(get_code_files_paginated "$page" "$page_size" 2>/dev/null || printf '')
     ((${#files[@]})) || break
-    "$callback" files "$@"    
+    "$callback" "$@" files
     ((page++))
   done
 }

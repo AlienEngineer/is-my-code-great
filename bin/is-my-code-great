@@ -13,7 +13,7 @@ CURRENT_BRANCH=""
 LOCAL_RUN=true
 DETAILED=false
 DETAILED_FILE="result.html"
-
+EVALUATION=""
 
 while [[ $# -gt 0 ]]; do
 	case $1 in
@@ -25,6 +25,10 @@ while [[ $# -gt 0 ]]; do
 			FRAMEWORK="$2"
 			shift 2
 			;;
+		#-e|--evaluation)
+		#	EVALUATION="$2"
+		#	shift 2
+		#	;;
 		-d|--detailed)
 			DETAILED=true
 			shift
@@ -102,6 +106,7 @@ if [ "$VERBOSE" = "1" ]; then
 	echo "[main] CURRENT_BRANCH: $CURRENT_BRANCH" >&2
 	echo "[main] LOCAL_RUN: $LOCAL_RUN" >&2
 	echo "[main] DETAILED: $DETAILED" >&2
+	echo "[main] EVALUATION: $EVALUATION" >&2
 fi
 
 source "$(dirname "$0")/../lib/analysis.sh"

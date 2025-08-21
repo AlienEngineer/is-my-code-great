@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 find_big_functions() {  
-  grep -nE '\[TestMethod\]|public[[:space:]]+(void|async[[:space:]]+Task(<[^>]+>)?)[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*\(\)|\{|\}' -- $(get_test_files_to_analyse) \
+  local -n batch="$1";
+  grep -nE '\[TestMethod\]|public[[:space:]]+(void|async[[:space:]]+Task(<[^>]+>)?)[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*\(\)|\{|\}' -- "${batch[@]}" \
     | awk '
     function report(file, name, start, end) {
       if (name != "" && end >= start && (end - start) > 15) {
@@ -56,7 +57,7 @@ function count_big_test_methods() {
   while read -r line; do
       add_details "$line"
       total=$(( total + 1 ))
-  done < <(find_big_functions)
+  done < <(iterate_test_files find_big_functions)
 
   echo "$total"
 }

@@ -1,36 +1,56 @@
 #!/usr/bin/env bash
 
 function find_in_files() {
-    local flags="$3"
-    local pattern="$1"
-    local files="$2"
+    local flags="$1"; shift
+    local pattern="$1"; shift
+    local -n batch="$1";
 
     if [[ "${DETAILED:-}" == "true" ]]; then
         local count=0
         while IFS= read -r match; do
             add_details "$match"
             count=$((count+1))
-        done < <(grep $flags "$pattern" -- $files)
+        done < <(grep $flags "$pattern" -- "${batch[@]}")
         echo "$count"
     else
-        local count=$(grep $flags "$pattern" -- $files | wc -l)
+        local count=$(grep $flags "$pattern" -- "${batch[@]}" | wc -l)
         count=$((count))
         echo "$count"
     fi
 }
 
-function find_text_in_test() {
-    find_in_files $1 "$(get_test_files_to_analyse)" -FnR
+function find_text_in_test() {    
+    local total=0
+    while IFS= read -r n; do
+        (( total += n ))
+    done < <(iterate_test_files find_in_files "-FnR" $1)
+
+    echo "$total"
 }
 
-function find_regex_in_test() {
-    find_in_files $1 "$(get_test_files_to_analyse)" -RnE
+function find_regex_in_test() { 
+    local total=0
+    while IFS= read -r n; do
+        (( total += n ))
+    done < <(iterate_test_files find_in_files "-RnE" $1)
+
+    echo "$total"
 }
 
 function find_text_in_files() {
-    find_in_files $1 "$(get_files_to_analyse)" -FnR
+    local total=0
+    while IFS= read -r n; do
+        (( total += n ))
+    done < <(iterate_code_files find_in_files "-FnR" $1)
+
+    echo "$total"    
 }
 
 function find_regex_in_files() {
-    find_in_files $1 "$(get_files_to_analyse)" -RnE
+    local total=0
+    while IFS= read -r n; do
+        (( total += n ))
+    done < <(iterate_code_files find_in_files "-FnR" $1)
+
+    echo "$total"    
 }

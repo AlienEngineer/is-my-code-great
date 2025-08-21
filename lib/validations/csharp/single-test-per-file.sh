@@ -1,6 +1,6 @@
 
 find_single_test_in_files() {
-  local -n batch="$1"; shift
+  local -n batch="$1";
   grep -nE "\[TestMethod\]|public[[:space:]]+(void|async[[:space:]]+Task(<[^>]+>)?)[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*\(\)" -- "${batch[@]}" \
   | awk '
       function get_file(line) {
