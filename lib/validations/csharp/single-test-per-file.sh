@@ -1,6 +1,7 @@
 
 find_single_test_in_files() {
-  grep -nE "test\(|testWidgets\(|testGoldens\(" -- $(get_test_files_to_analyse) \
+  local -n batch="$1"; shift
+  grep -nE "\[TestMethod\]|public[[:space:]]+(void|async[[:space:]]+Task(<[^>]+>)?)[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*\(\)" -- "${batch[@]}" \
   | awk '
       function get_file(line) {
         split(line, parts, ":")
@@ -16,14 +17,15 @@ find_single_test_in_files() {
         if (count==0) {
           count=0
           previous_file=get_file($0)
-          printf("init\n")
         }
+        
+        #printf("%s (%d) \n", get_file($0), count)
 
         filename=get_file($0)
         if (previous_file == filename) {
           count++
         } else {
-          if (count==1){
+          if (count==2){
             printf("%s:%d \n", previous_file, get_line_number($0))
           }
           count=1        
@@ -32,31 +34,19 @@ find_single_test_in_files() {
         previous_file=filename
       }
       END {
-        if (count==1){
+        if (count==2){
           printf("%s:%d \n", previous_file, get_line_number($0))
         }
       }
   '
 }
 
-function get_count_test_per_file() {
-  local files
-  files="$(get_test_files_to_analyse)"
-
+function count_single_test_methods() {
   local total=0
-  for file in $files; do
-    [[ -f "$file" ]] || continue
-    local c=0
-    for pattern in "${TEST_FUNCTION_PATTERNS[@]}"; do
-      found=$(grep -Fo "$pattern" "$file" | wc -l);   
-      c=$((c + found))
-    done
-    if [[ "$c" -eq 1 ]] then 
-      total=$((total+1))
-      file_name="$(basename "$file")"
-      add_details "$file:0: $file_name"
-    fi
-  done
+  while read -r line; do
+      add_details "$line"
+      total=$(( total + 1 ))
+  done < <(iterate_test_files find_single_test_in_files)
 
   echo "$total"
 }
@@ -64,6 +54,7 @@ function get_count_test_per_file() {
 register_test_validation \
     "tests-per-file" \
     "CRITICAL" \
-    "get_count_test_per_file" \
+    "count_single_test_methods" \
     "Files with 1 Test:"
+
 
