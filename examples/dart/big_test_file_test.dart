@@ -29,4 +29,78 @@ void main() {
     await tester.pumpAndSettle(Duration(seconds: 1));
     expect(find.text('0'), findsOneWidget);
   });
+
+  test('Some other test', () {
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+  });
+
+  testGoldens('bla bla bla', (tester) async {
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+  });
+
+  testWidgets('some test name', (tester) async {
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    // some golden test here
+    await tester.runAsync(() async {
+      someBuilder.build((context) {
+        return Container();
+      });
+    });
+  });
 }

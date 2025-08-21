@@ -19,10 +19,5 @@ void main() {
       find.byWidgetPredicate((widget) => widget is Text && widget.data?.contains('Test') == true),
       findsAtLeastNWidget(1)
     );
-
-    expect(
-      find.byWidgetPredicate((widget) => widget is ElevatedButton),
-      findsOneWidget
-    );
   });
 }
