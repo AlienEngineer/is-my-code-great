@@ -19,38 +19,42 @@ function find_in_files() {
     fi
 }
 
-function find_text_in_test() {    
+function sum_test_results() {
+    local flags="$1"; shift
+    local pattern="$1"; shift
+
     local total=0
     while IFS= read -r n; do
         (( total += n ))
-    done < <(iterate_test_files find_in_files "-FnR" $1)
+    done < <(iterate_test_files find_in_files "$flags" $pattern)
 
     echo "$total"
+}
+
+function sum_code_results() {
+    local flags="$1"; shift
+    local pattern="$1"; shift
+
+    local total=0
+    while IFS= read -r n; do
+        (( total += n ))
+    done < <(iterate_code_files find_in_files "$flags" $pattern)
+
+    echo "$total"
+}
+
+function find_text_in_test() {
+    sum_test_results "-FnR" $1
 }
 
 function find_regex_in_test() { 
-    local total=0
-    while IFS= read -r n; do
-        (( total += n ))
-    done < <(iterate_test_files find_in_files "-RnE" $1)
-
-    echo "$total"
+    sum_test_results "-RnE" $1
 }
 
 function find_text_in_files() {
-    local total=0
-    while IFS= read -r n; do
-        (( total += n ))
-    done < <(iterate_code_files find_in_files "-FnR" $1)
-
-    echo "$total"    
+    sum_code_results "-FnR" $1
 }
 
 function find_regex_in_files() {
-    local total=0
-    while IFS= read -r n; do
-        (( total += n ))
-    done < <(iterate_code_files find_in_files "-FnR" $1)
-
-    echo "$total"    
+    sum_code_results "-RnE" $1
 }
