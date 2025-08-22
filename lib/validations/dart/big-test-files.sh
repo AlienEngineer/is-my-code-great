@@ -1,80 +1,59 @@
 #!/usr/bin/env bash
-
-function _find_big_functions() {
-  MAX_LINES="${2:-15}"
-  local file="$1"
-  awk -v max="$MAX_LINES" -v file="$file" '
-      function report(name, start, end) {
-        if (name != "" && end >= start && (end - start + 1) > max) {
-          printf("%s:%d: (%d lines) %s\n", file, start, end-start+1, name)
-        }
-      }
-      function line_has_opening_brace(line) {
-        return line ~ /[{][ \t]*$|[{][ \t]*\/\//
-      }
-      /^[ \t]*(Future<.*>|Stream<.*>|void|int|double|bool|String|List<.*>|Map<.*>|dynamic|var)?[ \t]+[A-Za-z0-9_<>]+\s*\([^)]*\)[ \t]*(async)?[ \t]*[{]?[ \t]*$/ {
-        if (infunc) report(funcname, startline, NR - 1)
-        infunc = 1
-        startline = NR
-        funcname = $0
-        depth = 0
-        if (line_has_opening_brace($0)) {
-          depth = 1
-        } else {
-          wait_for_open_brace = 1
-        }
-        next
-      }
-      {
-        if (infunc) {
-          if (wait_for_open_brace && $0 ~ /^[ \t]*{/) {
-            depth = 1
-            wait_for_open_brace = 0
-          }
-          for (i = 1; i <= length($0); i++) {
-            c = substr($0, i, 1)
-            if (c == "{") depth++
-            if (c == "}") depth--
-          }
-          if (depth == 0) {
-            report(funcname, startline, NR)
-            infunc = 0
-            funcname = ""
-            startline = 0
-            wait_for_open_brace = 0
-          }
-        }
-      }
-      END {
-        if (infunc) report(funcname, startline, NR)
-      }
-    ' "$file"
-}
-
 function find_big_functions() {  
-  local files
-  files="$(get_test_files_to_analyse)"
-
-  for file in $files; do
-    [[ -f "$file" ]] || continue
-    _find_big_functions "$file"
-  done | sort -u
+  local -n batch="$1";
+  grep -nE 'test\('.*?',\s*\(\)( async)? \{|testWidgets\('.*?',\s*\(.*?\)( async)? \{|testGoldens\('.*?',\s*\(.*?\)( async)? \{|\}\);|.*?\(\(.*?\).*?\{' -- "${batch[@]}" \
+  | awk '
+    function report(file, name, start, end) {
+      if (name != "" && end >= start && (end - start) > 15) {
+        printf("%s:%d: (%d lines) %s\n", file, start, end-start, name)
+      }
+    }
+    function get_line_number(line) {
+      split(line, parts, ":")
+      lineno = parts[2]
+      return lineno
+    }
+    function get_file(line) {
+      split(line, parts, ":")
+      lineno = parts[1]
+      return lineno
+    }
+    function get_funcname(line) {
+      split(line, parts, ":")
+      lineno = parts[3]
+      return lineno
+    }
+    /testWidgets\(|test\(|testGoldens\(/ { 
+      inTest=1 
+      count=0
+      depth=1
+      funcname=get_funcname($0); 
+      startline=get_line_number($0)+1
+      next
+    }
+    inTest && /\{/ {
+      depth++
+      next
+    }
+    inTest && /\}/ {
+      depth--
+      if (depth == 0) {
+        report(get_file($0), funcname, startline, get_line_number($0))
+        inTest=0
+        funcname=""
+      }
+    }
+    '
 }
 
 function _count_big_test_methods() {
-  local total=0
-  while read -r line; do
-      for pattern in "${TEST_FUNCTION_PATTERNS[@]}"; do
-        local count=0
-        count=$(printf "%s\n" "$line" | grep -F "$pattern" | wc -l)
-        if [[ $count -gt 0 ]]; then
-          add_details "$line"
-        fi
-        total=$(( total + count ))
-      done
-  done < <(find_big_functions)
+    local total=0
+    while read -r line; do
+        add_details "$line"
+        total=$(( total + 1 ))
+    done < <(iterate_test_files find_big_functions)
 
-  echo "$total"
+    echo "$total"
 }
 
 register_test_validation \
@@ -82,3 +61,5 @@ register_test_validation \
     "HIGH" \
     "_count_big_test_methods" \
     "Big Tests (>15 lines):"
+
+
