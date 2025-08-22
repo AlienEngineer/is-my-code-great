@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 function find_big_functions() {  
   local -n batch="$1";
-  grep -nE 'test\('.*?',\s*\(\)(?: async)? \{|testWidgets\('.*?',\s*\(.*?\)(?: async)? \{|testGoldens\('.*?',\s*\(.*?\)(?: async)? \{|\}\);|.*?\(\(.*?\).*?\{' -- "${batch[@]}" \
+  grep -nE 'test\('.*?',\s*\(\)( async)? \{|testWidgets\('.*?',\s*\(.*?\)( async)? \{|testGoldens\('.*?',\s*\(.*?\)( async)? \{|\}\);|.*?\(\(.*?\).*?\{' -- "${batch[@]}" \
   | awk '
     function report(file, name, start, end) {
       if (name != "" && end >= start && (end - start) > 15) {
