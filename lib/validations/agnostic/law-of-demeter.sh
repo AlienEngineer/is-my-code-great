@@ -14,7 +14,7 @@ function count_violations() {
   while read -r line; do
       add_details "$line"
       total=$(( total + 1 ))
-  done < <(iterate_test_files find_lines_that_violate_lod)
+  done < <(iterate_code_files find_lines_that_violate_lod)
 
   echo "$total"
 }
@@ -24,3 +24,4 @@ register_code_validation \
     "HIGH" \
     "count_violations" \
     "law-of-demeter (>2):"
+

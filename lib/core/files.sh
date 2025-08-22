@@ -78,7 +78,6 @@ function iterate_test_files() {
   done
 }
 
-
 function iterate_code_files() {
   local callback="${1:?}"; shift
   local page_size=200
