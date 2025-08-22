@@ -24,11 +24,6 @@ jobs:
        bash --version
        bin/is-my-code-great -f dart
 
-    - name: is my code great?
-      uses: alienengineer/is-my-code-great@v0
-      with:
-        verbose: true # Optional, set to true for detailed output
-
     - name: Run validation on specified languages
       id: validate
       run: |        
