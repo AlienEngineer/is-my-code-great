@@ -19,9 +19,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: print file for debug
-      run: cat examples/dart/big_test_file_test.dart
-
     - name: is my code great?
       uses: alienengineer/is-my-code-great@v0
       with:
