@@ -19,6 +19,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: run is-my-code-great for dart (debug)
+      run: bin/is-my-code-great -f dart
+
     - name: is my code great?
       uses: alienengineer/is-my-code-great@v0
       with:
