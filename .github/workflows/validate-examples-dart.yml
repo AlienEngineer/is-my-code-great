@@ -1,4 +1,4 @@
-name: Validate Test Examples
+name: Validate Test Examples - Dart
 
 on:
   pull_request:
@@ -65,13 +65,13 @@ jobs:
       with:
         script: |
           const isFailure = '${{ steps.validate.outputs.validation_success }}' === 'false';
-          let comment = `## ✅ Validation Results - PASSED
+          let comment = `## ✅ Validation Results (dart) - PASSED
 
           All validation tests passed successfully! 🎉
           `;
           
           if (isFailure) {
-            comment = `## ❌ Validation Results - FAILED
+            comment = `## ❌ Validation Results (dart) - FAILED
 
             <details>
             <summary>Click to see detailed failure results</summary>
