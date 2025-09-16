@@ -1,4 +1,4 @@
-name: Validate Test Examples - Dart
+name: Validate Test Examples
 
 on:
   pull_request:
@@ -19,10 +19,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: print bash version
+      run: bash --version
+
     - name: run is-my-code-great for dart (debug)
-      run: |
-       bash --version
-       bin/is-my-code-great -f dart
+      run: bin/is-my-code-great -f dart -v
+
+    - name: run is-my-code-great for csharp (debug)
+      run: bin/is-my-code-great -f csharp -v
 
     - name: Run validation on specified languages
       id: validate
@@ -65,13 +69,13 @@ jobs:
       with:
         script: |
           const isFailure = '${{ steps.validate.outputs.validation_success }}' === 'false';
-          let comment = `## ✅ Validation Results (dart) - PASSED
+          let comment = `## ✅ Validation Results - PASSED
 
           All validation tests passed successfully! 🎉
           `;
           
           if (isFailure) {
-            comment = `## ❌ Validation Results (dart) - FAILED
+            comment = `## ❌ Validation Results - FAILED
 
             <details>
             <summary>Click to see detailed failure results</summary>
