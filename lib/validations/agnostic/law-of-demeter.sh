@@ -2,6 +2,10 @@
 #!/usr/bin/env bash
 
 find_lines_that_violate_lod() {
+
+  print_verbose "  - Checking for Law of Demeter violations..."
+  print_verbose "  - files: $1"
+
   local -n batch="$1";
   grep -nE '\b[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*){3,}\b' -- "${batch[@]}" \
     | grep -vE 'using ' \
