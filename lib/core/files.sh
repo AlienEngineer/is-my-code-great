@@ -24,8 +24,11 @@ _load_code_files_cache() {
 }
 
 get_test_files_to_analyse() {
-  _load_test_files_cache
-  printf '%s\n' "${TEST_FILES_CACHE[@]}"
+  if [ "${LOCAL_RUN:-false}" = true ]; then
+    find "$DIR" -type f -name "$CODE_FILE_PATTERN" -print0
+  else
+    get_git_files
+  fi
 }
 
 get_files_to_analyse() {
