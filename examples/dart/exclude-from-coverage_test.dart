@@ -12,5 +12,5 @@ void main() {
     // coverage:ignore-line
     expect(find.text('Counter'), findsOneWidget);
     expect(find.text('0'), findsOneWidget);
-  });
+  }); 
 }

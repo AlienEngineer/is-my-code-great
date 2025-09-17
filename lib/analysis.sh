@@ -56,6 +56,7 @@ run_analysis() {
     # done
 
     source "$VALIDATIONS_DIR/expect-on-keys.sh"
+    source "$VALIDATIONS_DIR/exclude-from-code-coverage.sh"
     
     VALIDATIONS_DIR="$SCRIPT_ROOT/lib/validations/agnostic"
 
@@ -70,6 +71,6 @@ run_analysis() {
 
     printf "\nIs my code great? "
 
-    #dump_summary
+    dump_summary
     #export_report
 }
