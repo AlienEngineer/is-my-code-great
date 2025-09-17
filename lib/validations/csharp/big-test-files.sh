@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 find_big_functions() {  
-  local -n batch="$1";
-  grep -nE '\[TestMethod\]|public[[:space:]]+(void|async[[:space:]]+Task(<[^>]+>)?)[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*\(\)|\{|\}' -- "${batch[@]}" \
+  get_code_files \
+    | xargs grep -nE '\[TestMethod\]|public[[:space:]]+(void|async[[:space:]]+Task(<[^>]+>)?)[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*\(\)|\{|\}' -- "${batch[@]}" \
     | awk '
     function report(file, name, start, end) {
       if (name != "" && end >= start && (end - start) > 15) {
@@ -57,14 +57,14 @@ function count_big_test_methods() {
   while read -r line; do
       add_details "$line"
       total=$(( total + 1 ))
-  done < <(iterate_test_files find_big_functions)
+  done < <(find_big_functions)
 
   echo "$total"
 }
 
-#register_test_validation \
-#    "big-test-files" \
-#    "HIGH" \
-#    "count_big_test_methods" \
-#    "C# Test methods > 15 lines:"
+register_test_validation \
+    "big-test-files" \
+    "HIGH" \
+    "count_big_test_methods" \
+    "C# Test methods > 15 lines:"
 
