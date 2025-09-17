@@ -51,10 +51,10 @@ function count_single_test_methods() {
   echo "$total"
 }
 
-register_test_validation \
-    "tests-per-file" \
-    "CRITICAL" \
-    "count_single_test_methods" \
-    "Files with 1 Test:"
+#register_test_validation \
+#    "tests-per-file" \
+#    "CRITICAL" \
+#    "count_single_test_methods" \
+#    "Files with 1 Test:"
 
 

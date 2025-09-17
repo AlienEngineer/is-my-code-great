@@ -33,6 +33,16 @@ get_test_files() {
   fi
 }
 
+get_code_files() {
+  if [ "${LOCAL_RUN:-false}" = true ]; then
+    find "$DIR" -type f -name "$CODE_FILE_PATTERN"
+  else
+    repo_root=$(get_repo_root)
+    git diff --name-only --diff-filter=ACMRT "$BASE_BRANCH"..."$CURRENT_BRANCH" -- "$CODE_FILE_PATTERN" \
+      | awk -v root="$repo_root" '{print root "/" $0}'s
+  fi
+}
+
 get_test_files_to_analyse() {
   if [ "${LOCAL_RUN:-false}" = true ]; then
     find "$DIR" -type f -name "$CODE_FILE_PATTERN" -print0
