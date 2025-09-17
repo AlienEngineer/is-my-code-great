@@ -68,8 +68,8 @@ function _count_expect_in_middle() {
   echo "$total"
 }
 
-register_test_validation \
-    "expects-in-middle" \
-    "LOW" \
-    "_count_expect_in_middle" \
-    "Expects in the middle:"
+#register_test_validation \
+#    "expects-in-middle" \
+#    "LOW" \
+#    "_count_expect_in_middle" \
+#    "Expects in the middle:"
