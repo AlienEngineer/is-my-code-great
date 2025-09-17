@@ -1,41 +1,41 @@
 find_single_test_in_files() {
-  local -n batch="$1";
-  grep -nE "test\(|testWidgets\(|testGoldens\(" -- "${batch[@]}" \
-  | awk '
-      function get_file(line) {
-        split(line, parts, ":")
-        lineno = parts[1]
-        return lineno
-      }
-      function get_line_number(line) {
-        split(line, parts, ":")
-        lineno = parts[2]
-        return lineno
-      }
-      {
-        if (count==0) {
-          count=0
-          previous_file=get_file($0)
+  get_code_files \
+    | xargs grep -nE "test\(|testWidgets\(|testGoldens\("  \
+    | awk '
+        function get_file(line) {
+          split(line, parts, ":")
+          lineno = parts[1]
+          return lineno
         }
+        function get_line_number(line) {
+          split(line, parts, ":")
+          lineno = parts[2]
+          return lineno
+        }
+        {
+          if (count==0) {
+            count=0
+            previous_file=get_file($0)
+          }
 
-        filename=get_file($0)
-        if (previous_file == filename) {
-          count++
-        } else {
+          filename=get_file($0)
+          if (previous_file == filename) {
+            count++
+          } else {
+            if (count==1){
+              printf("%s:%d \n", previous_file, get_line_number($0))
+            }
+            count=1        
+          }
+
+          previous_file=filename
+        }
+        END {
           if (count==1){
             printf("%s:%d \n", previous_file, get_line_number($0))
           }
-          count=1        
         }
-
-        previous_file=filename
-      }
-      END {
-        if (count==1){
-          printf("%s:%d \n", previous_file, get_line_number($0))
-        }
-      }
-  '
+    '
 }
 
 function count_single_test_methods() {

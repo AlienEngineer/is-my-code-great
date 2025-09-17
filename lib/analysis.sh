@@ -54,10 +54,8 @@ run_analysis() {
     for script in "$VALIDATIONS_DIR"/*.sh; do
         [ -r "$script" ] && source "$script"
     done
-
     
     VALIDATIONS_DIR="$SCRIPT_ROOT/lib/validations/agnostic"
-
     for script in "$VALIDATIONS_DIR"/*.sh; do
         [ -r "$script" ] && source "$script"
     done
@@ -70,5 +68,5 @@ run_analysis() {
     printf "\nIs my code great? "
 
     dump_summary
-    export_report
+    #export_report
 }

@@ -19,10 +19,20 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: run is-my-code-great for dart (debug)
-      run: |
-       bash --version
-       bin/is-my-code-great -f dart
+    - name: print bash version
+      run: bash --version
+
+    - name: run local is-my-code-great for dart (debug)
+      run: bin/is-my-code-great -f dart -v
+
+    - name: run local is-my-code-great for csharp (debug)
+      run: bin/is-my-code-great -f csharp -v
+
+    - name: run git diff is-my-code-great for dart (debug)
+      run: bin/is-my-code-great -f dart -v -b main
+
+    - name: run git diff is-my-code-great for csharp (debug)
+      run: bin/is-my-code-great -f csharp -v -b main
 
     - name: Run validation on specified languages
       id: validate

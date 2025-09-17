@@ -1,47 +1,48 @@
 
 find_single_test_in_files() {
-  grep -nE "test\(|testWidgets\(|testGoldens\(" -- $(get_test_files_to_analyse) \
-  | awk '
-      function get_file(line) {
-        split(line, parts, ":")
-        lineno = parts[1]
-        return lineno
-      }
-      function get_line_number(line) {
-        split(line, parts, ":")
-        lineno = parts[2]
-        return lineno
-      }
-      {
-        if (count==0) {
-          count=0
-          previous_file=get_file($0)
-          printf("init\n")
+  get_code_files \
+    | xargs grep -nE "test\(|testWidgets\(|testGoldens\(" \
+    | awk '
+        function get_file(line) {
+          split(line, parts, ":")
+          lineno = parts[1]
+          return lineno
         }
+        function get_line_number(line) {
+          split(line, parts, ":")
+          lineno = parts[2]
+          return lineno
+        }
+        {
+          if (count==0) {
+            count=0
+            previous_file=get_file($0)
+            printf("init\n")
+          }
 
-        filename=get_file($0)
-        if (previous_file == filename) {
-          count++
-        } else {
+          filename=get_file($0)
+          if (previous_file == filename) {
+            count++
+          } else {
+            if (count==1){
+              printf("%s:%d \n", previous_file, get_line_number($0))
+            }
+            count=1        
+          }
+
+          previous_file=filename
+        }
+        END {
           if (count==1){
             printf("%s:%d \n", previous_file, get_line_number($0))
           }
-          count=1        
         }
-
-        previous_file=filename
-      }
-      END {
-        if (count==1){
-          printf("%s:%d \n", previous_file, get_line_number($0))
-        }
-      }
-  '
+    '
 }
 
 function get_count_test_per_file() {
   local files
-  files="$(get_test_files_to_analyse)"
+  files="$(get_test_files)"
 
   local total=0
   for file in $files; do

@@ -1,14 +1,10 @@
 #!/usr/bin/env bash
 
 find_expects_in_the_middle_in_file() {
-  local file="$1"
-
-  # Generate the test patterns dynamically from TEST_FUNCTION_PATTERNS
-  # regex_pattern ends up looking like: testWidgets|testGoldens|...
   local regex_pattern
   regex_pattern=$(get_test_function_pattern_names | tr ' ' '|')
-
-  awk -v file="$file" -v test_patterns="$regex_pattern" '
+  get_code_files \
+    | xargs awk -v test_patterns="$regex_pattern" '
         function reset_block(){ in_test=0; depth=0; pending=0 }
         BEGIN { reset_block() }
 
@@ -45,16 +41,7 @@ find_expects_in_the_middle_in_file() {
           }
         }
         END { }
-      ' "$file"
-}
-
-
-
-_find_count_expects_in_middle() {
-  local total=0
-  for file in $(get_test_files_to_analyse); do
-    find_expects_in_the_middle_in_file "$file"
-  done
+      '
 }
 
 function _count_expect_in_middle() {
@@ -63,7 +50,7 @@ function _count_expect_in_middle() {
   while read -r line; do
     total=$((total + 1))
     add_details "$line"
-  done < <(_find_count_expects_in_middle)
+  done < <(find_expects_in_the_middle_in_file)
 
   echo "$total"
 }

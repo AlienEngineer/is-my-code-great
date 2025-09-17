@@ -40,11 +40,13 @@ function register_validation() {
     CATEGORY+=("$5")
     VALIDATION+=("$check_name")
 
+    print_verbose "[builder] Executing validation: $check_name"
     start_new_evaluation_details
 
     local start=$(date +%s%N)
     local command="$3"
     local result
+
     result=$(eval "$command") || {
       echo "Error executing command: $command" >&2
     }
