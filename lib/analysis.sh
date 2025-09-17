@@ -51,16 +51,18 @@ run_analysis() {
         return 1
     fi
 
-    for script in "$VALIDATIONS_DIR"/*.sh; do
-        [ -r "$script" ] && source "$script"
-    done
+    # for script in "$VALIDATIONS_DIR"/*.sh; do
+    #     [ -r "$script" ] && source "$script"
+    # done
 
+    source "$VALIDATIONS_DIR/expect-on-keys.sh"
+    source "$VALIDATIONS_DIR/exclude-from-code-coverage.sh"
     
     VALIDATIONS_DIR="$SCRIPT_ROOT/lib/validations/agnostic"
 
-    for script in "$VALIDATIONS_DIR"/*.sh; do
-        [ -r "$script" ] && source "$script"
-    done
+    # for script in "$VALIDATIONS_DIR"/*.sh; do
+    #     [ -r "$script" ] && source "$script"
+    # done
 
     if [ "$PARSEABLE" = "1" ]; then
         print_validations_parseable
@@ -70,5 +72,5 @@ run_analysis() {
     printf "\nIs my code great? "
 
     dump_summary
-    export_report
+    #export_report
 }

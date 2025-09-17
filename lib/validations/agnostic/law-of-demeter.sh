@@ -3,6 +3,9 @@
 
 find_lines_that_violate_lod() {
   local -n batch="$1";
+
+  print_verbose "  - files: ${batch[@]}"
+
   grep -nE '\b[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*){3,}\b' -- "${batch[@]}" \
     | grep -vE 'using ' \
     | grep -vE 'namespace ' \

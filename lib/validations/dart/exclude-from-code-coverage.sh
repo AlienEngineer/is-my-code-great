@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 function count_exclusions() {
-    find_text_in_files 'coverage:ignore-' "$DIR" "$BASE_BRANCH" "$CURRENT_BRANCH"
+    find_text_in_test 'coverage:ignore-' "$DIR" "$BASE_BRANCH" "$CURRENT_BRANCH"
 }
 
 register_test_validation \
