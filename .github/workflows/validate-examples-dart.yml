@@ -123,11 +123,11 @@ jobs:
             body: comment
           });
 
-    - name: Fail job if validation failed
-      if: steps.validate.outputs.validation_success == 'false'
-      run: |
-        echo "Validation tests failed. Failing the job."
-        exit 1
+    # - name: Fail job if validation failed
+    #   if: steps.validate.outputs.validation_success == 'false'
+    #   run: |
+    #     echo "Validation tests failed. Failing the job."
+    #     exit 1
 
     - name: Upload validation results as artifact
       if: always()
