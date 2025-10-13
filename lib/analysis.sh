@@ -68,5 +68,5 @@ run_analysis() {
     printf "\nIs my code great? "
 
     dump_summary
-    #export_report
+    export_report
 }
