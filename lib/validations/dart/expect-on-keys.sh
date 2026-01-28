@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 get_find_by_key_lines() {
-  get_test_files \
-    | xargs grep -nE "expect\(find.byKey\(" \
+  get_test_files | xargs grep -nE "expect\(\s*find.byKey\(" \
     | awk '
     {
       printf("%s:%d: %s\n", file, NR ,$0)
@@ -25,3 +24,7 @@ register_test_validation \
     "HIGH" \
     "_count_expect_on_keys" \
     "Expectation on Keys:"
+
+
+
+get_test_files | xargs grep -nE "expect\(\s*find.byKey\("

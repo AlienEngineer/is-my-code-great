@@ -9,5 +9,9 @@ void main() {
     expect(find.byKey(const Key('username_field')), findsOneWidget);
     expect(find.byKey(const Key('submit_button')), findsOneWidget);
     expect(find.byKey(const Key('success_message')), findsOneWidget);
+    expect(
+      find.byKey(const Key('success_message')), 
+      findsOneWidget,
+    );
   });
 } 

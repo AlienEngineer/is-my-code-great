@@ -2,7 +2,7 @@
 
 find_big_functions() { 
   get_code_files \
-    | xargs grep -nE '\[TestMethod\]|public[[:space:]]+(void|async[[:space:]]+Task(<[^>]+>)?)[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*\(\)|\{|\}' -- "${batch[@]}" \
+    | xargs grep -nE '\[TestMethod\]|public[[:space:]]+(void|async[[:space:]]+Task(<[^>]+>)?)[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*\(\)|\{|\}' \
     | awk '
     function report(file, name, start, end) {
       if (name != "" && end >= start && (end - start) > 15) {
