@@ -17,11 +17,19 @@ function sum_test_results() {
         while IFS= read -r match; do
             add_details "$match"
             count=$((count+1))
-        done < <(get_test_files | xargs grep "$flags" "$pattern")
+        done < <(get_test_files | xargs -0 grep "$flags" "$pattern")
         echo "$count"
     else
-        local count
-        count=$( (get_test_files | xargs grep "${flags//R/c}" "$pattern" || echo 0) | sum_results)
+        local count=0
+        while IFS= read -r line; do
+            # Extract the count from 'filename:count' or just 'count'
+            if [[ "$line" == *:* ]]; then
+                file_count=$(echo "$line" | cut -d: -f2)
+            else
+                file_count="$line"
+            fi
+            count=$((count + file_count))
+        done < <(get_test_files | xargs -0 grep "${flags//R/c}" "$pattern" || echo 0)
         echo "$count"
     fi
 }
@@ -35,11 +43,19 @@ function sum_code_results() {
         while IFS= read -r match; do
             add_details "$match"
             count=$((count+1))
-        done < <(get_code_files | xargs grep "$flags" "$pattern")
+        done < <(get_code_files | xargs -0 grep "$flags" "$pattern")
         echo "$count"
     else
-        local count
-        count=$( (get_code_files | xargs grep "${flags//R/c}" "$pattern" || echo 0) | sum_results)
+        local count=0
+        while IFS= read -r line; do
+            # Extract the count from 'filename:count' or just 'count'
+            if [[ "$line" == *:* ]]; then
+                file_count=$(echo "$line" | cut -d: -f2)
+            else
+                file_count="$line"
+            fi
+            count=$((count + file_count))
+        done < <(get_code_files | xargs -0 grep "${flags//R/c}" "$pattern" || echo 0)
         echo "$count"
     fi
 }

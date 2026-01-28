@@ -28,7 +28,7 @@ fi
 source "$EXPECTED_RESULTS_FILE"
 
 cd "$EXAMPLES_DIR"
-ACTUAL_RESULTS=$("$PROJECT_ROOT/bin/is-my-code-great" -p 2>/dev/null || true)
+ACTUAL_RESULTS=$("$PROJECT_ROOT/bin/is-my-code-great" -p || true)
 
 get_expected_count() {
     local key="$1"
