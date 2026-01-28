@@ -92,10 +92,7 @@ fi
 
 if [ "$LOCAL_RUN" = false ]; then
 	if [ -z "$CURRENT_BRANCH" ]; then
-		current_dir=$(pwd);
-		cd "$DIR" || { echo "❌ Dir not found: $DIR" >&2; exit 1; }
-		CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-		cd "$current_dir" || { echo "❌ Could not return to original directory: $current_dir" >&2; exit 1; }
+		CURRENT_BRANCH=$(git -C "$DIR" rev-parse --abbrev-ref HEAD)
 	fi
 fi
 
