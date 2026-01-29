@@ -1,4 +1,5 @@
 declare -a SEVERITY COMMAND TITLE VALIDATION EXECUTION_TIME DETAILS CATEGORY
+declare -gA VALIDATION_INDEX  # Maps check_name -> array index for O(1) lookup
 
 function register_test_validation() {
     local check_name="$1"
@@ -35,6 +36,10 @@ function register_code_validation() {
 
 function register_validation() {
     local check_name="$1"
+    
+    # Store index for O(1) lookup (VALIDATION_INDEX maps name -> array index)
+    VALIDATION_INDEX["$check_name"]="${#VALIDATION[@]}"
+    
     SEVERITY+=("$2")
     TITLE+=("$4")
     CATEGORY+=("$5")
@@ -95,10 +100,9 @@ function get_category() {
 
 function get_index() {
     local check_name="$1"
-    for i in "${!VALIDATION[@]}"; do
-        [[ "${VALIDATION[$i]}" == "$check_name" ]] && echo "$i" && return
-    done
-    return 1
+    local idx="${VALIDATION_INDEX[$check_name]:-}"
+    [[ -z "$idx" ]] && return 1
+    echo "$idx"
 }
 
 function get_severity() {
@@ -148,10 +152,9 @@ function get_total_execution_time() {
 }
 
 function print_validations_parseable() {
-    get_production_validations | while read -r validation; do
-        printf "%s=%d\n" "$validation" "$(get_result "$validation")"
-    done
-    get_test_validations | while read -r validation; do
-        printf "%s=%d\n" "$validation" "$(get_result "$validation")"
+    # Direct array iteration instead of pipes to while loops (no subshells)
+    local i
+    for i in "${!VALIDATION[@]}"; do
+        printf "%s=%s\n" "${VALIDATION[$i]}" "${COMMAND[$i]}"
     done
 }
