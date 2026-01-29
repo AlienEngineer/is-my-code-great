@@ -41,6 +41,9 @@ function register_validation() {
     VALIDATION+=("$check_name")
 
     print_verbose "[builder] Executing validation: $check_name"
+    
+    # Set context for details collection (CURRENT_CHECK_NAME used by add_details)
+    export CURRENT_CHECK_NAME="$check_name"
     start_new_evaluation_details
 
     local start=$(date +%s%N)
@@ -49,6 +52,7 @@ function register_validation() {
 
     result=$(eval "$command") || {
       echo "Error executing command: $command" >&2
+      return 1
     }
 
     local details
@@ -92,7 +96,7 @@ function get_category() {
 function get_index() {
     local check_name="$1"
     for i in "${!VALIDATION[@]}"; do
-        [[ "${VALIDATION[i]}" == "$check_name" ]] && echo "$i" && return
+        [[ "${VALIDATION[$i]}" == "$check_name" ]] && echo "$i" && return
     done
     return 1
 }
