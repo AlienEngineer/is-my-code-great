@@ -65,4 +65,4 @@ register_test_validation \
     "mock-abuse" \
     "HIGH" \
     "count_mock_declarations" \
-    "Mock declarations at describe block level:"
+    "Mock abuse:"

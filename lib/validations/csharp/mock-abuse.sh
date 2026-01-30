@@ -48,4 +48,4 @@ register_test_validation \
     "mock-abuse" \
     "HIGH" \
     "count_mock_fields" \
-    "Mock<...> fields declared at class level:"
+    "Mock abuse:"

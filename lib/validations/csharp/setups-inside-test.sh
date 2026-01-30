@@ -54,4 +54,4 @@ register_test_validation \
     "setups-inside-test" \
     "HIGH" \
     "count_setups_in_tests" \
-    "Setup(...) calls inside test methods:"
+    "Setups inside tests:"
