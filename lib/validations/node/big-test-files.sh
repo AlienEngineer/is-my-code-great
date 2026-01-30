@@ -13,7 +13,6 @@ find_big_tests_in_file() {
       return line ~ /[{][ \t]*$|[{][ \t]*\/\//
     }    
     /it\(/ { 
-      #if (infunc) report(funcname, startline, NR - 1)
       inTest = 1
       infunc = 1
       startline = NR
@@ -49,12 +48,13 @@ find_big_tests_in_file() {
 
 find_big_functions() {  
   local files
-  files="$(get_test_files)"
-
-  for file in $files; do
+  files=$(get_test_files) || return 1
+  
+  # Safely iterate over files, handling spaces and special characters
+  while IFS= read -r file; do
     [[ -f "$file" ]] || continue
     find_big_tests_in_file "$file"
-  done | sort -u
+  done < <(printf '%s\n' "$files") | sort -u
 }
 
 function count_big_test_methods() {

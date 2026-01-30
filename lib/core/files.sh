@@ -24,23 +24,13 @@ _load_code_files_cache() {
 }
 
 get_test_files() {
-  #if [ "${LOCAL_RUN:-false}" = true ]; then
-    find "$DIR" -type f -name "$TEST_FILE_PATTERN"
-  #else
-  #  repo_root=$(get_repo_root)
-  #  git diff --name-only --diff-filter=ACMRT "$BASE_BRANCH"..."$CURRENT_BRANCH" -- "$TEST_FILE_PATTERN" \
-  #    | awk -v root="$repo_root" '{print root "/" $0}'s
-  #fi
+  _load_test_files_cache
+  printf '%s\n' "${TEST_FILES_CACHE[@]}"
 }
 
 get_code_files() {
-  #f [ "${LOCAL_RUN:-false}" = true ]; then
-    find "$DIR" -type f -name "$CODE_FILE_PATTERN"
-  #else
-  #  repo_root=$(get_repo_root)
-  #  git diff --name-only --diff-filter=ACMRT "$BASE_BRANCH"..."$CURRENT_BRANCH" -- "$CODE_FILE_PATTERN" \
-  #    | awk -v root="$repo_root" '{print root "/" $0}'s
-  #fi
+  _load_code_files_cache
+  printf '%s\n' "${CODE_FILES_CACHE[@]}"
 }
 
 get_test_files_to_analyse() {

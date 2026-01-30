@@ -8,4 +8,6 @@ law-of-demeter:1
 big-test-files:1
 verifies:1
 tests-per-file:1
+setups-inside-test:2
+mock-abuse:1
 "

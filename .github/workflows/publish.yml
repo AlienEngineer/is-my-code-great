@@ -3,12 +3,16 @@ name: Publish
 on:
   push:
     tags:
-      - '*' 
+      - 'v[0-9]+.[0-9]+.[0-9]+' # Only run on valid version tags
 
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to publish (e.g. v1.2.3)'
+        required: true
 
 jobs:
-  build:
+  publish-homebrew:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,54 +20,47 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
-      - name: Get tag SHA
+      - name: Set version and SHA
+        id: set_vars
         run: |
-          TAG=${GITHUB_REF#refs/tags/}
-          echo "$TAG"
+          if [ -n "${{ github.event.inputs.tag }}" ]; then
+            TAG=${{ github.event.inputs.tag }}
+            echo "Running from workflow_dispatch for tag: $TAG"
+          else
+            TAG=${GITHUB_REF#refs/tags/}
+            echo "Running from push for tag: $TAG"
+          fi
           
-          echo "version=$TAG" >> $GITHUB_ENV
-
-          # Require format vX.X.X (two dots)
+          # This check is now redundant due to the trigger, but good for manual runs
           if ! [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "❌ Invalid version for homebrew: $TAG"
-            exit 0
+            echo "::error::Invalid tag format. Must be vX.X.X"
+            exit 1
           fi
 
+          echo "version=$TAG" >> $GITHUB_ENV
+          
           URL="https://github.com/alienengineer/is-my-code-great/archive/$TAG.tar.gz"
-          echo "$URL"
-          curl -LJO $URL
+          echo "Downloading from $URL"
+          
+          # Using curl with -f to fail on server errors
+          curl -fLJO "$URL"
+          
           FILE="is-my-code-great-${TAG#v}.tar.gz"
-          SHA=$(shasum -a256 $FILE | awk '{print $1}')
-          echo $SHA
+          SHA=$(shasum -a256 "$FILE" | awk '{print $1}')
           echo "sha256=$SHA" >> $GITHUB_ENV
           
       - name: Clone homebrew-tap
         env:
           TARGET_REPO_TOKEN: ${{ secrets.TARGET_REPO_TOKEN }}
         run: |
-
-          # Require format vX.X.X (two dots)
-          if ! [[ "${{ env.version }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "❌ Invalid version for homebrew: ${{ env.version }}"
-            exit 0
-          fi
-
-
           git config --global user.name "AlienEngineer"
           git config --global user.email "AlienEngineer@gmail.com"
           git clone https://AlienEngineer:${TARGET_REPO_TOKEN}@github.com/AlienEngineer/homebrew-tap.git
           
-      - name: Update formula
+      - name: Update Homebrew formula
         run: |
-
-          # Require format vX.X.X (two dots)
-          if ! [[ "${{ env.version }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "❌ Invalid version for homebrew: ${{ env.version }}"
-            exit 0
-          fi
-
           cd homebrew-tap
-          cat > Formula/is-my-code-great.rb <<EOF 
+          cat > Formula/is-my-code-great.rb <<EOF
           class IsMyCodeGreat < Formula
             desc "CLI to analyse Dart test code quality"
             homepage "https://github.com/alienengineer/is-my-code-great"
@@ -84,17 +81,13 @@ jobs:
           end
           EOF
 
-      - name: Commit & push
+      - name: Commit and push to homebrew-tap
         run: |
-
-          # Require format vX.X.X (two dots)
-          if ! [[ "${{ env.version }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "❌ Invalid version for homebrew: ${{ env.version }}"
-            exit 0
-          fi
-          
           cd homebrew-tap
           git add Formula/is-my-code-great.rb
-          git commit -m "Automated formula update to ${{ env.version }}"
-          git push origin HEAD:main
-      
+          if git diff --staged --quiet; then
+            echo "No changes to the formula. Nothing to commit."
+          else
+            git commit -m "Automated formula update to ${{ env.version }}"
+            git push origin HEAD:main
+          fi

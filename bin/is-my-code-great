@@ -109,5 +109,7 @@ if [ "$VERBOSE" = "1" ]; then
 	echo "[main] EVALUATION: $EVALUATION" >&2
 fi
 
+export LOCAL_RUN DETAILED VERBOSE PARSEABLE BASE_BRANCH CURRENT_BRANCH
+
 source "$(dirname "$0")/../lib/analysis.sh"
 run_analysis "$DIR" "$FRAMEWORK" "$BASE_BRANCH" "$CURRENT_BRANCH" "$LOCAL_RUN" "$PARSEABLE"
