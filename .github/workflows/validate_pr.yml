@@ -2,22 +2,178 @@ name: Validate Pull Request
 
 on:
   pull_request:
-    branches: [ "main" ]
+    types:
+      - opened
+      - synchronize
+      - reopened
+    branches:
+      - main
 
 jobs:
-  build:
+  validate:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          fetch-tags: true
+    permissions:
+      contents: read
+      pull-requests: write
 
-      - name: ✅ Validate version bump
-        run: |
-          if git diff --name-only origin/${{ github.event.repository.default_branch }} | grep -q "^VERSION$"; then
-            echo "Version bump detected."
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Required for version bump check
+
+    - name: ✅ Validate version bump
+      id: validate_version
+      run: |
+        if git diff --name-only origin/${{ github.base_ref }} | grep -q "^VERSION$"; then
+          echo "Version bump detected."
+        else
+          echo "::error::No version bump detected. Please increment the VERSION file."
+          exit 1
+        fi
+
+    - name: Print bash version
+      run: bash --version
+
+    - name: Run local is-my-code-great for dart (debug)
+      run: bin/is-my-code-great -f dart -v
+
+    - name: Run local is-my-code-great for csharp (debug)
+      run: bin/is-my-code-great -f csharp -v
+
+    - name: Run git diff is-my-code-great for dart (debug)
+      run: bin/is-my-code-great -f dart -v -b main
+
+    - name: Run git diff is-my-code-great for csharp (debug)
+      run: bin/is-my-code-great -f csharp -v -b main
+
+    - name: Run validation on all example languages
+      id: validate_examples
+      run: |
+        LANGUAGES=$(ls -d examples/*/ | sed 's|examples/||; s|/||')
+        echo "Running validation on languages: $LANGUAGES"
+
+        OVERALL_SUCCESS=true
+        rm -f combined_output.txt # clean up from previous runs
+
+        for LANGUAGE in $LANGUAGES; do
+          echo "::group::Validating $LANGUAGE examples"
+          # Run validation and capture output to file
+          if ./test/validate_results.sh "$LANGUAGE" > "validation_${LANGUAGE}_output.txt" 2>&1; then
+            echo "✅ $LANGUAGE validation passed"
+            cat "validation_${LANGUAGE}_output.txt"
           else
-            echo "No version bump detected."
-            exit 1
+            echo "❌ $LANGUAGE validation failed"
+            OVERALL_SUCCESS=false
+            cat "validation_${LANGUAGE}_output.txt"
+            # Create annotation for failed language
+            echo "::error::Validation failed for $LANGUAGE. See output above for details."
           fi
+          echo "::endgroup::"
+
+          # Append to combined output for PR comment
+          {
+            echo "### $LANGUAGE Results:"
+            cat "validation_${LANGUAGE}_output.txt"
+            echo ""
+          } >> combined_output.txt
+        done
+
+        if [ "$OVERALL_SUCCESS" = "true" ]; then
+          echo "validation_success=true" >> $GITHUB_OUTPUT
+          echo "All validations passed successfully!"
+        else
+          echo "validation_success=false" >> $GITHUB_OUTPUT
+          echo "Some validations failed!"
+        fi
+
+    - name: Comment PR with validation results
+      uses: actions/github-script@v7
+      if: always() # This ensures the comment is always posted, even if the job fails early
+      with:
+        script: |
+          const { owner, repo } = context.repo;
+          const issue_number = context.issue.number;
+          const job_status = '${{ job.status }}';
+          const validation_step_outcome = '${{ steps.validate_examples.outcome }}';
+          const version_step_outcome = '${{ steps.validate_version.outcome }}';
+          const commentIdentifier = "<!-- GHA VALIDATION RESULTS -->";
+          const fs = require('fs');
+
+          let commentBody;
+          const isSuccess = job_status === 'success';
+
+          if (isSuccess) {
+            commentBody = `## ✅ Validation Results - PASSED
+
+          ${commentIdentifier}
+
+          All validation tests passed successfully! 🎉`;
+          } else {
+            let errorDetails = 'An unexpected error occurred.';
+            if (version_step_outcome === 'failure') {
+              errorDetails = "The `Validate version bump` step failed. Please ensure you have incremented the VERSION file in your PR.";
+            } else if (validation_step_outcome === 'failure') {
+              if (fs.existsSync('combined_output.txt')) {
+                errorDetails = fs.readFileSync('combined_output.txt', 'utf8');
+              } else {
+                errorDetails = 'Validation failed, but no output file was generated.';
+              }
+            }
+            
+            commentBody = `## ❌ Validation Results - FAILED
+
+          ${commentIdentifier}
+
+          <details>
+          <summary>Click to see detailed failure results</summary>
+
+          \ 
+          \ 
+          ${errorDetails}
+          \ 
+          \ 
+
+          </details>
+
+          ⚠️ Some validation tests failed. Please review the results above and fix any issues.`;
+          }
+
+          const { data: comments } = await github.rest.issues.listComments({
+            owner,
+            repo,
+            issue_number,
+          });
+
+          const existingComment = comments.find(c => c.body.includes(commentIdentifier));
+
+          if (existingComment) {
+            await github.rest.issues.updateComment({
+              owner,
+              repo,
+              comment_id: existingComment.id,
+              body: commentBody,
+            });
+          } else {
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number,
+              body: commentBody,
+            });
+          }
+
+    - name: Fail job if validation failed
+      if: steps.validate_examples.outputs.validation_success == 'false'
+      run: |
+        exit 1
+
+    - name: Upload validation results as artifact
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: validation-results
+        path: |
+          validation_*_output.txt
+          combined_output.txt
+        retention-days: 7
