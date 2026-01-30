@@ -2,82 +2,135 @@
 
 set -euo pipefail
 
-if [ $# -eq 0 ]; then
-    echo "Usage: $0 <language>"
-    echo "Example: $0 dart"
-    exit 1
-fi
-
-LANGUAGE="$1"
 SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-EXPECTED_RESULTS_FILE="$PROJECT_ROOT/test/$LANGUAGE/expected_results.sh"
-EXAMPLES_DIR="$PROJECT_ROOT/examples/$LANGUAGE"
+# Auto-detect available frameworks
+_get_available_frameworks() {
+    local test_dir="$PROJECT_ROOT/test"
+    for dir in "$test_dir"/*; do
+        if [ -d "$dir" ] && [ -f "$dir/expected_results.sh" ]; then
+            basename "$dir"
+        fi
+    done | sort
+}
 
-if [ ! -f "$EXPECTED_RESULTS_FILE" ]; then
-    echo "Error: Expected results file not found: $EXPECTED_RESULTS_FILE"
-    exit 1
-fi
+# Validate framework exists
+_is_valid_framework() {
+    local framework="$1"
+    _get_available_frameworks | grep -q "^$framework$"
+}
 
-if [ ! -d "$EXAMPLES_DIR" ]; then
-    echo "Error: Examples directory not found: $EXAMPLES_DIR"
-    exit 1
-fi
-
-source "$EXPECTED_RESULTS_FILE"
-
-cd "$EXAMPLES_DIR"
-ACTUAL_RESULTS=$("$PROJECT_ROOT/bin/is-my-code-great" -p 2>/dev/null || true)
-
-get_expected_count() {
+# Helper: Get expected count for a key
+_get_expected_count() {
     local key="$1"
     echo "$EXPECTED_RESULTS" | grep "^$key:" | cut -d: -f2 | tr -d ' ' || echo ""
 }
 
-get_actual_count() {
+# Helper: Get actual count for a key
+_get_actual_count() {
     local key="$1"
     echo "$ACTUAL_RESULTS" | grep "^$key=" | cut -d= -f2 | tr -d ' ' || echo ""
 }
 
-echo "Validating $LANGUAGE results..."
-echo "================================"
+# Run tests for a single framework
+_run_framework_tests() {
+    local language="$1"
+    local expected_results_file="$PROJECT_ROOT/test/$language/expected_results.sh"
+    local examples_dir="$PROJECT_ROOT/examples/$language"
 
-EXIT_CODE=0
-
-while IFS=: read -r expected_key expected_count; do
-    expected_key=$(echo "$expected_key" | tr -d ' ')
-    expected_count=$(echo "$expected_count" | tr -d ' ')
-
-    actual_count=$(get_actual_count "$expected_key")
-    [ -z "$actual_count" ] && actual_count="0"
-
-    if [ "$actual_count" -eq "$expected_count" ]; then
-        echo "✅ PASS: $expected_key (expected: $expected_count, actual: $actual_count)"
-    else
-        echo "❌ FAIL: $expected_key (expected: $expected_count, actual: $actual_count)"
-        EXIT_CODE=1
+    if [ ! -f "$expected_results_file" ]; then
+        echo "Error: Expected results file not found: $expected_results_file"
+        return 1
     fi
-done < <(echo "$EXPECTED_RESULTS" | grep ":")
 
-
-while IFS= read -r line; do
-    actual_key=$(echo "$line" | cut -d= -f1 | tr -d ' ')
-    actual_value=$(echo "$line" | cut -d= -f2 | tr -d ' ')
-
-    expected_count=$(get_expected_count "$actual_key")
-
-    if [ -z "$expected_count" ]; then
-        echo "⚠ WARNING: Unexpected result found: $actual_key=$actual_value"
+    if [ ! -d "$examples_dir" ]; then
+        echo "Error: Examples directory not found: $examples_dir"
+        return 1
     fi
+
+    (
+        source "$expected_results_file"
+
+        cd "$examples_dir"
+        ACTUAL_RESULTS=$("$PROJECT_ROOT/bin/is-my-code-great" -p 2>/dev/null || true)
+
+        local exit_code=0
+
+        while IFS=: read -r expected_key expected_count; do
+            expected_key=$(echo "$expected_key" | tr -d ' ')
+            expected_count=$(echo "$expected_count" | tr -d ' ')
+
+            actual_count=$(_get_actual_count "$expected_key")
+            [ -z "$actual_count" ] && actual_count="0"
+
+            if [ "$actual_count" -eq "$expected_count" ]; then
+                echo "  ✅ PASS: $expected_key (expected: $expected_count, actual: $actual_count)"
+            else
+                echo "  ❌ FAIL: $expected_key (expected: $expected_count, actual: $actual_count)"
+                exit_code=1
+            fi
+        done < <(echo "$EXPECTED_RESULTS" | grep ":")
+
+        while IFS= read -r line; do
+            actual_key=$(echo "$line" | cut -d= -f1 | tr -d ' ')
+            actual_value=$(echo "$line" | cut -d= -f2 | tr -d ' ')
+
+            expected_count=$(_get_expected_count "$actual_key")
+
+            if [ -z "$expected_count" ]; then
+                echo "  ⚠ WARNING: Unexpected result found: $actual_key=$actual_value"
+            fi
+        done < <(echo "$ACTUAL_RESULTS" | grep "=")
+
+        return "$exit_code"
+    )
+}
+
+# Main logic
+if [ $# -eq 0 ]; then
+    # Run all frameworks
+    echo "Running validations for all frameworks..."
+    echo "=========================================="
     
-done < <(echo "$ACTUAL_RESULTS" | grep "=")
+    frameworks_passed=0
+    frameworks_failed=0
+    overall_exit_code=0
 
-echo "================================"
-if [ "$EXIT_CODE" -eq 0 ]; then
-    echo "All validations PASSED!"
+    for framework in $(_get_available_frameworks); do
+        echo ""
+        echo "Validating $framework results..."
+        echo "================================"
+        
+        if _run_framework_tests "$framework"; then
+            echo "✅ $framework PASSED"
+            frameworks_passed=$((frameworks_passed + 1))
+        else
+            echo "❌ $framework FAILED"
+            frameworks_failed=$((frameworks_failed + 1))
+            overall_exit_code=1
+        fi
+    done
+
+    echo ""
+    echo "=========================================="
+    echo "Summary: $frameworks_passed passed, $frameworks_failed failed"
+    echo "=========================================="
+    exit "$overall_exit_code"
 else
-    echo "Some validations FAILED!"
-fi
+    # Run specific framework
+    language="$1"
+    
+    if ! _is_valid_framework "$language"; then
+        echo "Error: Unknown framework '$language'"
+        echo ""
+        echo "Available frameworks:"
+        _get_available_frameworks | sed 's/^/  - /'
+        exit 1
+    fi
 
-exit "$EXIT_CODE"
+    echo "Validating $language results..."
+    echo "================================"
+    _run_framework_tests "$language"
+    exit $?
+fi
