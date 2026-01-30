@@ -10,4 +10,5 @@ verifies:1
 tests-per-file:1
 exclude-from-code-coverage:1
 setups-inside-test:2
+mock-abuse:1
 "
