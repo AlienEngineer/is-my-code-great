@@ -2,37 +2,23 @@ find_single_test_in_files() {
   get_code_files \
     | xargs grep -nE "test\(|testWidgets\(|testGoldens\("  \
     | awk '
-        function get_file(line) {
-          split(line, parts, ":")
-          lineno = parts[1]
-          return lineno
-        }
-        function get_line_number(line) {
-          split(line, parts, ":")
-          lineno = parts[2]
-          return lineno
-        }
         {
-          if (count==0) {
-            count=0
-            previous_file=get_file($0)
-          }
-
-          filename=get_file($0)
-          if (previous_file == filename) {
-            count++
-          } else {
-            if (count==1){
-              printf("%s:%d \n", previous_file, get_line_number($0))
+          split($0, parts, ":")
+          file = parts[1]
+          lineno = parts[2]
+          if (prev_file != file && prev_file != "") {
+            if (test_count == 1) {
+              printf("%s:%d \n", prev_file, prev_lineno)
             }
-            count=1        
+            test_count = 0
           }
-
-          previous_file=filename
+          prev_file = file
+          prev_lineno = lineno
+          test_count++
         }
         END {
-          if (count==1){
-            printf("%s:%d \n", previous_file, get_line_number($0))
+          if (test_count == 1) {
+            printf("%s:%d \n", prev_file, prev_lineno)
           }
         }
     '

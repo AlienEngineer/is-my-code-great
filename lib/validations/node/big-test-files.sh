@@ -13,7 +13,6 @@ find_big_tests_in_file() {
       return line ~ /[{][ \t]*$|[{][ \t]*\/\//
     }    
     /it\(/ { 
-      #if (infunc) report(funcname, startline, NR - 1)
       inTest = 1
       infunc = 1
       startline = NR
