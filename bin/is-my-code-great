@@ -14,12 +14,17 @@ LOCAL_RUN=true
 DETAILED=false
 DETAILED_FILE="result.html"
 EVALUATION=""
+PER_PROJECT=0
 
 while [[ $# -gt 0 ]]; do
 	case $1 in
 		-h|--help)
 			show_help
 			exit 0
+			;;
+		--per-project)
+			PER_PROJECT=1
+			shift
 			;;
 		-f|--framework)
 			FRAMEWORK="$2"
@@ -75,6 +80,52 @@ if [ -z "$DIR" ]; then
 	DIR="."
 fi
 
+export LOCAL_RUN DETAILED VERBOSE PARSEABLE BASE_BRANCH
+
+source "$(dirname "$0")/../lib/analysis.sh"
+
+if [ "$PER_PROJECT" -eq 1 ]; then
+    if [ -n "$FRAMEWORK" ] && [ "$FRAMEWORK" != "dart" ]; then
+        echo "Error: --per-project can only be used with the 'dart' framework." >&2
+        exit 1
+    fi
+
+    FRAMEWORK="dart"
+
+    if [ "$VERBOSE" = "1" ]; then
+        echo "[main] Running in per-project mode for Dart." >&2
+    fi
+
+    find "$DIR" -name "pubspec.yaml" -print0 | while IFS= read -r -d $'\0' pubspec_file; do
+        project_dir=$(dirname "$pubspec_file")
+        
+        project_current_branch="$CURRENT_BRANCH"
+        if [ "$LOCAL_RUN" = false ] && [ -z "$project_current_branch" ]; then
+            current_dir=$(pwd);
+            cd "$project_dir" || { echo "❌ Dir not found: $project_dir" >&2; continue; }
+            project_current_branch=$(git rev-parse --abbrev-ref HEAD)
+            cd "$current_dir" || { echo "❌ Could not return to original directory: $current_dir" >&2; continue; }
+        fi
+
+        if [ "$VERBOSE" = "1" ]; then
+            echo "[main] Analyzing Dart project at: '$project_dir'"
+            echo "[main] FRAMEWORK: $FRAMEWORK" >&2
+            echo "[main] DIR: $project_dir" >&2
+            echo "[main] BASE_BRANCH: $BASE_BRANCH" >&2
+            echo "[main] CURRENT_BRANCH: $project_current_branch" >&2
+            echo "[main] LOCAL_RUN: $LOCAL_RUN" >&2
+            echo "[main] DETAILED: $DETAILED" >&2
+            echo "[main] EVALUATION: $EVALUATION" >&2
+        fi
+        
+        export CURRENT_BRANCH="$project_current_branch"
+        run_analysis "$project_dir" "$FRAMEWORK" "$BASE_BRANCH" "$project_current_branch" "$LOCAL_RUN" "$PARSEABLE"
+        
+    done
+    
+    exit 0
+fi
+
 source "$(dirname "$0")/../lib/core/framework-detect.sh"
 
 if [ -z "$FRAMEWORK" ]; then
@@ -109,7 +160,6 @@ if [ "$VERBOSE" = "1" ]; then
 	echo "[main] EVALUATION: $EVALUATION" >&2
 fi
 
-export LOCAL_RUN DETAILED VERBOSE PARSEABLE BASE_BRANCH CURRENT_BRANCH
+export CURRENT_BRANCH
 
-source "$(dirname "$0")/../lib/analysis.sh"
 run_analysis "$DIR" "$FRAMEWORK" "$BASE_BRANCH" "$CURRENT_BRANCH" "$LOCAL_RUN" "$PARSEABLE"

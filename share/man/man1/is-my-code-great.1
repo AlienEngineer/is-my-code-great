@@ -18,6 +18,10 @@ OPTIONS
     -h, --help
         Show this help message and exit.
 
+    --per-project
+        Run analysis for each Dart project found in the specified directory.
+        Each Dart project is identified by the presence of a 'pubspec.yaml' file.
+
     -d, --detailed
         Tells the script to output a detailed report (html).
 
@@ -94,6 +98,9 @@ EXAMPLES
 
     Analyze a C# project (future support):
         is-my-code-great -f csharp /path/to/project
+
+    Analyze multiple Dart projects in a directory:
+        is-my-code-great --per-project /path/to/multiple/projects
 
 TESTING
     Test Structure:
