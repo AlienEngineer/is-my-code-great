@@ -1,3 +1,5 @@
+set -euo pipefail
+
 declare -a TEST_FILES_CACHE=()
 declare -a CODE_FILES_CACHE=()
 TEST_FILES_CACHE_READY=false

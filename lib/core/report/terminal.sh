@@ -1,3 +1,5 @@
+set -euo pipefail
+
 function dump_summary() {   
     local totalTests=$(get_total_tests)
     local totalIssues=$(get_total_issues)

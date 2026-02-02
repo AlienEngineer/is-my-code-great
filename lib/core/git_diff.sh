@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
 
 function _validate_git_repo() {
     local base="$1" current="$2"

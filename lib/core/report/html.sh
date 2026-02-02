@@ -1,3 +1,5 @@
+set -euo pipefail
+
 function export_report() {
     if [[ "${DETAILED:-}" != "true" ]]; then
         return
