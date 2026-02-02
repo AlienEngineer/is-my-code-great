@@ -1,3 +1,5 @@
+set -euo pipefail
+
 
 declare -gA VALIDATION_DETAILS
 

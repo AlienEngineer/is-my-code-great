@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
 
 find_big_tests_in_file() {
   MAX_LINES="${2:-15}"

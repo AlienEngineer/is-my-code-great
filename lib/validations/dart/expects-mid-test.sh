@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
 
 find_expects_in_the_middle_in_file() {
   local regex_pattern

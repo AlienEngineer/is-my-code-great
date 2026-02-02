@@ -1,5 +1,13 @@
-declare -a SEVERITY COMMAND TITLE VALIDATION EXECUTION_TIME DETAILS CATEGORY
-declare -gA VALIDATION_INDEX  # Maps check_name -> array index for O(1) lookup
+set -euo pipefail
+
+declare -a SEVERITY=()
+declare -a COMMAND=()
+declare -a TITLE=()
+declare -a VALIDATION=()
+declare -a EXECUTION_TIME=()
+declare -a DETAILS=()
+declare -a CATEGORY=()
+declare -gA VALIDATION_INDEX=()  # Maps check_name -> array index for O(1) lookup
 
 function register_test_validation() {
     local check_name="$1"

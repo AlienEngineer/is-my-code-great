@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
 # framework-detect.sh: Detects the project framework (dart, csharp, etc.)
 
 # Usage: detect_framework <directory> [<verbose>]

@@ -1,3 +1,5 @@
+set -euo pipefail
+
 function add_details() { :; }
 
 function get_details(){ :; }

@@ -1,3 +1,5 @@
+set -euo pipefail
+
    
 function print_verbose() {
     local message="$1"

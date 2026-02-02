@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
 
 find_lines_that_violate_lod() {
   get_code_files \

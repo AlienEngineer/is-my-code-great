@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
 
 find_mock_declarations() {
   local files

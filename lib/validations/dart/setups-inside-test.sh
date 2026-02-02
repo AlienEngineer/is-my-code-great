@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
 
 find_when_in_tests() {
   local regex_pattern

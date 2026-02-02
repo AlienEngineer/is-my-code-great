@@ -1,3 +1,5 @@
+set -euo pipefail
+
 find_single_test_in_files() {
   get_code_files \
     | xargs grep -nE "test\(|testWidgets\(|testGoldens\("  \

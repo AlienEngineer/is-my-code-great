@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
 
 function count_exclusions() {
     find_text_in_files '[ExcludeFromCodeCoverage]' "$DIR" "$BASE_BRANCH" "$CURRENT_BRANCH"

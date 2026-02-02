@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
 
 function sum_test_results() {
     local flags="$1"; shift
@@ -13,10 +15,10 @@ function sum_test_results() {
         while IFS= read -r match; do
             add_details "$match"
             count=$((count+1))
-        done < <(get_test_files | xargs grep "$flags" "$pattern" 2>/dev/null)
+        done < <(get_test_files | xargs -r grep "$flags" "$pattern" 2>/dev/null || true)
         echo "$count"
     else
-        get_test_files | xargs grep "$flags" "$pattern" 2>/dev/null | wc -l
+        get_test_files | xargs -r grep "$flags" "$pattern" 2>/dev/null | wc -l || echo "0"
     fi
 }
 
@@ -33,10 +35,10 @@ function sum_code_results() {
         while IFS= read -r match; do
             add_details "$match"
             count=$((count+1))
-        done < <(get_code_files | xargs grep "$flags" "$pattern" 2>/dev/null)
+        done < <(get_code_files | xargs -r grep "$flags" "$pattern" 2>/dev/null || true)
         echo "$count"
     else
-        get_code_files | xargs grep "$flags" "$pattern" 2>/dev/null | wc -l
+        get_code_files | xargs -r grep "$flags" "$pattern" 2>/dev/null | wc -l || echo "0"
     fi
 }
 

@@ -34,6 +34,19 @@ Framework-specific validation tests are in `/test`. To validate results for a la
 ./test/validate_results.sh dart    # Validate Dart examples
 ./test/validate_results.sh csharp  # Validate C# examples
 ./test/validate_results.sh node    # Validate Node examples
+./test/validate_results.sh         # Run all framework tests
+```
+
+### Additional flags
+```bash
+# Generate detailed HTML report
+./bin/is-my-code-great -d
+
+# Analyze multiple projects (each with framework marker file)
+./bin/is-my-code-great --per-project /path/to/multi-project
+
+# Quick git-based check (against main branch)
+./bin/is-my-code-great -g
 ```
 
 ## Architecture
@@ -64,12 +77,27 @@ Each validation receives:
 ### Core Modules
 - `lib/core/verbosity.sh` - Print functions for verbose output
 - `lib/core/tests.sh` - Test detection and iteration utilities
-- `lib/core/files.sh` - File pattern matching (excludes test, lock files, node_modules, etc.)
-- `lib/core/text-finders.sh` - Text search helpers (get_*_files, iterate_*_files functions)
+  - `get_total_tests()` - Count all test functions in the project
+  - `get_test_function_pattern_names()` - Get test function patterns for the framework
+- `lib/core/files.sh` - File pattern matching with caching (excludes test, lock files, node_modules, etc.)
+  - `get_code_files()` - Returns all production code files (cached)
+  - `get_test_files()` - Returns all test files (cached)
+  - Automatically switches between local filesystem and git diff modes
+- `lib/core/text-finders.sh` - Text search helpers for validations
+  - `sum_test_results(flags, pattern)` - Count grep matches in test files
+  - `sum_code_results(flags, pattern)` - Count grep matches in code files
+  - `find_text_in_test(pattern, dir)` - Simple text search in test files
+  - `find_regex_in_test(pattern, dir)` - Regex search in test files
+  - `find_text_in_files(pattern, dir)` - Simple text search in all files
+  - `find_regex_in_files(pattern, dir)` - Regex search in all files
 - `lib/core/git_diff.sh` - Git branch comparison utilities
+  - `get_changed_code_files()` - Production files changed between branches
+  - `get_changed_test_files()` - Test files changed between branches
 - `lib/core/builder.sh` - Validation registration and execution framework
+- `lib/core/details.sh` - Detail collection for HTML reports
+  - `add_details(message)` - Add a detail line to current validation (for `-d` flag)
 - `lib/core/report/terminal.sh` - Terminal output formatting
-- `lib/core/report/html.sh` - HTML report generation (when --detailed flag used)
+- `lib/core/report/html.sh` - HTML report generation (when `--detailed` flag used)
 
 ### Adding a New Validation
 1. Create `lib/validations/{FRAMEWORK}/{validation-name}.sh`
@@ -85,6 +113,22 @@ Each validation receives:
 4. Add test expectations to `test/{FRAMEWORK}/expected_results.sh`
 5. Ensure examples exist in `examples/{FRAMEWORK}/` that trigger the validation
 6. Run `./test/validate_results.sh {FRAMEWORK}` to verify
+
+**Example validation using core helpers:**
+```bash
+function count_my_issue() {
+  # Using sum_test_results for simple grep count
+  sum_test_results "-n" "badPattern"
+  
+  # OR using get_test_files for custom logic
+  local count=0
+  while read -r line; do
+    add_details "$line"  # For detailed HTML report
+    count=$((count + 1))
+  done < <(get_test_files | xargs grep -n "badPattern" 2>/dev/null)
+  echo "$count"
+}
+```
 
 ## Key Conventions
 
@@ -111,16 +155,35 @@ Keys used in `register_*_validation` should be hyphenated (e.g., `tests-per-file
 - `get_code_files` excludes: test files, lock files, node_modules, .git, etc.
 - `get_test_files` filters for framework-specific test file patterns
 - Use these functions via `lib/core/files.sh` helpers: `get_code_files`, `get_test_files`
-- Use `iterate_test_files` or `iterate_code_files` to loop over matching files
+- Files are cached on first call for performance; cache automatically handles local vs git-diff mode
+- When adding details for HTML reports, call `add_details "$line"` before counting
 
 ### Git Diff Mode
 When `-b/--base` flag is used, git diff against the base branch. Functions available:
 - `get_changed_code_files` - Files changed between branches
 - `get_changed_test_files` - Test files changed between branches
 - Use `LOCAL_RUN` variable to determine if comparing branches or local directory
+- File helper functions automatically adapt to git-diff mode when `LOCAL_RUN=false`
 
 ## Testing Tips
 - Examples serve as test cases; validations should match expected result counts
 - Use `-v` flag when debugging validation logic
 - Use `-p` flag to see parseable output (easier for testing)
 - Each language has separate validation sets; avoid assuming Dart rules apply to Node
+- Test runner compares actual output against `test/{FRAMEWORK}/expected_results.sh`
+- When a validation test fails, check both the validation logic and the example code in `examples/{FRAMEWORK}/`
+
+## CI/CD Integration
+The tool includes GitHub Actions workflows:
+- **validate_pr.yml** - Runs on PRs, validates version bump, runs tests for all frameworks
+- **publish.yml** - Publishes releases to Homebrew tap
+- **merge_main.yml** - Runs on main branch merges
+
+Using as a GitHub Action in other repos:
+```yaml
+- name: is my code great?
+  uses: alienengineer/is-my-code-great@v0
+  with:
+    base-branch: main   # Optional
+    verbose: true       # Optional
+```

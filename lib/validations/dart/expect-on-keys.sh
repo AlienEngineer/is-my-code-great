@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
 
 get_find_by_key_lines() {
   get_test_files \

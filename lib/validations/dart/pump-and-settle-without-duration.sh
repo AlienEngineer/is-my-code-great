@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
 
 function _find_pump_and_settle_without_duration() {
     find_text_in_test 'tester.pumpAndSettle()' "$DIR" "$BASE_BRANCH" "$CURRENT_BRANCH"
