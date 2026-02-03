@@ -125,7 +125,7 @@ while IFS= read -r file; do
     if grep -q "^set -[euo]*pipefail" "$file"; then
         strict_scripts=$((strict_scripts + 1))
     else
-        rel_path="${file#$PROJECT_ROOT/}"
+        rel_path="${file#"$PROJECT_ROOT"/}"
         non_strict_scripts+=("$rel_path")
     fi
 done < <(find "$PROJECT_ROOT/lib/validations" -name "*.sh" -type f)

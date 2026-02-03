@@ -1,8 +1,10 @@
 set -euo pipefail
 
 function dump_summary() {   
-    local totalTests=$(get_total_tests)
-    local totalIssues=$(get_total_issues)
+    local totalTests
+    local totalIssues
+    totalTests=$(get_total_tests)
+    totalIssues=$(get_total_issues)
     if [ "$totalIssues" -gt 0 ]; then
         printf "Nop!\n\n"
 

@@ -54,7 +54,7 @@ function get_count_test_per_file() {
       found=$(grep -Fo "$pattern" "$file" | wc -l);   
       c=$((c + found))
     done
-    if [[ "$c" -eq 1 ]] then 
+    if [[ "$c" -eq 1 ]]; then 
       total=$((total+1))
       file_name="$(basename "$file")"
       add_details "$file:0: $file_name"
