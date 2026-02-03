@@ -7,6 +7,7 @@ function export_report() {
     
     # Ensure the detailed file exists and its empty
     echo "" > "$DETAILED_FILE"
+    # shellcheck disable=SC2140,SC1078,SC1079
     print_to_file "
 <html lang="en">
     <head><title>Detailed Results</title></head>
@@ -119,10 +120,11 @@ function export_report() {
             <div class='card-content'>
     "
     get_production_validations | while read -r validation; do
-        local found=$(get_result "$validation")
-        local severity=$(get_severity "$validation")
-        local elapsed=$(get_execution_time "$validation")
-        local title=$(get_title "$validation")
+        local found severity elapsed title
+        found=$(get_result "$validation")
+        severity=$(get_severity "$validation")
+        elapsed=$(get_execution_time "$validation")
+        title=$(get_title "$validation")
         print_to_file "
         <div class='card collapsed'>
             <div class='card-header'>
@@ -160,10 +162,11 @@ function export_report() {
             <div class='card-content'>
     "
     get_test_validations | while read -r validation; do
-        local found=$(get_result "$validation")
-        local severity=$(get_severity "$validation")
-        local elapsed=$(get_execution_time "$validation")
-        local title=$(get_title "$validation")
+        local found severity elapsed title
+        found=$(get_result "$validation")
+        severity=$(get_severity "$validation")
+        elapsed=$(get_execution_time "$validation")
+        title=$(get_title "$validation")
         print_to_file "
         <div class='card collapsed'>
             <div class='card-header'>

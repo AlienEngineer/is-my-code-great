@@ -43,5 +43,17 @@ disable=SC2329
 # Trap handlers and callback functions are invoked indirectly
 disable=SC2317
 
+# SC1078: Did you forget to close this quoted string
+# False positives for HTML embedded in bash strings
+disable=SC1078
+
+# SC1079: This is actually an end quote
+# False positives for HTML class attributes with single quotes
+disable=SC1079
+
+# SC2140: Word is of the form "A"B"C"
+# HTML attributes inside bash strings
+disable=SC2140
+
 # Set shell dialect
 shell=bash
