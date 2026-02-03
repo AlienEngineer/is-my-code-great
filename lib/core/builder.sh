@@ -9,6 +9,34 @@ declare -a DETAILS=()
 declare -a CATEGORY=()
 declare -gA VALIDATION_INDEX=()  # Maps check_name -> array index for O(1) lookup
 
+# Validates that a function name contains only safe characters
+# Returns 0 if valid, 1 if invalid
+function _validate_function_name() {
+    local func_name="$1"
+    
+    # Function names must contain only alphanumeric characters and underscores
+    # No spaces, special characters, semicolons, pipes, redirects, etc.
+    if [[ ! "$func_name" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]]; then
+        echo "Error: Invalid function name '$func_name'. Must contain only alphanumeric and underscore characters." >&2
+        return 1
+    fi
+    
+    return 0
+}
+
+# Verifies a function exists and is callable
+# Returns 0 if function exists, 1 otherwise
+function _verify_function_exists() {
+    local func_name="$1"
+    
+    if ! declare -f "$func_name" > /dev/null; then
+        echo "Error: Function '$func_name' does not exist or is not defined." >&2
+        return 1
+    fi
+    
+    return 0
+}
+
 function register_test_validation() {
     local check_name="$1"
     local severity="$2"
@@ -44,6 +72,17 @@ function register_code_validation() {
 
 function register_validation() {
     local check_name="$1"
+    local command="$3"
+    
+    # Validate function name for security
+    if ! _validate_function_name "$command"; then
+        return 1
+    fi
+    
+    # Verify function exists before registration
+    if ! _verify_function_exists "$command"; then
+        return 1
+    fi
     
     # Store index for O(1) lookup (VALIDATION_INDEX maps name -> array index)
     VALIDATION_INDEX["$check_name"]="${#VALIDATION[@]}"
@@ -60,10 +99,10 @@ function register_validation() {
     start_new_evaluation_details
 
     local start=$(date +%s%N)
-    local command="$3"
     local result
 
-    result=$(eval "$command") || {
+    # Direct function invocation - no eval needed
+    result=$("$command") || {
       echo "Error executing command: $command" >&2
       return 1
     }

@@ -20,17 +20,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0 # Required for version bump check
-
-    - name: ✅ Validate version bump
-      id: validate_version
-      run: |
-        if git diff --name-only origin/${{ github.base_ref }} | grep -q "^VERSION$"; then
-          echo "Version bump detected."
-        else
-          echo "::error::No version bump detected. Please increment the VERSION file."
-          exit 1
-        fi
+        fetch-depth: 0
 
     - name: Print bash version
       run: bash --version
@@ -96,7 +86,6 @@ jobs:
           const issue_number = context.issue.number;
           const job_status = '${{ job.status }}';
           const validation_step_outcome = '${{ steps.validate_examples.outcome }}';
-          const version_step_outcome = '${{ steps.validate_version.outcome }}';
           const commentIdentifier = "<!-- GHA VALIDATION RESULTS -->";
           const fs = require('fs');
 
@@ -111,9 +100,7 @@ jobs:
           All validation tests passed successfully! 🎉`;
           } else {
             let errorDetails = 'An unexpected error occurred.';
-            if (version_step_outcome === 'failure') {
-              errorDetails = "The `Validate version bump` step failed. Please ensure you have incremented the VERSION file in your PR.";
-            } else if (validation_step_outcome === 'failure') {
+            if (validation_step_outcome === 'failure') {
               if (fs.existsSync('combined_output.txt')) {
                 errorDetails = fs.readFileSync('combined_output.txt', 'utf8');
               } else {

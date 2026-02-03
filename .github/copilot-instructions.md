@@ -69,6 +69,14 @@ Validations are registered via two functions in `lib/core/builder.sh`:
 - `register_test_validation` - For test-specific quality checks
 - `register_code_validation` - For production code quality checks
 
+**Security:** Validation functions are invoked directly (no `eval`). Function names are validated to contain only alphanumeric characters and underscores. This prevents command injection vulnerabilities.
+
+**Function name requirements:**
+- Must start with a letter or underscore
+- Can only contain: `[a-zA-Z0-9_]`
+- Invalid examples: `rm -rf /`, `echo; malicious_cmd`, `func-with-hyphens`
+- Valid examples: `count_violations`, `get_verifies_count`, `_private_helper`
+
 Each validation receives:
 - `$DIR` - The project directory being analyzed
 - Helper functions from core modules (text-finders, file utilities, git diffing)
@@ -102,6 +110,8 @@ Each validation receives:
 ### Adding a New Validation
 1. Create `lib/validations/{FRAMEWORK}/{validation-name}.sh`
 2. Implement function: `function my_validation_name() { ... }`
+   - **IMPORTANT:** Use only `snake_case` with alphanumeric and underscores
+   - Function names are security-validated; hyphens and special characters are rejected
 3. Register it:
    ```bash
    register_test_validation \

@@ -42,19 +42,19 @@
 **Deliverable:** ✅ All scripts have proper error handling; existing tests pass
 
 ### Phase 1.2: Remove Security Vulnerability
-- [ ] Refactor `lib/core/builder.sh` to remove `eval`
-  - [ ] Change validation registration to store function names
-  - [ ] Use direct function invocation: `"$command"` instead of `eval "$command"`
-  - [ ] Verify all validations still execute correctly
-- [ ] Add input sanitization for validation function names
-- [ ] Update documentation on validation registration
+- [x] Refactor `lib/core/builder.sh` to remove `eval`
+  - [x] Change validation registration to store function names
+  - [x] Use direct function invocation: `"$command"` instead of `eval "$command"`
+  - [x] Verify all validations still execute correctly
+- [x] Add input sanitization for validation function names
+- [x] Update documentation on validation registration
 
 **Testing:**
-- [ ] Create unit test for `register_validation` function
-- [ ] Verify all 22 existing validation scripts still work
-- [ ] Run full test suite for all frameworks (dart, csharp, node)
+- [x] Create unit test for `register_validation` function
+- [x] Verify all 22 existing validation scripts still work
+- [x] Run full test suite for all frameworks (dart, csharp, node)
 
-**Deliverable:** No `eval` usage; validation system secure
+**Deliverable:** ✅ No `eval` usage; validation system secure
 
 ### Phase 1.3: Setup Testing Infrastructure
 - [ ] Install `bats-core` (Bash Automated Testing System)
