@@ -107,14 +107,18 @@ _report_results() {
 }
 
 run_analysis() {
+    # shellcheck disable=SC2153
     if [ ! -d "$DIR" ]; then
         echo "Directory $DIR does not exist." >&2
         return 1
     fi
     
+    # shellcheck disable=SC2153
     _source_framework_config "$FRAMEWORK" || return 1
     _source_core_utilities || return 1
+    # shellcheck disable=SC2153
     _load_validations "$FRAMEWORK" || return 1
+    # shellcheck disable=SC2153
     _report_results "$PARSEABLE" || return 1
     
     return 0

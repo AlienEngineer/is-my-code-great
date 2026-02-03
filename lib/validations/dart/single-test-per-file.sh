@@ -1,7 +1,8 @@
 set -euo pipefail
 
 # Path to AWK script
-readonly SINGLE_TEST_AWK="$(dirname "${BASH_SOURCE[0]}")/../../awk/find_single_test_files.awk"
+SINGLE_TEST_AWK="$(dirname "${BASH_SOURCE[0]}")/../../awk/find_single_test_files.awk"
+readonly SINGLE_TEST_AWK
 
 find_single_test_in_files() {
   get_code_files \

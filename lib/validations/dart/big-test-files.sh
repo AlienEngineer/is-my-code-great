@@ -6,7 +6,8 @@ set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../core/constants.sh"
 
 # Path to AWK script
-readonly BIG_TEST_AWK="$(dirname "${BASH_SOURCE[0]}")/../../awk/find_big_test_functions.awk"
+BIG_TEST_AWK="$(dirname "${BASH_SOURCE[0]}")/../../awk/find_big_test_functions.awk"
+readonly BIG_TEST_AWK
 
 function find_big_functions() {  
   get_code_files \
