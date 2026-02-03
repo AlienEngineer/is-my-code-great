@@ -20,8 +20,6 @@ find_single_test_in_files() {
             count=0
             previous_file=get_file($0)
           }
-          
-          #printf("%s (%d) \n", get_file($0), count)
 
           filename=get_file($0)
           if (previous_file == filename) {

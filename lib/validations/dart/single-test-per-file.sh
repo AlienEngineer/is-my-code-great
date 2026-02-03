@@ -1,29 +1,12 @@
 set -euo pipefail
 
+# Path to AWK script
+readonly SINGLE_TEST_AWK="$(dirname "${BASH_SOURCE[0]}")/../../awk/find_single_test_files.awk"
+
 find_single_test_in_files() {
   get_code_files \
-    | xargs grep -nE "test\(|testWidgets\(|testGoldens\("  \
-    | awk '
-        {
-          split($0, parts, ":")
-          file = parts[1]
-          lineno = parts[2]
-          if (prev_file != file && prev_file != "") {
-            if (test_count == 1) {
-              printf("%s:%d \n", prev_file, prev_lineno)
-            }
-            test_count = 0
-          }
-          prev_file = file
-          prev_lineno = lineno
-          test_count++
-        }
-        END {
-          if (test_count == 1) {
-            printf("%s:%d \n", prev_file, prev_lineno)
-          }
-        }
-    '
+    | xargs grep -nE "test\(|testWidgets\(|testGoldens\(" \
+    | awk -f "$SINGLE_TEST_AWK"
 }
 
 function count_single_test_methods() {

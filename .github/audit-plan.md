@@ -79,58 +79,80 @@
 ## Week 2: Eliminate Code Duplication & Fix `cd` Hell
 
 ### Phase 2.1: DRY Refactor - Text Finders
-- [ ] Refactor `lib/core/text-finders.sh`
-  - [ ] Extract common logic: `_sum_results(file_getter, flags, pattern)`
-  - [ ] Simplify `sum_test_results()` and `sum_code_results()`
-  - [ ] Remove duplication between `find_text_*` and `find_regex_*` functions
-- [ ] Create constants file: `lib/core/constants.sh`
-  - [ ] Define `readonly PAGINATION_SIZE=200`
-  - [ ] Define `readonly MAX_TEST_LINES=15`
-  - [ ] Move other magic numbers to constants
+- [x] Refactor `lib/core/text-finders.sh`
+  - [x] Extract common logic: `_sum_results(file_getter, flags, pattern)`
+  - [x] Simplify `sum_test_results()` and `sum_code_results()`
+  - [x] Remove duplication between `find_text_*` and `find_regex_*` functions
+- [x] Create constants file: `lib/core/constants.sh`
+  - [x] Define `readonly PAGINATION_SIZE=200`
+  - [x] Define `readonly MAX_TEST_LINES=15`
+  - [x] Move other magic numbers to constants
 
 **Testing:**
-- [ ] Unit tests for `_sum_results` with mocked file lists
-- [ ] Unit tests for edge cases (empty results, large files)
-- [ ] Integration tests still pass
+- [x] Unit tests for `_sum_results` with mocked file lists
+- [x] Unit tests for edge cases (empty results, large files)
+- [x] Integration tests still pass
 
-**Deliverable:** 50% less code in text-finders.sh; constants file created
+**Deliverable:** ✅ 50% less code in text-finders.sh; constants file created; unit tests added
 
 ### Phase 2.2: Fix Git Operations
-- [ ] Refactor `lib/core/git_diff.sh` to eliminate `cd` usage
-  - [ ] Replace all `cd` with `git -C "$DIR"` flag
-  - [ ] Remove `original_dir` tracking
-  - [ ] Simplify `get_git_test_files()` and `get_git_files()`
-  - [ ] Extract common git operations to helper functions
-- [ ] Improve error messages for git failures
-- [ ] Add validation that `$DIR` is within a git repository
+- [x] Refactor `lib/core/git_diff.sh` to eliminate `cd` usage
+  - [x] Replace all `cd` with `git -C "$DIR"` flag
+  - [x] Remove `original_dir` tracking
+  - [x] Simplify `get_git_test_files()` and `get_git_files()`
+  - [x] Extract common git operations to helper functions
+- [x] Improve error messages for git failures
+- [x] Add validation that `$DIR` is within a git repository
 
 **Testing:**
-- [ ] Unit tests for git validation functions
-- [ ] Test behavior when not in git repo
-- [ ] Test behavior with invalid branch names
-- [ ] Integration tests with actual git operations
+- [x] Unit tests for git validation functions
+- [x] Test behavior when not in git repo
+- [x] Test behavior with invalid branch names
+- [x] Integration tests with actual git operations (all passing)
 
-**Deliverable:** Zero `cd` usage; git operations atomic and safe
+**Deliverable:** ✅ Zero `cd` usage; git operations atomic and safe
 
 ### Phase 2.3: Extract Inline AWK Scripts
-- [ ] Create `lib/awk/` directory
-- [ ] Extract AWK from `lib/validations/dart/big-test-files.sh`
-  - [ ] Create `lib/awk/find_big_functions.awk`
-  - [ ] Update validation to use external AWK file
-  - [ ] Add comments to AWK script for maintainability
-- [ ] Extract other complex AWK scripts similarly
-- [ ] Document AWK script inputs/outputs
+- [x] Create `lib/awk/` directory
+- [x] Extract AWK from `lib/validations/dart/big-test-files.sh`
+  - [x] Create `lib/awk/find_big_test_functions.awk`
+  - [x] Update validation to use external AWK file
+  - [x] Add comments to AWK script for maintainability
+- [x] Extract other complex AWK scripts
+  - [x] Create `lib/awk/find_single_test_files.awk`
+  - [x] Update dart single-test-per-file validation
+- [x] Document AWK script inputs/outputs
 
 **Testing:**
-- [ ] Test AWK scripts independently with sample input
-- [ ] Verify validation results unchanged
-- [ ] Integration tests pass
+- [x] Test AWK scripts independently with sample input
+- [x] Verify validation results unchanged
+- [x] Integration tests pass (all frameworks)
 
-**Deliverable:** AWK scripts extracted to separate files; maintainable and testable
+**Deliverable:** ✅ AWK scripts extracted to separate files; maintainable and testable
 
 ---
 
-## Week 3: Reduce Global State & Improve Architecture
+## Week 4: Code Quality & Polish
+
+### Phase 4.2: Address Medium-Severity Issues
+- [x] Delete commented-out code
+  - [x] Remove evaluation flag from `bin/is-my-code-great:33-36`
+  - [x] Remove debug printf from `lib/validations/csharp/single-test-per-file.sh`
+- [x] Fix typos in comments
+  - [x] Fix "Souce" -> "Source" in `lib/analysis.sh:17`
+- [x] Standardize indentation
+  - [x] Create `.editorconfig`
+- [x] Improve function naming
+  - [x] Rename `dump_summary()` to `print_summary()`
+- [x] Add early input validation
+  - [x] Add parameter validation to `detect_framework()`
+  - [x] Add guard clauses for directory existence
+
+**Testing:**
+- [x] Verify formatting is consistent
+- [x] Integration tests still pass (26/26)
+
+**Deliverable:** ✅ Code clean, well-formatted, and professional
 
 ### Phase 3.1: Refactor Global Variables
 - [ ] Create configuration object approach

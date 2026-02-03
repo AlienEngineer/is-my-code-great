@@ -32,10 +32,6 @@ while [[ $# -gt 0 ]]; do
 			FRAMEWORK="$2"
 			shift 2
 			;;
-		#-e|--evaluation)
-		#	EVALUATION="$2"
-		#	shift 2
-		#	;;
 		-d|--detailed)
 			DETAILED=true
 			shift

@@ -1,52 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-function find_big_functions() {  
+# Source constants
+# shellcheck source=lib/core/constants.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../../core/constants.sh"
 
+# Path to AWK script
+readonly BIG_TEST_AWK="$(dirname "${BASH_SOURCE[0]}")/../../awk/find_big_test_functions.awk"
+
+function find_big_functions() {  
   get_code_files \
     | xargs grep -nE 'test\('.*?',\s*\(\)( async)? \{|testWidgets\('.*?',\s*\(.*?\)( async)? \{|testGoldens\('.*?',\s*\(.*?\)( async)? \{|\}\);|.*?\(\(.*?\).*?\{' \
-    | awk '
-      function report(file, name, start, end) {
-        if (name != "" && end >= start && (end - start) > 15) {
-          printf("%s:%d: (%d lines) %s\n", file, start, end-start, name)
-        }
-      }
-      function get_line_number(line) {
-        split(line, parts, ":")
-        lineno = parts[2]
-        return lineno
-      }
-      function get_file(line) {
-        split(line, parts, ":")
-        lineno = parts[1]
-        return lineno
-      }
-      function get_funcname(line) {
-        split(line, parts, ":")
-        lineno = parts[3]
-        return lineno
-      }
-      /testWidgets\(|test\(|testGoldens\(/ { 
-        inTest=1 
-        count=0
-        depth=1
-        funcname=get_funcname($0); 
-        startline=get_line_number($0)+1
-        next
-      }
-      inTest && /\{/ {
-        depth++
-        next
-      }
-      inTest && /\}/ {
-        depth--
-        if (depth == 0) {
-          report(get_file($0), funcname, startline, get_line_number($0))
-          inTest=0
-          funcname=""
-        }
-      }
-      '
+    | awk -v max_lines="$MAX_TEST_LINES" -f "$BIG_TEST_AWK"
 }
 
 function _count_big_test_methods() {
@@ -63,6 +28,6 @@ register_test_validation \
     "big-test-files" \
     "HIGH" \
     "_count_big_test_methods" \
-    "Big Tests (>15 lines):"
+    "Big Tests (>${MAX_TEST_LINES} lines):"
 
 

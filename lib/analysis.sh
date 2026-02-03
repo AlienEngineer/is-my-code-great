@@ -15,7 +15,7 @@ run_analysis() {
         source "$SCRIPT_ROOT/lib/core/$FRAMEWORK/config.sh"
     fi
 
-    # Souce tech agnostic core files
+    # Source tech agnostic core files
     # These files can only be sourced after config.sh is sourced
     if [ -f "$SCRIPT_ROOT/lib/core/files.sh" ]; then
         source "$SCRIPT_ROOT/lib/core/files.sh"
@@ -69,6 +69,6 @@ run_analysis() {
 
     printf "\nIs my code great? "
 
-    dump_summary
+    print_summary
     export_report
 }
