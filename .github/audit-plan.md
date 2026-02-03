@@ -252,22 +252,40 @@ These phases would require significant refactoring and testing effort. The curre
 ## Remaining Work
 
 ### Phase 4.1: Expand Unit Test Coverage
-**Status:** Partially complete (strong foundation, room for expansion)
+**Status:** In Progress - Strong foundation with room for expansion
 
-**What's Done:**
-- ✅ Core error handling (errors.sh, strict mode)
-- ✅ Text finders (29 tests)
-- ✅ Git operations (23 tests)
-- ✅ Builder/validation system
-- ✅ Phase 1 integration tests
+- [x] Test coverage for `lib/core/text-finders.sh`
+  - [x] 29 tests created (26 passing, 3 skipped edge cases)
+  - [x] Tests for sum_results, find functions, error handling
+- [x] Test coverage for `lib/core/git_diff.sh`
+  - [x] 23 tests created for git operations
+  - [x] Tests for validation, branch diff, error cases
+- [x] Test coverage for `lib/core/builder.sh`
+  - [x] Tests for validation registration and execution
+- [x] Test coverage for `lib/core/errors.sh`
+  - [x] Tests for die, warn, debug functions
+- [x] Test coverage for strict mode integration
+  - [x] Tests verify set -euo pipefail enabled
+- [x] Phase 1 integration tests
+  - [x] End-to-end tests for full analysis pipeline
+- [x] Test coverage for `lib/analysis.sh`
+  - [x] 7 integration tests for refactored pipeline
+- [x] Test coverage for `lib/core/files.sh`
+  - [x] 18 tests (12 passing, 6 skipped for complexity)
+  - [x] Tests for get_code_files, get_test_files, pagination
+  - [x] Tests for empty directories, caching behavior
+- [ ] Additional coverage for remaining modules
+  - [ ] `lib/core/framework-detect.sh` (auto-detection logic)
+  - [ ] `lib/core/report/terminal.sh` and `lib/core/report/html.sh`
+  - [ ] Edge cases in text-finders (3 skipped tests)
 
-**What's Left:**
-- [ ] `lib/core/files.sh` - File pagination and caching logic
-- [ ] Framework detection - Auto-detect logic for dart/csharp/node
-- [ ] Report generation - Terminal and HTML report formatting
-- [ ] Edge cases - Unskip the 3 deferred tests in text-finders
+**Testing:**
+- [x] 7 unit test suites created (142+ tests total)
+- [x] All integration tests passing (26/26 frameworks)
+- [x] Coverage for critical paths and error handling
+- [ ] ~80% total coverage (estimated ~65% currently)
 
-**Priority:** Medium (strong foundation exists)
+**Deliverable:** ✅ Strong test foundation (142+ tests); additional coverage recommended for completeness
 
 ### Phase 4.3: Documentation & Polish
 **Status:** Not started
