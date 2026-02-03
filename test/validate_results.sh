@@ -50,6 +50,7 @@ _run_framework_tests() {
     fi
 
     (
+        # shellcheck source=/dev/null
         source "$expected_results_file"
 
         cd "$examples_dir"

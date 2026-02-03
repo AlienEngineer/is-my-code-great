@@ -98,7 +98,8 @@ function register_validation() {
     export CURRENT_CHECK_NAME="$check_name"
     start_new_evaluation_details
 
-    local start=$(date +%s%N)
+    local start
+    start=$(date +%s%N)
     local result
 
     # Direct function invocation - no eval needed

@@ -33,7 +33,8 @@ function _validate_git_repo() {
 
 function get_git_test_files() {
 
-    local original_dir=$(pwd)
+    local original_dir
+    original_dir=$(pwd)
     cd "$DIR" 2>/dev/null || { echo "❌ Dir not found: $DIR" >&2; return 1; }
     
     # Validate repo, but don't exit on failure - just return empty
@@ -58,7 +59,8 @@ function get_git_test_files() {
 
 function get_git_files() {
 
-    local original_dir=$(pwd)
+    local original_dir
+    original_dir=$(pwd)
     cd "$DIR" 2>/dev/null || { echo "❌ Dir not found: $DIR" >&2; return 1; }
     
     # Validate repo, but don't exit on failure - just return empty
@@ -81,7 +83,8 @@ function get_git_files() {
 
 
 function get_repo_root() {
-    local original_dir=$(pwd)
+    local original_dir
+    original_dir=$(pwd)
     cd "$DIR" || { echo "❌ Dir not found: $DIR" >&2; return 1; }
 
     repo_root=$(git rev-parse --show-toplevel) || {
