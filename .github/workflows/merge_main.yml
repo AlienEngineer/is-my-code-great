@@ -14,6 +14,30 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
+      - name: Bump version
+        run: |
+          git config --global user.name "AlienEngineer"
+          git config --global user.email "AlienEngineer@gmail.com"
+          
+          # Read current version
+          CURRENT_VERSION=$(cat VERSION)
+          echo "Current version: $CURRENT_VERSION"
+          
+          # Parse version (format: MAJOR.MINOR.PATCH)
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+          
+          # Increment patch version
+          PATCH=$((PATCH + 1))
+          NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          
+          echo "New version: $NEW_VERSION"
+          echo "$NEW_VERSION" > VERSION
+          
+          # Commit and push version bump
+          git add VERSION
+          git commit -m "chore: bump version to $NEW_VERSION [skip ci]"
+          git push origin main
+
       - name: Create and push new tag
         run: |
           
