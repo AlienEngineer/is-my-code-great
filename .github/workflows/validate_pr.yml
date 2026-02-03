@@ -22,6 +22,37 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Install shellcheck
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y shellcheck
+
+    - name: Run shellcheck on all bash scripts
+      run: |
+        echo "Running shellcheck on bash scripts..."
+        
+        # Find all .sh files and the main script
+        SCRIPTS=$(find . -type f \( -name "*.sh" -o -path "*/bin/is-my-code-great" \) \
+          ! -path "./tmp/*" \
+          ! -path "./.git/*" \
+          ! -path "./node_modules/*")
+        
+        FAILED=0
+        for script in $SCRIPTS; do
+          echo "Checking: $script"
+          if ! shellcheck "$script"; then
+            FAILED=1
+            echo "::error file=$script::ShellCheck found issues in $script"
+          fi
+        done
+        
+        if [ $FAILED -eq 1 ]; then
+          echo "::error::ShellCheck found issues in one or more scripts"
+          exit 1
+        fi
+        
+        echo "✅ All scripts passed shellcheck"
+
     - name: Print bash version
       run: bash --version
 

@@ -1,0 +1,31 @@
+# ShellCheck configuration for is-my-code-great
+# https://www.shellcheck.net/wiki/
+
+# Disable specific checks that don't apply to our use case
+
+# SC2086: Double quote to prevent globbing and word splitting
+# We intentionally use unquoted variables in some cases for word splitting
+disable=SC2086
+
+# SC2181: Check exit code directly with e.g. 'if mycmd;', not indirectly with $?
+# We use $? for clarity in some contexts
+disable=SC2181
+
+# SC2250: Prefer braces around variable references
+# Cosmetic style preference - not required for correctness
+disable=SC2250
+
+# SC2034: Variable appears unused
+# Some variables are used in sourced scripts
+disable=SC2034
+
+# SC1091: Not following sourced files
+# We don't need to follow all sourced files for analysis
+disable=SC1091
+
+# SC2016: Expressions don't expand in single quotes
+# This is intentional for awk scripts where we use -v for variables
+disable=SC2016
+
+# Set shell dialect
+shell=bash
