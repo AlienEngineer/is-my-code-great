@@ -1,7 +1,7 @@
 # is-my-code-great
-Command-line tool to verify arbitrary aspects about code. Has initial support for dart and C#.
+Command-line tool to verify code quality and test patterns. Supports Dart, C#, and Node.js with framework-agnostic validations.
 
-## use it as a github action
+## Use it as a GitHub Action
 ### is-my-code-great@v0
 
 ```
@@ -12,59 +12,186 @@ Command-line tool to verify arbitrary aspects about code. Has initial support fo
         verbose: true       # Optional, set to true for detailed output
 ```
 
-## for windows users
-[brew for windows](https://docs.brew.sh/Installation#linux-or-windows-10-subsystem-for-linux)
+## Install
 
-## install
+```sh
+brew tap AlienEngineer/tap
+brew install is-my-code-great
+```
 
-`brew tap AlienEngineer/tap`
-
-`brew install is-my-code-great`
+For Windows users, see [Brew for Windows](https://docs.brew.sh/Installation#linux-or-windows-10-subsystem-for-linux).
 
 
 ## Usage
-Navigate to the root folder you would like to evaluate and execute the following command, alternativelly the path can be specified.
-```sh
-is-my-code-great <path>
-is-my-code-great --help
+Navigate to the root folder you would like to evaluate, or specify a path:
 
-# for quick check againt main branch:
+```sh
+# Validate current directory (auto-detects framework)
+is-my-code-great
+
+# Validate specific path
+is-my-code-great /path/to/project
+
+# Quick check against main branch (git diff mode)
 is-my-code-great -g
 
-# for quick check againt specific branch:
-is-my-code-great -b master
+# Compare against specific branch
+is-my-code-great -b master /path/to/project
+
+# Verbose output for debugging
+is-my-code-great -v
+
+# Generate detailed HTML report
+is-my-code-great -d
+
+# Parseable output (for CI/CD integration)
+is-my-code-great -p
+
+# Show help
+is-my-code-great --help
 ```
 
-## update
-`brew update`
+## Update
 
-`brew upgrade is-my-code-great`
-
-## add new validations
-To add a new validations it's as simple as adding a new <filename>.sh file to the lib/validations folder using the following template:
-
+```sh
+brew update
+brew upgrade is-my-code-great
 ```
+
+## Testing
+
+### Run Unit Tests
+```sh
+# All unit tests (requires Bats-core)
+./test/unit/run_tests.sh
+
+# Specific test file
+bats test/unit/test_files.bats
+
+# Install Bats on macOS
+brew install bats-core
+```
+
+### Run Integration Tests
+```sh
+# All frameworks
+./test/validate_results.sh
+
+# Specific framework
+./test/validate_results.sh dart
+./test/validate_results.sh csharp
+./test/validate_results.sh node
+```
+
+Integration tests validate that validations correctly detect issues in example projects under [examples/](examples/).
+
+## Architecture
+
+### Directory Structure
+```
+bin/is-my-code-great         # CLI entry point
+lib/
+  analysis.sh                # Main analysis orchestrator
+  core/                      # Framework-agnostic utilities
+    builder.sh               # Validation registration system
+    constants.sh             # Global constants (PAGINATION_SIZE, MAX_TEST_LINES)
+    details.sh               # HTML report detail collection
+    errors.sh                # Error handling utilities
+    files.sh                 # File discovery and iteration (with caching)
+    framework-detect.sh      # Auto-detect project type
+    git_diff.sh              # Git branch comparison
+    tests.sh                 # Test function detection
+    text-finders.sh          # Text search helpers
+    verbosity.sh             # Verbose output functions
+    {FRAMEWORK}/config.sh    # Framework-specific configuration
+    report/
+      html.sh                # HTML report generation
+      terminal.sh            # Terminal output formatting
+  awk/                       # Extracted AWK scripts for readability
+    find_big_test_functions.awk
+    find_single_test_files.awk
+  validations/
+    agnostic/                # Framework-agnostic validations
+    {FRAMEWORK}/             # Framework-specific validations
+examples/{FRAMEWORK}/        # Example code for integration tests
+test/
+  unit/                      # Unit tests (Bats-core)
+  {FRAMEWORK}/expected_results.sh  # Integration test expectations
+  validate_results.sh        # Integration test runner
+```
+
+### Execution Flow
+1. **CLI Entry**: [bin/is-my-code-great](bin/is-my-code-great) parses arguments
+2. **Framework Detection**: [lib/core/framework-detect.sh](lib/core/framework-detect.sh) identifies project type (Dart/C#/Node)
+3. **Analysis Pipeline**: [lib/analysis.sh](lib/analysis.sh) orchestrates:
+   - Sources framework config from `lib/core/{FRAMEWORK}/config.sh`
+   - Sources core utilities (files, git_diff, tests, text-finders)
+   - Loads validations from `lib/validations/{FRAMEWORK}/*.sh` and `lib/validations/agnostic/*.sh`
+   - Executes registered validations
+   - Collects results
+4. **Reporting**: Outputs via [lib/core/report/terminal.sh](lib/core/report/terminal.sh) or [lib/core/report/html.sh](lib/core/report/html.sh)
+
+### Key Features
+- **Pagination**: Large file sets processed in chunks (PAGINATION_SIZE=200) to avoid memory issues
+- **Caching**: File lists cached on first access for performance
+- **Git Diff Mode**: When `-b/--base` flag used, only analyzes changed files
+- **Security**: No `eval` usage, function names validated, variables always quoted
+- **AWK Extraction**: Complex AWK scripts in `lib/awk/` for maintainability
+
+## Add New Validations
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed instructions. Quick template:
+
+```sh
 #!/usr/bin/env bash
+set -euo pipefail
 
-# implementation for the new validation
-# $DIR - this variable can be used to fetch which directory we are working on.
-# checkout the core folder for functions that makes it easier to find text on files.
-function my_custom_validaton() {
- echo -1
+# Description: Detects violations of X pattern
+# Severity: CRITICAL|HIGH|LOW
+
+function my_custom_validation() {
+    # Use helper functions from lib/core/text-finders.sh
+    sum_test_results "-nE" "pattern_regex"
+    
+    # OR for custom logic:
+    # local count=0
+    # while read -r line; do
+    #     add_details "$line"  # For HTML report
+    #     count=$((count + 1))
+    # done < <(get_test_files | xargs grep -nE "pattern" 2>/dev/null)
+    # echo "$count"
 }
 
-# registers a new test validation (choose this one for testing validations)
+# Register test validation
 register_test_validation \
-    "<unique_key>" \
-    "<severity>" \ # LOW, HIGH, CRITICAL
-    "my_custom_validaton" \
-    "<description>:"
+    "my-validation-key" \
+    "HIGH" \
+    "my_custom_validation" \
+    "Description of what this validates"
 
-# registers a new production code validation (choose this one for production code validations)
-register_code_validation \
-    "<unique_key>" \
-    "<severity>" \ # LOW, HIGH, CRITICAL
-    "my_custom_validaton" \
-    "<description>:"
+# OR register code validation
+# register_code_validation \
+#     "my-code-check" \
+#     "CRITICAL" \
+#     "my_custom_validation" \
+#     "Description"
 ```
 
+**Important**:
+- Function names: `snake_case` only (alphanumeric + underscores)
+- Validation keys: `hyphenated-format`
+- Return: Numeric count (0 or positive), or -1 if N/A
+- Add examples to `examples/{FRAMEWORK}/`
+- Update `test/{FRAMEWORK}/expected_results.sh`
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for:
+- Development setup
+- Coding standards ([CONVENTIONS.md](CONVENTIONS.md))
+- Testing guidelines
+- Pull request process
+
+## License
+
+MIT License - see [LICENSE](LICENSE) file for details.

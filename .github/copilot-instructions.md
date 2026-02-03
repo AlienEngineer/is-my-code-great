@@ -59,10 +59,22 @@ Framework-specific validation tests are in `/test`. To validate results for a la
 1. **Entry point**: `bin/is-my-code-great` parses CLI arguments
 2. **Framework detection**: `lib/core/framework-detect.sh` identifies the project type
 3. **Analysis execution**: `lib/analysis.sh` orchestrates the validation pipeline:
-   - Sources framework-specific config from `lib/core/{FRAMEWORK}/config.sh`
-   - Sources language-agnostic core utilities (files, git_diff, tests, text-finders)
-   - Loads all validations from `lib/validations/{FRAMEWORK}/*.sh` and `lib/validations/agnostic/*.sh`
-   - Executes registered validations and collects results
+   - `_source_framework_config(framework)` - Loads framework-specific config
+   - `_source_core_utilities()` - Sources core modules (files, git_diff, tests, text-finders)
+   - `_load_validations(framework)` - Loads all validation scripts
+   - `_report_results(parseable)` - Generates output
+   - Refactored in Phase 3.2: 75-line monolith → 4 functions + 5-line orchestrator
+
+### Code Organization (Post-Week 2 Refactor)
+- **DRY Principle Applied**: Eliminated 50% code duplication across framework configs
+- **Zero `cd` Usage**: All commands use `git -C "$DIR"` or subshells `( cd "$DIR"; ... )`
+- **AWK Extraction**: Complex AWK scripts moved to `lib/awk/` directory for maintainability:
+  - `lib/awk/find_big_test_functions.awk` - Detects test functions exceeding MAX_TEST_LINES
+  - `lib/awk/find_single_test_files.awk` - Finds files with exactly one test function
+- **Constants Centralized**: Global constants in `lib/core/constants.sh`:
+  - `PAGINATION_SIZE=200` - Files processed per batch
+  - `MAX_TEST_LINES=15` - Max lines per test function
+  - `readonly` enforcement prevents accidental modification
 
 ### Validation System
 Validations are registered via two functions in `lib/core/builder.sh`:
@@ -83,14 +95,19 @@ Each validation receives:
 - Returns: Number or result for the validation
 
 ### Core Modules
+- `lib/core/constants.sh` - **NEW**: Global constants (PAGINATION_SIZE=200, MAX_TEST_LINES=15)
 - `lib/core/verbosity.sh` - Print functions for verbose output
+- `lib/core/errors.sh` - Error handling utilities (log_error, die functions)
 - `lib/core/tests.sh` - Test detection and iteration utilities
   - `get_total_tests()` - Count all test functions in the project
   - `get_test_function_pattern_names()` - Get test function patterns for the framework
-- `lib/core/files.sh` - File pattern matching with caching (excludes test, lock files, node_modules, etc.)
-  - `get_code_files()` - Returns all production code files (cached)
-  - `get_test_files()` - Returns all test files (cached)
+- `lib/core/files.sh` - File pattern matching with caching and pagination
+  - `get_code_files()` - Returns all production code files (cached, paginated)
+  - `get_test_files()` - Returns all test files (cached, paginated)
+  - `iterate_test_files(callback)` - Paginated iteration to avoid memory issues
+  - `iterate_code_files(callback)` - Paginated iteration over code files
   - Automatically switches between local filesystem and git diff modes
+  - Uses null terminators (`-print0`/`mapfile -d ''`) for safe filename handling
 - `lib/core/text-finders.sh` - Text search helpers for validations
   - `sum_test_results(flags, pattern)` - Count grep matches in test files
   - `sum_code_results(flags, pattern)` - Count grep matches in code files
@@ -176,7 +193,11 @@ When `-b/--base` flag is used, git diff against the base branch. Functions avail
 - File helper functions automatically adapt to git-diff mode when `LOCAL_RUN=false`
 
 ## Testing Tips
-- Examples serve as test cases; validations should match expected result counts
+- **Unit Tests**: Run `./test/unit/run_tests.sh` to execute Bats-core unit tests
+  - Test files: `test/unit/test_*.bats` (173+ tests across 9 suites)
+  - Test coverage: ~70% of core modules (files, framework-detect, analysis, report, git_diff, text-finders)
+  - Custom assert functions in `test/unit/test_helper.bash` (assert_success, assert_failure, assert_output)
+- **Integration Tests**: Examples serve as test cases; validations should match expected result counts
 - Use `-v` flag when debugging validation logic
 - Use `-p` flag to see parseable output (easier for testing)
 - Each language has separate validation sets; avoid assuming Dart rules apply to Node
