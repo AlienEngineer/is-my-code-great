@@ -39,5 +39,9 @@ disable=SC2295
 # Some internal functions are invoked indirectly or used as callbacks
 disable=SC2329
 
+# SC2317: Command appears to be unreachable
+# Trap handlers and callback functions are invoked indirectly
+disable=SC2317
+
 # Set shell dialect
 shell=bash
