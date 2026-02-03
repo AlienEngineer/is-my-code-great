@@ -8,7 +8,20 @@ set -euo pipefail
 
 detect_framework() {
     local dir="$1"
-    local verbose="$2"
+    local verbose="${2:-0}"
+    
+    # Validate required parameters
+    if [[ -z "$dir" ]]; then
+        echo "Error: directory parameter required for detect_framework" >&2
+        return 1
+    fi
+    
+    # Validate directory exists
+    if [[ ! -d "$dir" ]]; then
+        echo "Error: directory does not exist: $dir" >&2
+        return 1
+    fi
+    
     if [ "$verbose" = "1" ]; then
         echo "[framework-detect] Scanning directory: $dir" >&2
     fi

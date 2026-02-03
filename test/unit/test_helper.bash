@@ -1,6 +1,59 @@
 #!/usr/bin/env bash
 # Test helper functions for bats-core tests
 
+# Simple assert functions (no external dependencies needed)
+assert_success() {
+    if [ "$status" -ne 0 ]; then
+        echo "Expected success (status 0), got: $status"
+        echo "Output: $output"
+        return 1
+    fi
+}
+
+assert_failure() {
+    if [ "$status" -eq 0 ]; then
+        echo "Expected failure (non-zero status), got: $status"
+        echo "Output: $output"
+        return 1
+    fi
+}
+
+assert_output() {
+    if [ "$1" = "--partial" ]; then
+        local expected="$2"
+        if [[ ! "$output" =~ $expected ]]; then
+            echo "Expected output to contain: $expected"
+            echo "Actual output: $output"
+            return 1
+        fi
+    else
+        local expected="$1"
+        if [ "$output" != "$expected" ]; then
+            echo "Expected output: $expected"
+            echo "Actual output: $output"
+            return 1
+        fi
+    fi
+}
+
+refute_output() {
+    if [ "$1" = "--partial" ]; then
+        local unexpected="$2"
+        if [[ "$output" =~ $unexpected ]]; then
+            echo "Expected output to NOT contain: $unexpected"
+            echo "Actual output: $output"
+            return 1
+        fi
+    else
+        local unexpected="$1"
+        if [ "$output" = "$unexpected" ]; then
+            echo "Expected output to NOT be: $unexpected"
+            echo "Actual output: $output"
+            return 1
+        fi
+    fi
+}
+
 # Helper: Assert output contains string
 assert_output_contains() {
     local expected="$1"

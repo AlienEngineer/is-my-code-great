@@ -1,6 +1,6 @@
 set -euo pipefail
 
-function dump_summary() {   
+function print_summary() {   
     local totalTests
     local totalIssues
     totalTests=$(get_total_tests)

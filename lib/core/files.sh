@@ -1,5 +1,9 @@
 set -euo pipefail
 
+# Source constants
+# shellcheck source=lib/core/constants.sh
+source "$(dirname "${BASH_SOURCE[0]}")/constants.sh"
+
 declare -a TEST_FILES_CACHE=()
 declare -a CODE_FILES_CACHE=()
 TEST_FILES_CACHE_READY=false
@@ -82,11 +86,10 @@ function get_code_files_paginated() {
 
 function iterate_test_files() {
   local callback="${1:?}"; shift
-  local page_size=200
   local page=0
   local -a files
   while :; do
-    mapfile -d '' -t files < <(get_test_files_paginated "$page" "$page_size" 2>/dev/null || printf '')
+    mapfile -d '' -t files < <(get_test_files_paginated "$page" "$PAGINATION_SIZE" 2>/dev/null || printf '')
     ((${#files[@]})) || break
     "$callback" "$@" files
     ((page++))
@@ -95,11 +98,10 @@ function iterate_test_files() {
 
 function iterate_code_files() {
   local callback="${1:?}"; shift
-  local page_size=200
   local page=0
   local -a files
   while :; do
-    mapfile -d '' -t files < <(get_code_files_paginated "$page" "$page_size" 2>/dev/null || printf '')
+    mapfile -d '' -t files < <(get_code_files_paginated "$page" "$PAGINATION_SIZE" 2>/dev/null || printf '')
     ((${#files[@]})) || break
     "$callback" "$@" files
     ((page++))

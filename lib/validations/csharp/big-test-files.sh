@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Source constants
+# shellcheck source=lib/core/constants.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../../core/constants.sh"
 
 find_big_functions() { 
   get_code_files \
     | xargs grep -nE '\[TestMethod\]|public[[:space:]]+(void|async[[:space:]]+Task(<[^>]+>)?)[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*\(\)|\{|\}' \
-    | awk '
+    | awk -v max_lines="$MAX_TEST_LINES" '
     function report(file, name, start, end) {
-      if (name != "" && end >= start && (end - start) > 15) {
+      if (name != "" && end >= start && (end - start) > max_lines) {
         printf("%s:%d: (%d lines) %s\n", file, start, end-start, name)
       }
     }
@@ -68,5 +71,5 @@ register_test_validation \
     "big-test-files" \
     "HIGH" \
     "count_big_test_methods" \
-    "C# Test methods > 15 lines:"
+    "C# Test methods > ${MAX_TEST_LINES} lines:"
 

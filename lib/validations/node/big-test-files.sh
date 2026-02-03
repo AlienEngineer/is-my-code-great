@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Source constants
+# shellcheck source=lib/core/constants.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../../core/constants.sh"
 
 find_big_tests_in_file() {
-  MAX_LINES="${2:-15}"
+  MAX_LINES="${2:-$MAX_TEST_LINES}"
   local file="$1"
   awk -v max="$MAX_LINES" -v file="$file" '
     function report(name, start, end) {
@@ -73,4 +76,4 @@ register_test_validation \
     "big-test-files" \
     "HIGH" \
     "count_big_test_methods" \
-    "Test methods > 15 lines:"
+    "Test methods > ${MAX_TEST_LINES} lines:"
