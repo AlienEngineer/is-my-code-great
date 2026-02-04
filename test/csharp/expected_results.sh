@@ -4,11 +4,11 @@
 # Format: validation_key:expected_count
 
 EXPECTED_RESULTS="
-law-of-demeter:1
+law-of-demeter:3
 big-test-files:1
-verifies:1
-tests-per-file:1
-exclude-from-code-coverage:1
+verifies:3
+tests-per-file:3
+exclude-from-code-coverage:3
 setups-inside-test:2
-mock-abuse:1
+mock-abuse:3
 "
