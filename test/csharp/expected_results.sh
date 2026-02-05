@@ -11,4 +11,5 @@ tests-per-file:3
 exclude-from-code-coverage:3
 setups-inside-test:2
 mock-abuse:3
+too-many-arguments:3
 "
