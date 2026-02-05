@@ -10,4 +10,5 @@ verifies:1
 tests-per-file:1
 setups-inside-test:2
 mock-abuse:1
+too-many-arguments:3
 "

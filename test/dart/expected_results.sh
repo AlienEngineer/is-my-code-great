@@ -16,4 +16,5 @@ widgets-predicate:2
 exclude-from-code-coverage:2
 setups-inside-test:2
 mock-abuse:1
+too-many-arguments:3
 "
