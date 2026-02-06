@@ -25,15 +25,18 @@ detect_framework() {
     if [ "$verbose" = "1" ]; then
         echo "[framework-detect] Scanning directory: $dir" >&2
     fi
-    if find "$dir" -name "pubspec.yaml" -o -name "*.dart" | grep -q .; then
+    
+    # Use find -quit to stop after first match, avoiding broken pipe errors
+    # when grep -q exits early in strict pipefail mode
+    if [[ -n "$(find "$dir" \( -name "pubspec.yaml" -o -name "*.dart" \) -print -quit 2>/dev/null)" ]]; then
         [ "$verbose" = "1" ] && echo "[framework-detect] Detected Dart project" >&2
         echo "dart"
         return 0
-    elif find "$dir" -name "package.json" -o -name "*.ts" | grep -q .; then
+    elif [[ -n "$(find "$dir" \( -name "package.json" -o -name "*.ts" \) -print -quit 2>/dev/null)" ]]; then
         [ "$verbose" = "1" ] && echo "[framework-detect] Detected NodeJs project" >&2
         echo "node"
         return 0
-    elif find "$dir" -name "*.csproj" -o -name "*.cs" | grep -q .; then
+    elif [[ -n "$(find "$dir" \( -name "*.csproj" -o -name "*.cs" \) -print -quit 2>/dev/null)" ]]; then
         [ "$verbose" = "1" ] && echo "[framework-detect] Detected C# project" >&2
         echo "csharp"
         return 0
