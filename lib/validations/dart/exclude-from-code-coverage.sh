@@ -3,7 +3,7 @@ set -euo pipefail
 
 
 function count_exclusions() {
-    find_text_in_test 'coverage:ignore-' "$DIR" "$BASE_BRANCH" "$CURRENT_BRANCH"
+    find_text_in_test 'coverage:ignore-'
 }
 
 register_test_validation \

@@ -10,9 +10,6 @@ FRAMEWORK=""
 DIR=""
 VERBOSE=0
 PARSEABLE=0
-BASE_BRANCH="main"
-CURRENT_BRANCH=""
-LOCAL_RUN=true
 DETAILED=false
 DETAILED_FILE="result.html"
 EVALUATION=""
@@ -36,20 +33,6 @@ while [[ $# -gt 0 ]]; do
 			DETAILED=true
 			shift
 			;;
-        -b|--base)
-            LOCAL_RUN=false
-            BASE_BRANCH="$2"
-            shift 2
-            ;;
-        -c|--current)
-            LOCAL_RUN=false
-            CURRENT_BRANCH="$2"
-            shift 2
-            ;;		
-        -g|--use-git-diff)
-            LOCAL_RUN=false
-            shift 1
-            ;;
 		-v|--verbose)
 			VERBOSE=1
 			shift
@@ -78,7 +61,7 @@ if [ -z "$DIR" ]; then
 	DIR="."
 fi
 
-export LOCAL_RUN DETAILED VERBOSE PARSEABLE BASE_BRANCH
+export DETAILED VERBOSE PARSEABLE
 
 source "$(dirname "$0")/../lib/analysis.sh"
 
@@ -96,28 +79,15 @@ if [ "$PER_PROJECT" -eq 1 ]; then
 
     find "$DIR" -name "pubspec.yaml" -print0 | while IFS= read -r -d $'\0' pubspec_file; do
         project_dir=$(dirname "$pubspec_file")
-        
-        project_current_branch="$CURRENT_BRANCH"
-        if [ "$LOCAL_RUN" = false ] && [ -z "$project_current_branch" ]; then
-            current_dir=$(pwd);
-            cd "$project_dir" || { echo "❌ Dir not found: $project_dir" >&2; continue; }
-            project_current_branch=$(git rev-parse --abbrev-ref HEAD)
-            cd "$current_dir" || { echo "❌ Could not return to original directory: $current_dir" >&2; continue; }
-        fi
 
         if [ "$VERBOSE" = "1" ]; then
             echo "[main] Analyzing Dart project at: '$project_dir'"
             echo "[main] FRAMEWORK: $FRAMEWORK" >&2
             echo "[main] DIR: $project_dir" >&2
-            echo "[main] BASE_BRANCH: $BASE_BRANCH" >&2
-            echo "[main] CURRENT_BRANCH: $project_current_branch" >&2
-            echo "[main] LOCAL_RUN: $LOCAL_RUN" >&2
             echo "[main] DETAILED: $DETAILED" >&2
-            echo "[main] EVALUATION: $EVALUATION" >&2
         fi
         
-        export CURRENT_BRANCH="$project_current_branch"
-        run_analysis "$project_dir" "$FRAMEWORK" "$BASE_BRANCH" "$project_current_branch" "$LOCAL_RUN" "$PARSEABLE"
+        run_analysis "$project_dir" "$FRAMEWORK" "$PARSEABLE"
         
     done
     
@@ -137,27 +107,10 @@ if [ -z "$FRAMEWORK" ]; then
 	fi
 fi
 
-# We can only set the current branch after receiving in which directory we are running.
-
-if [ "$LOCAL_RUN" = false ]; then
-	if [ -z "$CURRENT_BRANCH" ]; then
-		current_dir=$(pwd);
-		cd "$DIR" || { echo "❌ Dir not found: $DIR" >&2; exit 1; }
-		CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-		cd "$current_dir" || { echo "❌ Could not return to original directory: $current_dir" >&2; exit 1; }
-	fi
-fi
-
 if [ "$VERBOSE" = "1" ]; then
 	echo "[main] FRAMEWORK: $FRAMEWORK" >&2
 	echo "[main] DIR: $DIR" >&2
-	echo "[main] BASE_BRANCH: $BASE_BRANCH" >&2
-	echo "[main] CURRENT_BRANCH: $CURRENT_BRANCH" >&2
-	echo "[main] LOCAL_RUN: $LOCAL_RUN" >&2
 	echo "[main] DETAILED: $DETAILED" >&2
-	echo "[main] EVALUATION: $EVALUATION" >&2
 fi
 
-export CURRENT_BRANCH
-
-run_analysis "$DIR" "$FRAMEWORK" "$BASE_BRANCH" "$CURRENT_BRANCH" "$LOCAL_RUN" "$PARSEABLE"
+run_analysis "$DIR" "$FRAMEWORK" "$PARSEABLE"

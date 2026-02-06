@@ -29,7 +29,6 @@ _source_framework_config() {
 _source_core_utilities() {
     local core_files=(
         "$SCRIPT_ROOT/lib/core/files.sh"
-        "$SCRIPT_ROOT/lib/core/git_diff.sh"
         "$SCRIPT_ROOT/lib/core/text-finders.sh"
         "$SCRIPT_ROOT/lib/core/tests.sh"
         "$SCRIPT_ROOT/lib/core/report/html.sh"

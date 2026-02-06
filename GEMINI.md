@@ -19,9 +19,9 @@ The project follows a modular architecture based on shell scripts:
 *   **`lib/core/`:** A directory containing foundational utility scripts, such as:
     *   `builder.sh`: Manages the registration and execution of individual validations, collecting their results and execution times.
     *   `framework-detect.sh`: Detects the project's framework (e.g., Dart, Node, C#) by looking for characteristic files like `pubspec.yaml`, `package.json`, or `.csproj`.
-    *   Other utilities for verbosity, file operations, git diffs, text finding, and test-related functions.
+    *   Other utilities for verbosity, file operations, text finding, and test-related functions.
 *   **`lib/validations/`:** Contains the actual validation scripts, organized by framework (`dart`, `csharp`, `node`) and a common `agnostic` directory for cross-framework checks. Each validation script defines a function that performs a specific check and registers itself with the `builder.sh` functions (`register_test_validation` or `register_code_validation`).
-*   **`action.yml`:** Defines the GitHub Action for the tool, allowing it to be run in CI workflows. It fetches branches, executes the `is-my-code-great` CLI, and comments results back to pull requests.
+*   **`action.yml`:** Defines the GitHub Action for the tool, allowing it to be run in CI workflows. It executes the `is-my-code-great` CLI and comments results back to pull requests.
 
 ## Building and Running
 
@@ -50,12 +50,6 @@ is-my-code-great -f dart /path/to/project
 
 # Analyze multiple Dart projects within a directory (each with a pubspec.yaml)
 is-my-code-great --per-project /path/to/multiple/projects
-
-# Perform a quick check against the main branch (git-based analysis)
-is-my-code-great -g
-
-# Perform a quick check against a specific base branch
-is-my-code-great -b master
 
 # Perform a detailed report (html)
 is-my-code-great -d

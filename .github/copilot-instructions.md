@@ -18,9 +18,6 @@ A CLI tool for code quality validation across multiple languages (Dart, C#, Node
 # Validate specific path
 ./bin/is-my-code-great /path/to/project
 
-# Compare against a specific base branch
-./bin/is-my-code-great -b main /path/to/project
-
 # Verbose output for debugging
 ./bin/is-my-code-great -v
 
@@ -44,9 +41,6 @@ Framework-specific validation tests are in `/test`. To validate results for a la
 
 # Analyze multiple projects (each with framework marker file)
 ./bin/is-my-code-great --per-project /path/to/multi-project
-
-# Quick git-based check (against main branch)
-./bin/is-my-code-great -g
 ```
 
 ## Architecture
@@ -60,7 +54,7 @@ Framework-specific validation tests are in `/test`. To validate results for a la
 2. **Framework detection**: `lib/core/framework-detect.sh` identifies the project type
 3. **Analysis execution**: `lib/analysis.sh` orchestrates the validation pipeline:
    - `_source_framework_config(framework)` - Loads framework-specific config
-   - `_source_core_utilities()` - Sources core modules (files, git_diff, tests, text-finders)
+   - `_source_core_utilities()` - Sources core modules (files, tests, text-finders)
    - `_load_validations(framework)` - Loads all validation scripts
    - `_report_results(parseable)` - Generates output
    - Refactored in Phase 3.2: 75-line monolith → 4 functions + 5-line orchestrator
@@ -106,18 +100,14 @@ Each validation receives:
   - `get_test_files()` - Returns all test files (cached, paginated)
   - `iterate_test_files(callback)` - Paginated iteration to avoid memory issues
   - `iterate_code_files(callback)` - Paginated iteration over code files
-  - Automatically switches between local filesystem and git diff modes
   - Uses null terminators (`-print0`/`mapfile -d ''`) for safe filename handling
 - `lib/core/text-finders.sh` - Text search helpers for validations
   - `sum_test_results(flags, pattern)` - Count grep matches in test files
   - `sum_code_results(flags, pattern)` - Count grep matches in code files
-  - `find_text_in_test(pattern, dir)` - Simple text search in test files
-  - `find_regex_in_test(pattern, dir)` - Regex search in test files
-  - `find_text_in_files(pattern, dir)` - Simple text search in all files
-  - `find_regex_in_files(pattern, dir)` - Regex search in all files
-- `lib/core/git_diff.sh` - Git branch comparison utilities
-  - `get_changed_code_files()` - Production files changed between branches
-  - `get_changed_test_files()` - Test files changed between branches
+  - `find_text_in_test(pattern)` - Simple text search in test files
+  - `find_regex_in_test(pattern)` - Regex search in test files
+  - `find_text_in_files(pattern)` - Simple text search in all files
+  - `find_regex_in_files(pattern)` - Regex search in all files
 - `lib/core/builder.sh` - Validation registration and execution framework
 - `lib/core/details.sh` - Detail collection for HTML reports
   - `add_details(message)` - Add a detail line to current validation (for `-d` flag)
@@ -182,20 +172,12 @@ Keys used in `register_*_validation` should be hyphenated (e.g., `tests-per-file
 - `get_code_files` excludes: test files, lock files, node_modules, .git, etc.
 - `get_test_files` filters for framework-specific test file patterns
 - Use these functions via `lib/core/files.sh` helpers: `get_code_files`, `get_test_files`
-- Files are cached on first call for performance; cache automatically handles local vs git-diff mode
+- Files are cached on first call for performance
 - When adding details for HTML reports, call `add_details "$line"` before counting
-
-### Git Diff Mode
-When `-b/--base` flag is used, git diff against the base branch. Functions available:
-- `get_changed_code_files` - Files changed between branches
-- `get_changed_test_files` - Test files changed between branches
-- Use `LOCAL_RUN` variable to determine if comparing branches or local directory
-- File helper functions automatically adapt to git-diff mode when `LOCAL_RUN=false`
 
 ## Testing Tips
 - **Unit Tests**: Run `./test/unit/run_tests.sh` to execute Bats-core unit tests
-  - Test files: `test/unit/test_*.bats` (173+ tests across 9 suites)
-  - Test coverage: ~70% of core modules (files, framework-detect, analysis, report, git_diff, text-finders)
+  - Test files: `test/unit/test_*.bats`
   - Custom assert functions in `test/unit/test_helper.bash` (assert_success, assert_failure, assert_output)
 - **Integration Tests**: Examples serve as test cases; validations should match expected result counts
 - Use `-v` flag when debugging validation logic
@@ -215,6 +197,5 @@ Using as a GitHub Action in other repos:
 - name: is my code great?
   uses: alienengineer/is-my-code-great@v0
   with:
-    base-branch: main   # Optional
     verbose: true       # Optional
 ```

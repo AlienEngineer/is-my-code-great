@@ -3,7 +3,7 @@ set -euo pipefail
 
 
 function get_verifies_count() {
-    find_text_in_test '.toHaveBeenCalled' "$DIR" "$BASE_BRANCH" "$CURRENT_BRANCH"
+    find_text_in_test '.toHaveBeenCalled'
 }
 
 register_test_validation \

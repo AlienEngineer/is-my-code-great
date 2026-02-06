@@ -3,7 +3,7 @@ set -euo pipefail
 
 
 function get_verifies_count() {
-    find_regex_in_test 'verify\(|verifyNever\(' "$DIR" "$BASE_BRANCH" "$CURRENT_BRANCH"
+    find_regex_in_test 'verify\(|verifyNever\('
 }
 
 register_test_validation \

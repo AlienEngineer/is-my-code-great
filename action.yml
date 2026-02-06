@@ -2,10 +2,6 @@ name: "Is my code great?"
 description: "Executes the is-my-code-great CLI tool to validate code quality."
 author: "AlienEngineer"
 inputs:
-  base-branch:
-    description: "Base branch to compare against"
-    required: false
-    default: "${{ github.event.repository.default_branch }}"
   verbose:
     description: "Enable verbose output"
     required: false
@@ -14,14 +10,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    
-    - name: "fetch main"
-      shell: bash
-      run: |
-        git switch -c ${{ github.head_ref }}
-        git fetch origin ${{ inputs.base-branch }}
-        git branch ${{ inputs.base-branch }} origin/${{ inputs.base-branch }}
-
     - name: "execute script"
       shell: bash
       run: |
@@ -30,7 +18,7 @@ runs:
           VERBOSE_FLAG="-v"
         fi
         
-        ${{ github.action_path }}/bin/is-my-code-great -b ${{ inputs.base-branch }} $VERBOSE_FLAG > results.txt
+        ${{ github.action_path }}/bin/is-my-code-great $VERBOSE_FLAG > results.txt
         echo "VALIDATION_OUTPUT<<EOF" >> $GITHUB_ENV
         cat results.txt >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV

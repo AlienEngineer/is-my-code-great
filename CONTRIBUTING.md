@@ -202,18 +202,6 @@ get_code_files
 iterate_test_files "process_function"
 ```
 
-### Git Operations (lib/core/git_diff.sh)
-```bash
-# Get changed files (when -b/--base flag used)
-get_changed_test_files
-get_changed_code_files
-
-# Check if in git-diff mode
-if [[ "$LOCAL_RUN" == "false" ]]; then
-    # Comparing branches
-fi
-```
-
 ### Test Utilities (lib/core/tests.sh)
 ```bash
 # Count all test functions
@@ -284,7 +272,6 @@ lib/
     errors.sh                # Error handling utilities
     files.sh                 # File discovery and iteration
     framework-detect.sh      # Auto-detect project framework
-    git_diff.sh              # Git branch comparison
     tests.sh                 # Test function detection
     text-finders.sh          # Text search helpers
     verbosity.sh             # Verbose output functions
@@ -321,7 +308,7 @@ test/
 2. **Detection**: `lib/core/framework-detect.sh` identifies project type
 3. **Analysis**: `lib/analysis.sh` orchestrates validation pipeline:
    - Sources framework config from `lib/core/{FRAMEWORK}/config.sh`
-   - Sources core utilities (files, git_diff, tests, text-finders)
+   - Sources core utilities (files, tests, text-finders)
    - Loads validations from `lib/validations/{FRAMEWORK}/*.sh`
    - Executes registered validations
 4. **Reporting**: Outputs results via `lib/core/report/terminal.sh` or `lib/core/report/html.sh`

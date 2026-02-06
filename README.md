@@ -8,7 +8,6 @@ Command-line tool to verify code quality and test patterns. Supports Dart, C#, a
     - name: is my code great?
       uses: alienengineer/is-my-code-great@v0
       with:
-        base-branch: main   # Optional, set to the branch you want to compare against
         verbose: true       # Optional, set to true for detailed output
 ```
 
@@ -31,12 +30,6 @@ is-my-code-great
 
 # Validate specific path
 is-my-code-great /path/to/project
-
-# Quick check against main branch (git diff mode)
-is-my-code-great -g
-
-# Compare against specific branch
-is-my-code-great -b master /path/to/project
 
 # Verbose output for debugging
 is-my-code-great -v
@@ -99,7 +92,6 @@ lib/
     errors.sh                # Error handling utilities
     files.sh                 # File discovery and iteration (with caching)
     framework-detect.sh      # Auto-detect project type
-    git_diff.sh              # Git branch comparison
     tests.sh                 # Test function detection
     text-finders.sh          # Text search helpers
     verbosity.sh             # Verbose output functions
@@ -125,7 +117,7 @@ test/
 2. **Framework Detection**: [lib/core/framework-detect.sh](lib/core/framework-detect.sh) identifies project type (Dart/C#/Node)
 3. **Analysis Pipeline**: [lib/analysis.sh](lib/analysis.sh) orchestrates:
    - Sources framework config from `lib/core/{FRAMEWORK}/config.sh`
-   - Sources core utilities (files, git_diff, tests, text-finders)
+   - Sources core utilities (files, tests, text-finders)
    - Loads validations from `lib/validations/{FRAMEWORK}/*.sh` and `lib/validations/agnostic/*.sh`
    - Executes registered validations
    - Collects results
@@ -134,7 +126,6 @@ test/
 ### Key Features
 - **Pagination**: Large file sets processed in chunks (PAGINATION_SIZE=200) to avoid memory issues
 - **Caching**: File lists cached on first access for performance
-- **Git Diff Mode**: When `-b/--base` flag used, only analyzes changed files
 - **Security**: No `eval` usage, function names validated, variables always quoted
 - **AWK Extraction**: Complex AWK scripts in `lib/awk/` for maintainability
 

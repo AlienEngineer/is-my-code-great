@@ -3,7 +3,7 @@ set -euo pipefail
 
 
 function _find_pump_without_duration() {
-    find_text_in_test 'tester.pump()' "$DIR" "$BASE_BRANCH" "$CURRENT_BRANCH"    
+    find_text_in_test 'tester.pump()'
 }
 
 register_test_validation \

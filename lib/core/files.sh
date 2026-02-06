@@ -11,21 +11,13 @@ CODE_FILES_CACHE_READY=false
 
 _load_test_files_cache() {
   $TEST_FILES_CACHE_READY && return 0
-  if [ "${LOCAL_RUN:-false}" = true ]; then
-    mapfile -d '' -t TEST_FILES_CACHE < <(find "$DIR" -type f -name "$TEST_FILE_PATTERN" -print0)
-  else
-    mapfile -t TEST_FILES_CACHE < <(get_git_test_files || true)
-  fi
+  mapfile -d '' -t TEST_FILES_CACHE < <(find "$DIR" -type f -name "$TEST_FILE_PATTERN" -print0)
   TEST_FILES_CACHE_READY=true
 }
 
 _load_code_files_cache() {
   $CODE_FILES_CACHE_READY && return 0
-  if [ "${LOCAL_RUN:-false}" = true ]; then
-    mapfile -d '' -t CODE_FILES_CACHE < <(find "$DIR" -type f -name "$CODE_FILE_PATTERN" -print0)
-  else
-    mapfile -t CODE_FILES_CACHE < <(get_git_files || true)
-  fi
+  mapfile -d '' -t CODE_FILES_CACHE < <(find "$DIR" -type f -name "$CODE_FILE_PATTERN" -print0)
   CODE_FILES_CACHE_READY=true
 }
 
@@ -40,11 +32,7 @@ get_code_files() {
 }
 
 get_test_files_to_analyse() {
-  if [ "${LOCAL_RUN:-false}" = true ]; then
-    find "$DIR" -type f -name "$CODE_FILE_PATTERN" -print0
-  else
-    get_git_files || true
-  fi
+  find "$DIR" -type f -name "$CODE_FILE_PATTERN" -print0
 }
 
 get_files_to_analyse() {
