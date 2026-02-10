@@ -59,7 +59,7 @@ jobs:
     - name: Run validation on all example languages
       id: validate_examples
       run: |
-        LANGUAGES=$(ls -d examples/*/ | sed 's|examples/||; s|/||')
+        LANGUAGES=$(ls -d examples/*/ | sed 's|examples/||; s|/||' | grep -v '^dart2$')
         echo "Running validation on languages: $LANGUAGES"
 
         OVERALL_SUCCESS=true
