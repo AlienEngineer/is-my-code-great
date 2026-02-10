@@ -5,9 +5,11 @@ set -euo pipefail
 # shellcheck source=lib/core/constants.sh
 source "$(dirname "${BASH_SOURCE[0]}")/../../core/constants.sh"
 
-# Path to AWK script
-BIG_TEST_AWK="$(dirname "${BASH_SOURCE[0]}")/../../awk/find_big_test_functions.awk"
-readonly BIG_TEST_AWK
+# Path to AWK script (conditional to avoid readonly errors on re-sourcing)
+if [ -z "${BIG_TEST_AWK:-}" ]; then
+    BIG_TEST_AWK="$(dirname "${BASH_SOURCE[0]}")/../../awk/find_big_test_functions.awk"
+    readonly BIG_TEST_AWK
+fi
 
 function find_big_functions() {  
   get_test_files \

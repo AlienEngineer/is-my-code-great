@@ -49,22 +49,24 @@ create_test_structure() {
 @test "get_test_files: returns all test files" {
     create_test_structure
     
-    run get_test_files
-    assert_success
+    # Count files directly without using run/output (preserves null terminators)
+    local count=0
+    while IFS= read -r -d '' file; do
+        count=$((count + 1))
+    done < <(get_test_files)
     
-    # Should have 3 test files
-    local count=$(echo "$output" | wc -l | tr -d ' ')
     [ "$count" -eq 3 ]
 }
 
 @test "get_code_files: returns all code files" {
     create_test_structure
     
-    run get_code_files
-    assert_success
+    # Count files directly without using run/output (preserves null terminators)
+    local count=0
+    while IFS= read -r -d '' file; do
+        [[ "$file" == *.dart ]] && count=$((count + 1))
+    done < <(get_code_files)
     
-    # Should have at least 3 code files (our test ones, may have more from find patterns)
-    local count=$(echo "$output" | grep -c "\.dart$" || echo 0)
     [ "$count" -ge 3 ]
 }
 

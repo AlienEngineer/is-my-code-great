@@ -7,13 +7,14 @@ show_help() {
 }
 
 FRAMEWORK=""
-DIR=""
+DIRS=()
 VERBOSE=0
 PARSEABLE=0
 DETAILED=false
 DETAILED_FILE="result.html"
 EVALUATION=""
 PER_PROJECT=0
+RESULT_MODE="combined"  # Can be "combined" or "per-path"
 
 while [[ $# -gt 0 ]]; do
 	case $1 in
@@ -23,6 +24,14 @@ while [[ $# -gt 0 ]]; do
 			;;
 		--per-project)
 			PER_PROJECT=1
+			shift
+			;;
+		--combined)
+			RESULT_MODE="combined"
+			shift
+			;;
+		--per-path)
+			RESULT_MODE="per-path"
 			shift
 			;;
 		-f|--framework)
@@ -51,66 +60,121 @@ while [[ $# -gt 0 ]]; do
 			exit 1
 			;;
 		*)
-			DIR="$1"
+			DIRS+=("$1")
 			shift
 			;;
 	esac
 done
 
-if [ -z "$DIR" ]; then
-	DIR="."
+if [ ${#DIRS[@]} -eq 0 ]; then
+	DIRS=(".")
 fi
 
-export DETAILED VERBOSE PARSEABLE
+export DETAILED VERBOSE PARSEABLE RESULT_MODE
 
 source "$(dirname "$0")/../lib/analysis.sh"
+source "$(dirname "$0")/../lib/core/framework-detect.sh"
 
 if [ "$PER_PROJECT" -eq 1 ]; then
-    if [ -n "$FRAMEWORK" ] && [ "$FRAMEWORK" != "dart" ]; then
-        echo "Error: --per-project can only be used with the 'dart' framework." >&2
-        exit 1
-    fi
-
-    FRAMEWORK="dart"
-
+    # Framework-agnostic per-project mode
     if [ "$VERBOSE" = "1" ]; then
-        echo "[main] Running in per-project mode for Dart." >&2
+        echo "[main] Running in per-project mode (framework-agnostic)." >&2
     fi
 
-    find "$DIR" -name "pubspec.yaml" -print0 | while IFS= read -r -d $'\0' pubspec_file; do
-        project_dir=$(dirname "$pubspec_file")
-
-        if [ "$VERBOSE" = "1" ]; then
-            echo "[main] Analyzing Dart project at: '$project_dir'"
-            echo "[main] FRAMEWORK: $FRAMEWORK" >&2
-            echo "[main] DIR: $project_dir" >&2
-            echo "[main] DETAILED: $DETAILED" >&2
-        fi
-        
-        run_analysis "$project_dir" "$FRAMEWORK" "$PARSEABLE"
-        
+    # Process each directory for project discovery
+    for base_dir in "${DIRS[@]}"; do
+        # Find all framework marker files
+        while IFS= read -r -d $'\0' marker_file; do
+            project_dir=$(dirname "$marker_file")
+            
+            # Detect framework for this project
+            project_framework=$(detect_framework "$project_dir" "$VERBOSE" 2>/dev/null) || continue
+            
+            if [ "$VERBOSE" = "1" ]; then
+                echo "[main] Found $project_framework project at: '$project_dir'"
+            fi
+            
+            # Run with reporting (skip_report=0)
+            run_analysis "$project_dir" "$project_framework" "$PARSEABLE" 0
+            
+        done < <(find "$base_dir" \( -name "pubspec.yaml" -o -name "*.csproj" -o -name "package.json" \) -print0)
     done
     
     exit 0
 fi
 
-source "$(dirname "$0")/../lib/core/framework-detect.sh"
-
-if [ -z "$FRAMEWORK" ]; then
-	if [ "$VERBOSE" = "1" ]; then
-		echo "[main] No framework specified, attempting auto-detection..." >&2
-	fi
-	FRAMEWORK=$(detect_framework "$DIR" "$VERBOSE")
-	if [ $? -ne 0 ]; then
-		echo "Could not auto-detect framework. Please specify with -f." >&2
-		exit 1
-	fi
-fi
-
+# Multi-path analysis mode
 if [ "$VERBOSE" = "1" ]; then
-	echo "[main] FRAMEWORK: $FRAMEWORK" >&2
-	echo "[main] DIR: $DIR" >&2
-	echo "[main] DETAILED: $DETAILED" >&2
+    echo "[main] Analyzing ${#DIRS[@]} path(s) in $RESULT_MODE mode" >&2
 fi
 
-run_analysis "$DIR" "$FRAMEWORK" "$PARSEABLE"
+if [ "$RESULT_MODE" = "per-path" ]; then
+    # Per-path mode: Report after each path, clear results between paths
+    for dir in "${DIRS[@]}"; do
+        # Auto-detect framework if not specified
+        dir_framework="$FRAMEWORK"
+        if [ -z "$dir_framework" ]; then
+            if [ "$VERBOSE" = "1" ]; then
+                echo "[main] No framework specified for '$dir', attempting auto-detection..." >&2
+            fi
+            dir_framework=$(detect_framework "$dir" "$VERBOSE")
+            if [ $? -ne 0 ]; then
+                echo "Could not auto-detect framework for '$dir'. Please specify with -f." >&2
+                exit 1
+            fi
+        fi
+
+        if [ "$VERBOSE" = "1" ]; then
+            echo "[main] FRAMEWORK: $dir_framework" >&2
+            echo "[main] DIR: $dir" >&2
+            echo "[main] DETAILED: $DETAILED" >&2
+        fi
+        
+        # Clear results before each path (per-path mode)
+        clear_validation_results
+        
+        # Run analysis with reporting (skip_report=0)
+        run_analysis "$dir" "$dir_framework" "$PARSEABLE" 0
+        
+        # Print separator between paths
+        if [ ${#DIRS[@]} -gt 1 ]; then
+            echo ""
+            echo "=========================================="
+            echo ""
+        fi
+    done
+else
+    # Combined mode: Accumulate results across all paths, report once at the end
+    for dir in "${DIRS[@]}"; do
+        # Auto-detect framework if not specified
+        dir_framework="$FRAMEWORK"
+        if [ -z "$dir_framework" ]; then
+            if [ "$VERBOSE" = "1" ]; then
+                echo "[main] No framework specified for '$dir', attempting auto-detection..." >&2
+            fi
+            dir_framework=$(detect_framework "$dir" "$VERBOSE")
+            if [ $? -ne 0 ]; then
+                echo "Could not auto-detect framework for '$dir'. Please specify with -f." >&2
+                exit 1
+            fi
+        fi
+
+        if [ "$VERBOSE" = "1" ]; then
+            echo "[main] FRAMEWORK: $dir_framework" >&2
+            echo "[main] DIR: $dir" >&2
+            echo "[main] DETAILED: $DETAILED" >&2
+        fi
+        
+        # Run analysis without reporting (skip_report=1)
+        run_analysis "$dir" "$dir_framework" "$PARSEABLE" 1
+    done
+    
+    # Report combined results
+    if [ "$PARSEABLE" = "1" ]; then
+        print_validations_parseable
+    else
+        printf "\nIs my code great? "
+        print_summary
+        export_report
+    fi
+fi

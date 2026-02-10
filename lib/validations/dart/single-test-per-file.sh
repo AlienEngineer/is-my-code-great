@@ -1,8 +1,10 @@
 set -euo pipefail
 
-# Path to AWK script
-SINGLE_TEST_AWK="$(dirname "${BASH_SOURCE[0]}")/../../awk/find_single_test_files.awk"
-readonly SINGLE_TEST_AWK
+# Path to AWK script (conditional to avoid readonly errors on re-sourcing)
+if [ -z "${SINGLE_TEST_AWK:-}" ]; then
+    SINGLE_TEST_AWK="$(dirname "${BASH_SOURCE[0]}")/../../awk/find_single_test_files.awk"
+    readonly SINGLE_TEST_AWK
+fi
 
 find_single_test_in_files() {
   get_test_files \

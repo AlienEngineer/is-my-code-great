@@ -7,7 +7,21 @@ declare -a VALIDATION=()
 declare -a EXECUTION_TIME=()
 declare -a DETAILS=()
 declare -a CATEGORY=()
+declare -a PROJECT_PATH=()  # Tracks which path each validation came from
 declare -gA VALIDATION_INDEX=()  # Maps check_name -> array index for O(1) lookup
+
+# Clear all validation results (used in per-path mode or between analyses)
+function clear_validation_results() {
+    SEVERITY=()
+    COMMAND=()
+    TITLE=()
+    VALIDATION=()
+    EXECUTION_TIME=()
+    DETAILS=()
+    CATEGORY=()
+    PROJECT_PATH=()
+    VALIDATION_INDEX=()
+}
 
 # Validates that a function name contains only safe characters
 # Returns 0 if valid, 1 if invalid
@@ -91,6 +105,7 @@ function register_validation() {
     TITLE+=("$4")
     CATEGORY+=("$5")
     VALIDATION+=("$check_name")
+    PROJECT_PATH+=("${DIR:-}")  # Capture current directory being analyzed
 
     print_verbose "[builder] Executing validation: $check_name"
     
