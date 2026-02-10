@@ -23,12 +23,12 @@ _load_code_files_cache() {
 
 get_test_files() {
   _load_test_files_cache
-  printf '%s\n' "${TEST_FILES_CACHE[@]}"
+  printf '%s\0' "${TEST_FILES_CACHE[@]}"
 }
 
 get_code_files() {
   _load_code_files_cache
-  printf '%s\n' "${CODE_FILES_CACHE[@]}"
+  printf '%s\0' "${CODE_FILES_CACHE[@]}"
 }
 
 get_test_files_to_analyse() {

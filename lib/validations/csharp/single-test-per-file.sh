@@ -2,8 +2,8 @@ set -euo pipefail
 
 
 find_single_test_in_files() {
-  get_code_files \
-    | xargs grep -nE "\[TestMethod\]|\[Test\]|\[Fact\]|public[[:space:]]+(void|async[[:space:]]+Task(<[^>]+>)?)[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*\([^)]*\)" \
+  get_test_files \
+    | xargs -r0 grep -nE "\[TestMethod\]|\[Test\]|\[Fact\]|public[[:space:]]+(void|async[[:space:]]+Task(<[^>]+>)?)[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*\([^)]*\)" 2>/dev/null \
     | awk '
         function get_file(line) {
           split(line, parts, ":")

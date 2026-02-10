@@ -5,7 +5,7 @@ function count_too_many_arguments() {
     local count=0
     while read -r line; do
         count=$((count + 1))
-    done < <(get_code_files | xargs grep -En 'function\s+\w+\s*\([^)]*,[^)]*,[^)]*,[^)]*\)|const\s+\w+\s*=\s*\([^)]*,[^)]*,[^)]*,[^)]*\)\s*=>|=>\s*\([^)]*,[^)]*,[^)]*,[^)]*\)' 2>/dev/null)
+    done < <(get_code_files | xargs -0 grep -En 'function\s+\w+\s*\([^)]*,[^)]*,[^)]*,[^)]*\)|const\s+\w+\s*=\s*\([^)]*,[^)]*,[^)]*,[^)]*\)\s*=>|=>\s*\([^)]*,[^)]*,[^)]*,[^)]*\)' 2>/dev/null)
     echo "$count"
 }
 

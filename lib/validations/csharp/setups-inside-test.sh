@@ -3,8 +3,8 @@ set -euo pipefail
 
 
 find_setups_in_tests() {
-  get_code_files \
-    | xargs grep -nE '\[TestMethod\]|public[[:space:]]+(void|async[[:space:]]+Task(<[^>]+>)?)[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*\(\)|\{|\}|Setup\(' \
+  get_test_files \
+    | xargs -r0 grep -nE '\[TestMethod\]|public[[:space:]]+(void|async[[:space:]]+Task(<[^>]+>)?)[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*\(\)|\{|\}|Setup\(' 2>/dev/null \
     | awk '
     function get_line_number(line) {
       split(line, parts, ":")

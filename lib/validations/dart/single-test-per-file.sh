@@ -5,8 +5,8 @@ SINGLE_TEST_AWK="$(dirname "${BASH_SOURCE[0]}")/../../awk/find_single_test_files
 readonly SINGLE_TEST_AWK
 
 find_single_test_in_files() {
-  get_code_files \
-    | xargs grep -nE "test\(|testWidgets\(|testGoldens\(" \
+  get_test_files \
+    | xargs -r0 grep -nE "test\(|testWidgets\(|testGoldens\(" 2>/dev/null \
     | awk -f "$SINGLE_TEST_AWK"
 }
 

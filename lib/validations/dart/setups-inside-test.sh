@@ -5,8 +5,8 @@ set -euo pipefail
 find_when_in_tests() {
   local regex_pattern
   regex_pattern=$(get_test_function_pattern_names | tr ' ' '|')
-  get_code_files \
-    | xargs awk -v test_patterns="$regex_pattern" '
+  get_test_files \
+    | xargs -r0 awk -v test_patterns="$regex_pattern" '
     function get_line_number(line) {
       return NR
     }

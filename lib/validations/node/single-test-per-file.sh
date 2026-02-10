@@ -2,8 +2,8 @@ set -euo pipefail
 
 
 find_single_test_in_files() {
-  get_code_files \
-    | xargs grep -nE "test\(|testWidgets\(|testGoldens\(" \
+  get_test_files \
+    | xargs -r0 grep -nE "test\(|testWidgets\(|testGoldens\(" 2>/dev/null \
     | awk '
         function get_file(line) {
           split(line, parts, ":")

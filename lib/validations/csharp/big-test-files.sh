@@ -6,8 +6,8 @@ set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../core/constants.sh"
 
 find_big_functions() { 
-  get_code_files \
-    | xargs grep -nE '\[TestMethod\]|public[[:space:]]+(void|async[[:space:]]+Task(<[^>]+>)?)[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*\(\)|\{|\}' \
+  get_test_files \
+    | xargs -r0 grep -nE '\[TestMethod\]|public[[:space:]]+(void|async[[:space:]]+Task(<[^>]+>)?)[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*\(\)|\{|\}' 2>/dev/null \
     | awk -v max_lines="$MAX_TEST_LINES" '
     function report(file, name, start, end) {
       if (name != "" && end >= start && (end - start) > max_lines) {

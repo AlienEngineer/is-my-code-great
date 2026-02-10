@@ -5,7 +5,7 @@ function count_too_many_arguments() {
     local count=0
     while read -r line; do
         count=$((count + 1))
-    done < <(get_code_files | xargs grep -En '(public|private|protected|internal).*\([^)]*,[^)]*,[^)]*,[^)]*\)' 2>/dev/null | grep -v '//.*\([^)]*,[^)]*,[^)]*,[^)]*\)')
+    done < <(get_code_files | xargs -0 grep -En '(public|private|protected|internal).*\([^)]*,[^)]*,[^)]*,[^)]*\)' 2>/dev/null | grep -v '//.*\([^)]*,[^)]*,[^)]*,[^)]*\)')
     echo "$count"
 }
 

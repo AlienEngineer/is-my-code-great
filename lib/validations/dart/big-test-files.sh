@@ -10,8 +10,8 @@ BIG_TEST_AWK="$(dirname "${BASH_SOURCE[0]}")/../../awk/find_big_test_functions.a
 readonly BIG_TEST_AWK
 
 function find_big_functions() {  
-  get_code_files \
-    | xargs grep -nE 'test\('.*?',\s*\(\)( async)? \{|testWidgets\('.*?',\s*\(.*?\)( async)? \{|testGoldens\('.*?',\s*\(.*?\)( async)? \{|\}\);|.*?\(\(.*?\).*?\{' \
+  get_test_files \
+    | xargs -r0 grep -nE 'test\('.*?',\s*\(\)( async)? \{|testWidgets\('.*?',\s*\(.*?\)( async)? \{|testGoldens\('.*?',\s*\(.*?\)( async)? \{|\}\);|.*?\(\(.*?\).*?\{' 2>/dev/null \
     | awk -v max_lines="$MAX_TEST_LINES" -f "$BIG_TEST_AWK"
 }
 

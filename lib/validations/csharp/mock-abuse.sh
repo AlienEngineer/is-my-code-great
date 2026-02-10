@@ -3,8 +3,8 @@ set -euo pipefail
 
 
 find_mock_fields() {
-  get_code_files \
-    | xargs grep -nE 'Mock<|TestMethod\]|public[[:space:]]+(void|async[[:space:]]+Task(<[^>]+>)?)[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*\(\)|\{|\}' \
+  get_test_files \
+    | xargs -r0 grep -nE 'Mock<|TestMethod\]|public[[:space:]]+(void|async[[:space:]]+Task(<[^>]+>)?)[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*\(\)|\{|\}' 2>/dev/null \
     | awk '
     function get_line_number(line) {
       split(line, parts, ":")

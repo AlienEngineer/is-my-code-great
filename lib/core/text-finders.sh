@@ -17,12 +17,12 @@ _sum_results() {
         while IFS= read -r match; do
             add_details "$match"
             count=$((count+1))
-        done < <("$file_getter" | xargs -r grep "$flags" "$pattern" 2>/dev/null || true)
+        done < <("$file_getter" | xargs -r0 grep "$flags" "$pattern" 2>/dev/null || true)
         echo "$count"
     else
         # Count lines, defaulting to 0 if grep finds nothing
         local count
-        count=$("$file_getter" | xargs -r grep "$flags" "$pattern" 2>/dev/null | wc -l)
+        count=$("$file_getter" | xargs -r0 grep "$flags" "$pattern" 2>/dev/null | wc -l)
         # Trim whitespace and handle empty/error cases
         count="${count// /}"
         echo "${count:-0}"

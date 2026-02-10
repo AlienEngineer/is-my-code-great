@@ -4,7 +4,7 @@ set -euo pipefail
 
 get_find_by_key_lines() {
   get_test_files \
-    | xargs grep -nE "expect\(find.byKey\(" \
+    | xargs -0 grep -nE "expect\(find.byKey\(" 2>/dev/null \
     | awk '
     {
       printf("%s:%d: %s\n", file, NR ,$0)
