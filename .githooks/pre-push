@@ -1,0 +1,27 @@
+#!/bin/bash
+# Pre-push git hook to run shellcheck on all bash scripts
+
+set -e
+
+echo "Running shellcheck on bash scripts..."
+
+# Find all shell scripts and run shellcheck
+SCRIPTS=$(find . -type f \( -name "*.sh" -o -path "*/bin/*" \) -not -path "./.git/*" -not -path "./tmp/*")
+
+FAILED=0
+
+for script in $SCRIPTS; do
+    echo "Checking: $script"
+    if ! shellcheck "$script"; then
+        FAILED=1
+        echo "Error: ShellCheck found issues in $script"
+    fi
+done
+
+if [ $FAILED -eq 1 ]; then
+    echo "Error: ShellCheck found issues in one or more scripts"
+    exit 1
+fi
+
+echo "✅ All shellcheck validations passed!"
+exit 0

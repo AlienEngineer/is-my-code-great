@@ -19,7 +19,7 @@ function print_combined_summary() {
     # Get unique paths
     local -a unique_paths=()
     for path in "${PROJECT_PATH[@]}"; do
-        if [[ ! " ${unique_paths[*]} " =~ " ${path} " ]]; then
+        if [[ ! " ${unique_paths[*]} " =~ \ ${path}\  ]]; then
             unique_paths+=("$path")
         fi
     done
@@ -104,7 +104,7 @@ function print_per_path_summary() {
     # Get unique paths in order of appearance
     local -a unique_paths=()
     for path in "${PROJECT_PATH[@]}"; do
-        if [[ ! " ${unique_paths[*]} " =~ " ${path} " ]]; then
+        if [[ ! " ${unique_paths[*]} " =~ \ ${path}\  ]]; then
             unique_paths+=("$path")
         fi
     done
