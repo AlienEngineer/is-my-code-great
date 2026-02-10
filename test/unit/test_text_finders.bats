@@ -53,14 +53,14 @@ teardown() {
     rm -rf "$TEST_DIR"
 }
 
-# Helper function to mock get_test_files
+# Helper function to mock get_test_files (returns null-terminated output)
 get_test_files() {
-    find "$TEST_DIR" -name "*test*.dart" 2>/dev/null
+    find "$TEST_DIR" -name "*test*.dart" -print0 2>/dev/null
 }
 
-# Helper function to mock get_code_files
+# Helper function to mock get_code_files (returns null-terminated output)
 get_code_files() {
-    find "$TEST_DIR" -name "*.dart" ! -name "*test*" 2>/dev/null
+    find "$TEST_DIR" -name "*.dart" ! -name "*test*" -print0 2>/dev/null
 }
 
 # Export for subprocess visibility

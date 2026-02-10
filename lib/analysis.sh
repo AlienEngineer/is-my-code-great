@@ -106,19 +106,45 @@ _report_results() {
 }
 
 run_analysis() {
-    # shellcheck disable=SC2153
+    # Accept parameters or fall back to environment variables for backward compatibility
+    local dir="${1:-${DIR:-}}"
+    local framework="${2:-${FRAMEWORK:-}}"
+    local parseable="${3:-${PARSEABLE:-0}}"
+    local skip_report="${4:-0}"  # Optional: skip reporting (for multi-path combined mode)
+    
+    # Validate required parameters
+    if [ -z "$dir" ]; then
+        echo "Error: Directory required (pass as parameter or set DIR environment variable)" >&2
+        return 1
+    fi
+    if [ -z "$framework" ]; then
+        echo "Error: Framework required (pass as parameter or set FRAMEWORK environment variable)" >&2
+        return 1
+    fi
+    
+    # Export for downstream modules that expect these as environment variables
+    export DIR="$dir"
+    export FRAMEWORK="$framework"
+    export PARSEABLE="$parseable"
+    
     if [ ! -d "$DIR" ]; then
         echo "Directory $DIR does not exist." >&2
         return 1
     fi
     
-    # shellcheck disable=SC2153
     _source_framework_config "$FRAMEWORK" || return 1
     _source_core_utilities || return 1
-    # shellcheck disable=SC2153
+    
+    # Clear file caches at the start of each analysis
+    # (clear_file_caches is defined in files.sh which was just sourced)
+    clear_file_caches
+    
     _load_validations "$FRAMEWORK" || return 1
-    # shellcheck disable=SC2153
-    _report_results "$PARSEABLE" || return 1
+    
+    # Only report if not skipped (combined mode will report at the end)
+    if [ "$skip_report" = "0" ]; then
+        _report_results "$PARSEABLE" || return 1
+    fi
     
     return 0
 }

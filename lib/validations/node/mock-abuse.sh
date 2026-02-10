@@ -3,10 +3,10 @@ set -euo pipefail
 
 
 find_mock_declarations() {
-  local files
-  files=$(get_test_files) || return 1
+  local -a files
+  mapfile -d '' -t files < <(get_test_files)
   
-  while IFS= read -r file; do
+  for file in "${files[@]}"; do
     [[ -f "$file" ]] || continue
     awk -v file="$file" '
     function reset_test_block(){ in_test=0; depth=0 }
@@ -50,7 +50,7 @@ find_mock_declarations() {
     }
     END { }
     ' "$file"
-  done < <(printf '%s\n' "$files") | sort -u
+  done | sort -u
 }
 
 function count_mock_declarations() {

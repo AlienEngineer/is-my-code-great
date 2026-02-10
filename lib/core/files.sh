@@ -9,6 +9,13 @@ declare -a CODE_FILES_CACHE=()
 TEST_FILES_CACHE_READY=false
 CODE_FILES_CACHE_READY=false
 
+clear_file_caches() {
+  TEST_FILES_CACHE=()
+  CODE_FILES_CACHE=()
+  TEST_FILES_CACHE_READY=false
+  CODE_FILES_CACHE_READY=false
+}
+
 _load_test_files_cache() {
   $TEST_FILES_CACHE_READY && return 0
   mapfile -d '' -t TEST_FILES_CACHE < <(find "$DIR" -type f -name "$TEST_FILE_PATTERN" -print0)

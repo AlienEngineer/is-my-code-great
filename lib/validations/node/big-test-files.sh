@@ -52,14 +52,14 @@ find_big_tests_in_file() {
 }
 
 find_big_functions() {  
-  local files
-  files=$(get_test_files) || return 1
+  local -a files
+  mapfile -d '' -t files < <(get_test_files)
   
   # Safely iterate over files, handling spaces and special characters
-  while IFS= read -r file; do
+  for file in "${files[@]}"; do
     [[ -f "$file" ]] || continue
     find_big_tests_in_file "$file"
-  done < <(printf '%s\n' "$files") | sort -u
+  done | sort -u
 }
 
 function count_big_test_methods() {

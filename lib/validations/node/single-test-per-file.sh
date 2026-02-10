@@ -43,11 +43,11 @@ find_single_test_in_files() {
 }
 
 function get_count_test_per_file() {
-  local files
-  files="$(get_test_files)"
+  local -a files
+  mapfile -d '' -t files < <(get_test_files)
 
   local total=0
-  for file in $files; do
+  for file in "${files[@]}"; do
     [[ -f "$file" ]] || continue
     local c=0
     for pattern in "${TEST_FUNCTION_PATTERNS[@]}"; do
