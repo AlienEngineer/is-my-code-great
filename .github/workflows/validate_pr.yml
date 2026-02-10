@@ -56,18 +56,6 @@ jobs:
     - name: Print bash version
       run: bash --version
 
-    - name: Run local is-my-code-great for dart (debug)
-      run: bin/is-my-code-great -f dart -v
-
-    - name: Run local is-my-code-great for csharp (debug)
-      run: bin/is-my-code-great -f csharp -v
-
-    - name: Run git diff is-my-code-great for dart (debug)
-      run: bin/is-my-code-great -f dart -v -b main
-
-    - name: Run git diff is-my-code-great for csharp (debug)
-      run: bin/is-my-code-great -f csharp -v -b main
-
     - name: Run validation on all example languages
       id: validate_examples
       run: |
