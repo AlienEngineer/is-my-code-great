@@ -9,6 +9,7 @@ Command-line tool to verify code quality and test patterns. Supports Dart, C#, a
       uses: alienengineer/is-my-code-great@v0
       with:
         verbose: true       # Optional, set to true for detailed output
+        path: "."           # Optional, sets the path to analyze
 ```
 
 ## Install
