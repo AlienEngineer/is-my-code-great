@@ -6,6 +6,10 @@ inputs:
     description: "Enable verbose output"
     required: false
     default: "false"
+  path:
+    description: "Path to run validation on (defaults to current directory)"
+    required: false
+    default: "."
 
 runs:
   using: "composite"
@@ -17,8 +21,7 @@ runs:
         if [[ "${{ inputs.verbose }}" == "true" ]]; then
           VERBOSE_FLAG="-v"
         fi
-        
-        ${{ github.action_path }}/bin/is-my-code-great $VERBOSE_FLAG > results.txt
+        ${{ github.action_path }}/bin/is-my-code-great ${{ inputs.path }} $VERBOSE_FLAG > results.txt
         echo "VALIDATION_OUTPUT<<EOF" >> $GITHUB_ENV
         cat results.txt >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
