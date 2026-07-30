@@ -96,78 +96,11 @@ jobs:
           echo "Some validations failed!"
         fi
 
-    - name: Comment PR with validation results
-      uses: actions/github-script@v7
-      if: always() # This ensures the comment is always posted, even if the job fails early
-      with:
-        script: |
-          const { owner, repo } = context.repo;
-          const issue_number = context.issue.number;
-          const job_status = '${{ job.status }}';
-          const validation_step_outcome = '${{ steps.validate_examples.outcome }}';
-          const commentIdentifier = "<!-- GHA VALIDATION RESULTS -->";
-          const fs = require('fs');
-
-          let commentBody;
-          const isSuccess = job_status === 'success';
-
-          if (isSuccess) {
-            commentBody = `## ✅ Validation Results - PASSED
-
-          ${commentIdentifier}
-
-          All validation tests passed successfully! 🎉`;
-          } else {
-            let errorDetails = 'An unexpected error occurred.';
-            if (validation_step_outcome === 'failure') {
-              if (fs.existsSync('combined_output.txt')) {
-                errorDetails = fs.readFileSync('combined_output.txt', 'utf8');
-              } else {
-                errorDetails = 'Validation failed, but no output file was generated.';
-              }
-            }
-            
-            commentBody = `## ❌ Validation Results - FAILED
-
-          ${commentIdentifier}
-
-          <details>
-          <summary>Click to see detailed failure results</summary>
-
-          \ 
-          \ 
-          ${errorDetails}
-          \ 
-          \ 
-
-          </details>
-
-          ⚠️ Some validation tests failed. Please review the results above and fix any issues.`;
-          }
-
-          const { data: comments } = await github.rest.issues.listComments({
-            owner,
-            repo,
-            issue_number,
-          });
-
-          const existingComment = comments.find(c => c.body.includes(commentIdentifier));
-
-          if (existingComment) {
-            await github.rest.issues.updateComment({
-              owner,
-              repo,
-              comment_id: existingComment.id,
-              body: commentBody,
-            });
-          } else {
-            await github.rest.issues.createComment({
-              owner,
-              repo,
-              issue_number,
-              body: commentBody,
-            });
-          }
+    - name: Save PR metadata for comment workflow
+      if: always()
+      run: |
+        echo "${{ github.event.pull_request.number }}" > pr_number.txt
+        echo "${{ steps.validate_examples.outputs.validation_success }}" > validation_success.txt
 
     - name: Fail job if validation failed
       if: steps.validate_examples.outputs.validation_success == 'false'
@@ -182,4 +115,6 @@ jobs:
         path: |
           validation_*_output.txt
           combined_output.txt
+          pr_number.txt
+          validation_success.txt
         retention-days: 7
