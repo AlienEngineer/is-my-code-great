@@ -8,7 +8,7 @@ fi
 
 find_single_test_in_files() {
   get_test_files \
-    | xargs -r0 grep -nE "test\(|testWidgets\(|testGoldens\(" 2>/dev/null \
+    | xargs -r0 grep -nHE "test\(|testWidgets\(|testGoldens\(" 2>/dev/null \
     | awk -f "$SINGLE_TEST_AWK"
 }
 
