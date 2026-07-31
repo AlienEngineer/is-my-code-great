@@ -136,6 +136,7 @@ function export_report() {
             <div class='card-content'>
 "
         get_execution_details "$validation" | while read -r detail; do
+            [[ -z "$detail" ]] && continue
             file="${detail%%:*}"
             rest="${detail#*:}"
             linenum="${rest%%:*}"
@@ -178,6 +179,7 @@ function export_report() {
             <div class='card-content'>
 "
         get_execution_details "$validation" | while read -r detail; do
+            [[ -z "$detail" ]] && continue
             file="${detail%%:*}"
             rest="${detail#*:}"
             linenum="${rest%%:*}"
