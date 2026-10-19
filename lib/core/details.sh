@@ -1,19 +1,16 @@
 set -euo pipefail
 
-
-declare -gA VALIDATION_DETAILS
+RESULT_DETAILS="$(mktemp)"
+trap 'rm -f "$RESULT_DETAILS"' EXIT
 
 function add_details() {
-    local check_name="${CURRENT_CHECK_NAME:-unknown}"
-    VALIDATION_DETAILS["$check_name"]+="${1}"$'\n'
+    echo "$1" >> "$RESULT_DETAILS"
 }
 
 function get_details(){
-    local check_name="${CURRENT_CHECK_NAME:-unknown}"
-    printf '%s' "${VALIDATION_DETAILS[$check_name]}"
+    cat "$RESULT_DETAILS"
 }
 
 function start_new_evaluation_details() {
-    # Clear all details (called at start of analysis)
-    VALIDATION_DETAILS=()
+    : > "$RESULT_DETAILS"
 }

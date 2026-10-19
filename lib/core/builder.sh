@@ -97,18 +97,9 @@ function register_validation() {
     if ! _verify_function_exists "$command"; then
         return 1
     fi
-    
-    # Store index for O(1) lookup (VALIDATION_INDEX maps name -> array index)
-    VALIDATION_INDEX["$check_name"]="${#VALIDATION[@]}"
-    
-    SEVERITY+=("$2")
-    TITLE+=("$4")
-    CATEGORY+=("$5")
-    VALIDATION+=("$check_name")
-    PROJECT_PATH+=("${DIR:-}")  # Capture current directory being analyzed
 
     print_verbose "[builder] Executing validation: $check_name"
-    
+
     # Set context for details collection (CURRENT_CHECK_NAME used by add_details)
     export CURRENT_CHECK_NAME="$check_name"
     start_new_evaluation_details
@@ -126,11 +117,33 @@ function register_validation() {
     local details
     details=$(get_details)
 
-    DETAILS+=("$details")
-    COMMAND+=("$result")
-
     elapsed=$((($(date +%s%N) - start) / 1000000))
-    EXECUTION_TIME+=("$elapsed")
+
+    # In combined mode the same check_name is registered once per directory.
+    # Accumulate count + details into the existing entry instead of duplicating.
+    if [[ -n "${VALIDATION_INDEX[$check_name]+_}" ]]; then
+        local idx="${VALIDATION_INDEX[$check_name]}"
+        COMMAND[$idx]=$((COMMAND[$idx] + result))
+        EXECUTION_TIME[$idx]=$((EXECUTION_TIME[$idx] + elapsed))
+        if [[ -n "$details" ]]; then
+            if [[ -n "${DETAILS[$idx]}" ]]; then
+                DETAILS[$idx]="${DETAILS[$idx]}"$'\n'"$details"
+            else
+                DETAILS[$idx]="$details"
+            fi
+        fi
+    else
+        # First time seeing this check — register a new entry.
+        VALIDATION_INDEX["$check_name"]="${#VALIDATION[@]}"
+        SEVERITY+=("$2")
+        TITLE+=("$4")
+        CATEGORY+=("$5")
+        VALIDATION+=("$check_name")
+        PROJECT_PATH+=("${DIR:-}")
+        COMMAND+=("$result")
+        DETAILS+=("$details")
+        EXECUTION_TIME+=("$elapsed")
+    fi
 
     print_verbose "[builder] Validation '$check_name' executed in $elapsed ms with result: $result"
 }
